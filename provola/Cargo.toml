@@ -1,0 +1,11 @@
+[package]
+name = "provola-cli"
+version = "0.1.0"
+authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
+edition = "2018"
+
+[dependencies]
+log = "*"
+provola-core = { path = "../provola-core" }
+strum = "*"
+strum_macros = "*"

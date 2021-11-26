@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+  "provola",
+  "provola-core",
+]
