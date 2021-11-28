@@ -1,6 +1,6 @@
 use std::{fmt::Display, str::FromStr};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Language {
     Ada,
     Bash,

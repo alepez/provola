@@ -29,9 +29,9 @@ impl From<&Opt> for Actions {
     fn from(opt: &Opt) -> Self {
         let mut actions = Vec::new();
 
-        if let Some(source) = &opt.source {
+        if let (Some(lang), Some(source)) = (opt.lang, &opt.source) {
             let source = Source::new(source.clone());
-            actions.push(Action::Build(source));
+            actions.push(Action::Build(lang, source));
         }
 
         if let (Some(input), Some(output)) = (&opt.input, &opt.output) {

@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+use crate::Language;
+
 #[derive(Debug)]
 pub struct Source(PathBuf);
 
@@ -29,7 +31,7 @@ impl TestDataOut {
 
 #[derive(Debug)]
 pub enum Action {
-    Build(Source),
+    Build(Language, Source),
     TestInputOutput(TestDataIn, TestDataOut),
 }
 
