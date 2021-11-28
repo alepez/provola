@@ -7,5 +7,3 @@ edition = "2018"
 [dependencies]
 log = "*"
 provola-core = { path = "../provola-core" }
-strum = "*"
-strum_macros = "*"
