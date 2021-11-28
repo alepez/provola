@@ -1,4 +1,4 @@
-use provola_core::lang::Language;
+use provola_core::{Action, Actions, Language};
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -20,9 +20,30 @@ struct Opt {
     /// Language
     #[structopt(short, long)]
     lang: Option<Language>,
+    /// Source code
+    #[structopt(short, long)]
+    source: Option<PathBuf>,
+}
+
+impl From<&Opt> for Actions {
+    fn from(opt: &Opt) -> Self {
+        let mut actions = Vec::new();
+
+        if opt.source.is_some() {
+            actions.push(Action::Build);
+        }
+
+        if opt.input.is_some() && opt.output.is_some() {
+            actions.push(Action::TestInputOutput);
+        }
+
+        Actions(actions)
+    }
 }
 
 fn main() {
     let opt = Opt::from_args();
+    let actions = Actions::from(&opt);
     println!("{:?}", opt);
+    println!("{:?}", actions);
 }
