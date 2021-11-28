@@ -1,4 +1,4 @@
-use provola_core::{Action, Actions, Language};
+use provola_core::*;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -29,12 +29,15 @@ impl From<&Opt> for Actions {
     fn from(opt: &Opt) -> Self {
         let mut actions = Vec::new();
 
-        if opt.source.is_some() {
-            actions.push(Action::Build);
+        if let Some(source) = &opt.source {
+            let source = Source::new(source.clone());
+            actions.push(Action::Build(source));
         }
 
-        if opt.input.is_some() && opt.output.is_some() {
-            actions.push(Action::TestInputOutput);
+        if let (Some(input), Some(output)) = (&opt.input, &opt.output) {
+            let input = TestDataIn::new(input.clone());
+            let output = TestDataOut::new(output.clone());
+            actions.push(Action::TestInputOutput(input, output));
         }
 
         Actions(actions)
