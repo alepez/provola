@@ -24,3 +24,7 @@ pub(crate) fn build(source: &Source, gen_command: CommandGenerator) -> Result<Ex
         Err(Error::BuildFailed(msg))
     }
 }
+
+pub(crate) fn interpret(source: &Source, interpreter: impl ToString) -> Result<Executable, Error> {
+    Ok(Executable::interpreted(interpreter.to_string(), source))
+}
