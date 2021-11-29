@@ -1,5 +1,6 @@
 mod rust;
 mod haskell;
+mod common;
 
 use std::path::PathBuf;
 
