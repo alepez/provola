@@ -16,23 +16,31 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Build
       run: cargo build --verbose
+
     - name: Test
       run: cargo test --verbose
+
     - name: Clippy
-      uses: actions-rs/clippy-check@v1.0.7
+      uses: actions-rs/clippy-check@v1
       with:
         toolchain: stable
+        token: ${{ secrets.GITHUB_TOKEN }}
+        args: --all-features
+
     - name: Code coverage
       uses: actions-rs/tarpaulin@v0.1.0
       with:
         version: '0.18.5'
         args: -- -Z unstable-options --include-ignored
+
     - name: Upload to codecov.io
       uses: codecov/codecov-action@v1.0.2
       with:
         token: ${{secrets.CODECOV_TOKEN}}
+
     - name: Archive code coverage results
       uses: actions/upload-artifact@v1
       with:
