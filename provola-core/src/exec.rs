@@ -7,7 +7,7 @@ use crate::{build::gen_executable, Language, Source};
 pub struct Executable(PathBuf);
 
 impl TryFrom<(Language, &Source)> for Executable {
-    type Error = Box<dyn std::error::Error>;
+    type Error = crate::Error;
 
     fn try_from(x: (Language, &Source)) -> Result<Self, Self::Error> {
         let (lang, source) = x;
