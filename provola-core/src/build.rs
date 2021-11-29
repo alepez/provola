@@ -1,28 +1,25 @@
 use std::path::PathBuf;
+use std::process::Command;
 use std::process::Output;
 
 use crate::actions::Source;
 use crate::errors::Error;
 use crate::lang::Language;
 
-pub fn gen_executable(
-    lang: Language,
-    source: &Source,
-) -> Result<PathBuf, Box<dyn std::error::Error>> {
+pub fn gen_executable(lang: Language, source: &Source) -> Result<PathBuf, Error> {
     match lang {
         Language::Rust => build_rust(source),
         _ => todo!(),
     }
 }
 
-fn make_build_rust_command(exec: &PathBuf, source: &Source) -> std::process::Command {
-    use std::process::Command;
+fn make_build_rust_command(exec: &PathBuf, source: &Source) -> Command {
     let mut cmd = Command::new("rustc");
     cmd.arg(&source.0).arg("-o").arg(exec);
     cmd
 }
 
-fn build_rust(source: &Source) -> Result<PathBuf, Box<dyn std::error::Error>> {
+fn build_rust(source: &Source) -> Result<PathBuf, Error> {
     let exec = PathBuf::from("./tmp.exe");
     let mut cmd = make_build_rust_command(&exec, source);
     log::info!("Running {:?}", cmd);
@@ -35,6 +32,6 @@ fn build_rust(source: &Source) -> Result<PathBuf, Box<dyn std::error::Error>> {
     } else {
         let msg = format!("Cannot build executable with command {:?}: {}", cmd, stderr);
         log::error!("{}", &msg);
-        Err(Box::new(Error::BuildFailed(msg)))
+        Err(Error::BuildFailed(msg))
     }
 }
