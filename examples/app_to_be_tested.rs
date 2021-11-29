@@ -1,3 +1,3 @@
 fn main() {
-    println!("dcba");
+    print!("dcba");
 }
