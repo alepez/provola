@@ -1,9 +1,10 @@
 mod actions;
 mod build;
+mod errors;
 mod exec;
 mod lang;
+mod reporter;
 mod result;
-mod errors;
 pub mod test;
 
 pub use actions::Action;
@@ -11,7 +12,9 @@ pub use actions::Actions;
 pub use actions::Source;
 pub use actions::TestDataIn;
 pub use actions::TestDataOut;
+pub use errors::Error;
 pub use exec::Executable;
 pub use lang::Language;
 pub use result::TestResult;
-pub use errors::Error;
+pub use reporter::Reporter;
+pub use reporter::SimpleReporter;

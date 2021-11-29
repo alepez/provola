@@ -49,9 +49,9 @@ fn main() {
 
     let opt = Opt::from_args();
     let actions = Actions::from(&opt);
-    log::info!("{:?}", opt);
-    log::info!("{:?}", actions);
 
     let result = actions.run().unwrap();
-    log::info!("{:?}", result);
+
+    let reporter = SimpleReporter::new();
+    reporter.report(result);
 }
