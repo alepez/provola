@@ -1,4 +1,4 @@
-use std::{convert::TryInto, io::Read, path::PathBuf};
+use std::{convert::TryFrom, io::Read, path::PathBuf};
 
 use crate::Language;
 
@@ -23,11 +23,11 @@ impl TestDataIn {
     }
 }
 
-impl TryInto<std::fs::File> for &TestDataIn {
+impl TryFrom<&TestDataIn> for std::fs::File {
     type Error = std::io::Error;
 
-    fn try_into(self) -> Result<std::fs::File, Self::Error> {
-        std::fs::File::open(&self.0)
+    fn try_from(x: &TestDataIn) -> Result<Self, Self::Error> {
+        std::fs::File::open(&x.0)
     }
 }
 
@@ -40,20 +40,20 @@ impl TestDataOut {
     }
 }
 
-impl TryInto<std::fs::File> for &TestDataOut {
+impl TryFrom<&TestDataOut> for std::fs::File {
     type Error = std::io::Error;
 
-    fn try_into(self) -> Result<std::fs::File, Self::Error> {
-        std::fs::File::open(&self.0)
+    fn try_from(x: &TestDataOut) -> Result<std::fs::File, Self::Error> {
+        std::fs::File::open(&x.0)
     }
 }
 
-impl TryInto<String> for &TestDataOut {
+impl TryFrom<&TestDataOut> for String {
     type Error = std::io::Error;
 
-    fn try_into(self) -> Result<String, Self::Error> {
+    fn try_from(x: &TestDataOut) -> Result<String, Self::Error> {
         let mut content = String::new();
-        let mut file: std::fs::File = self.try_into()?;
+        let mut file = std::fs::File::try_from(x)?;
         file.read_to_string(&mut content)?;
         Ok(content)
     }
