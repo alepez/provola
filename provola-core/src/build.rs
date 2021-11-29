@@ -1,6 +1,8 @@
 use std::path::PathBuf;
+use std::process::Output;
 
 use crate::actions::Source;
+use crate::errors::Error;
 use crate::lang::Language;
 
 pub fn gen_executable(
@@ -24,6 +26,12 @@ fn build_rust(source: &Source) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let exec = PathBuf::from("./tmp.exe");
     let mut cmd = make_build_rust_command(&exec, source);
     log::info!("Running {:?}", cmd);
-    cmd.output()?;
-    Ok(exec)
+    let Output { status, .. } = cmd.output()?;
+
+    if status.success() {
+        Ok(exec)
+    } else {
+        log::error!("Cannot build executable with command {:?}", cmd);
+        Err(Box::new(Error::NoExecutable))
+    }
 }

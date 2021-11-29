@@ -4,4 +4,6 @@ pub enum Error {
     NoResult,
     #[error("no executable available")]
     NoExecutable,
+    #[error("cannot read input file")]
+    NoInputFile(#[from] std::io::Error),
 }
