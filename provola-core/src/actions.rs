@@ -20,10 +20,10 @@ impl TestDataIn {
 }
 
 impl TryFrom<&TestDataIn> for std::fs::File {
-    type Error = std::io::Error;
+    type Error = Error;
 
     fn try_from(x: &TestDataIn) -> Result<Self, Self::Error> {
-        std::fs::File::open(&x.0)
+        std::fs::File::open(&x.0).map_err(|e| Error::InvalidInputData(e))
     }
 }
 
@@ -37,15 +37,15 @@ impl TestDataOut {
 }
 
 impl TryFrom<&TestDataOut> for std::fs::File {
-    type Error = std::io::Error;
+    type Error = Error;
 
     fn try_from(x: &TestDataOut) -> Result<std::fs::File, Self::Error> {
-        std::fs::File::open(&x.0)
+        std::fs::File::open(&x.0).map_err(|e| Error::InvalidOutputData(e))
     }
 }
 
 impl TryFrom<&TestDataOut> for String {
-    type Error = std::io::Error;
+    type Error = Error;
 
     fn try_from(x: &TestDataOut) -> Result<String, Self::Error> {
         let mut content = String::new();

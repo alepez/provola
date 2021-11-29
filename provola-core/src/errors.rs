@@ -12,4 +12,8 @@ pub enum Error {
     LangNotSupported(String),
     #[error("cannot execute")]
     ExecError(#[from] subprocess::PopenError),
+    #[error(transparent)]
+    InvalidInputData(std::io::Error),
+    #[error(transparent)]
+    InvalidOutputData(std::io::Error),
 }
