@@ -1,4 +1,4 @@
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, path::Path, str::FromStr};
 
 #[derive(Debug, Copy, Clone)]
 pub enum Language {
@@ -110,5 +110,20 @@ impl Display for Language {
         };
 
         write!(f, "{}", s)
+    }
+}
+
+impl Language {
+    pub fn from_source(source: &Path) -> Option<Language> {
+        source
+            .extension()
+            .and_then(|x| x.to_str())
+            .and_then(|ext| match ext {
+                "sh" => Some(Language::Bash),
+                "c" => Some(Language::C),
+                "cpp" | "cxx" | "c++" => Some(Language::CPlusPlus),
+                "hs" => Some(Language::Haskell),
+                _ => None,
+            })
     }
 }
