@@ -82,8 +82,6 @@ impl Actions {
             }
         }
 
-        log::info!("{:?}", result);
-
         if let Some(result) = result {
             Ok(result)
         } else {
