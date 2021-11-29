@@ -14,8 +14,9 @@ impl SimpleReporter {
 
 impl Reporter for SimpleReporter {
     fn report(&self, result: TestResult) {
-        if let TestResult::Fail(_) = result {
-            println!("FAIL");
+        if let TestResult::Fail(reason) = result {
+            println!("FAIL\n");
+            println!("{}", reason);
         } else {
             println!("PASS");
         }
