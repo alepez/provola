@@ -1,5 +1,8 @@
 use provola_core::*;
-use std::{convert::TryInto, path::PathBuf};
+use std::{
+    convert::{TryFrom, TryInto},
+    path::PathBuf,
+};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -44,28 +47,19 @@ impl From<&Opt> for Actions {
     }
 }
 
-fn make_build_rust_command(source: &Source) -> std::process::Command {
-    use std::process::Command;
-    let mut cmd = Command::new("rustc");
-    cmd.arg(&source.0).arg("-o").arg("tmp.exe");
-    cmd
-}
-
-fn build_rust(source: &Source) -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = make_build_rust_command(source);
-    log::info!("Running {:?}", cmd);
-    cmd.output()?;
-    Ok(())
-}
-
 fn test_input_output(
+    executable: &Executable,
     input: &TestDataIn,
     output: &TestDataOut,
 ) -> Result<TestResult, Box<dyn std::error::Error>> {
     use subprocess::*;
 
+    let path = executable.path();
+
+    log::debug!("Executing {:?}", path);
+
     let mut p = Popen::create(
-        &["./tmp.exe"],
+        &[path],
         PopenConfig {
             stdin: Redirection::File(input.try_into()?),
             stdout: Redirection::Pipe,
@@ -98,15 +92,18 @@ fn test_input_output(
 
 fn run_actions(actions: &Actions) -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Run actions");
+
+    let mut executable: Option<Executable> = Default::default();
+
     for action in actions.0.iter() {
         match action {
-            Action::Build(Language::Rust, source) => {
-                build_rust(source)?;
+            Action::Build(lang, source) => {
+                executable = Some(Executable::try_from((*lang, source))?);
             }
             Action::TestInputOutput(input, output) => {
-                test_input_output(input, output)?;
+                let executable = executable.as_ref().expect("No executable");
+                test_input_output(&executable, input, output)?;
             }
-            _ => todo!(),
         }
     }
 

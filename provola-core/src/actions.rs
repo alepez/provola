@@ -12,9 +12,6 @@ impl Source {
 }
 
 #[derive(Debug)]
-pub struct Executable(PathBuf);
-
-#[derive(Debug)]
 pub struct TestDataIn(PathBuf);
 
 impl TestDataIn {
