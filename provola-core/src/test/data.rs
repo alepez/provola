@@ -12,11 +12,17 @@ pub fn test(
 
     log::debug!("Executing {:?}", path);
 
+    // Read from file
+    let stdin = Redirection::File(input.try_into()?);
+
+    // Intercept output, so we can compare it later
+    let stdout = Redirection::Pipe;
+
     let mut p = Popen::create(
         &[path],
         PopenConfig {
-            stdin: Redirection::File(input.try_into()?),
-            stdout: Redirection::Pipe,
+            stdin,
+            stdout,
             ..Default::default()
         },
     )?;
