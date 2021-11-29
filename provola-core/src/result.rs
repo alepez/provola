@@ -5,12 +5,12 @@ pub enum TestResult {
 }
 
 #[derive(Debug)]
-pub struct Reason {
-    text: String,
+pub enum Reason {
+    Generic(String),
 }
 
 impl From<String> for Reason {
     fn from(text: String) -> Self {
-        Reason { text }
+        Reason::Generic(text)
     }
 }
