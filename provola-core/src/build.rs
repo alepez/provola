@@ -26,12 +26,15 @@ fn build_rust(source: &Source) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let exec = PathBuf::from("./tmp.exe");
     let mut cmd = make_build_rust_command(&exec, source);
     log::info!("Running {:?}", cmd);
-    let Output { status, .. } = cmd.output()?;
+    let Output { status, stderr, .. } = cmd.output()?;
+
+    let stderr = String::from_utf8(stderr).unwrap_or_default();
 
     if status.success() {
         Ok(exec)
     } else {
-        log::error!("Cannot build executable with command {:?}", cmd);
-        Err(Box::new(Error::NoExecutable))
+        let msg = format!("Cannot build executable with command {:?}: {}", cmd, stderr);
+        log::error!("{}", &msg);
+        Err(Box::new(Error::BuildFailed(msg)))
     }
 }
