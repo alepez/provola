@@ -4,6 +4,7 @@ pub trait Reporter {
     fn report(&self, result: TestResult);
 }
 
+#[derive(Default)]
 pub struct SimpleReporter;
 
 impl SimpleReporter {

@@ -1,5 +1,5 @@
-use std::{convert::TryFrom, path::Path};
 use std::path::PathBuf;
+use std::{convert::TryFrom, path::Path};
 
 use crate::{build::gen_executable, Language, Source};
 
@@ -29,9 +29,9 @@ fn path_to_string(path: &Path) -> String {
     path.as_os_str().to_str().unwrap().to_string()
 }
 
-impl Into<Vec<String>> for &Executable {
-    fn into(self) -> Vec<String> {
-        match &self {
+impl From<&Executable> for Vec<String> {
+    fn from(exec: &Executable) -> Self {
+        match &exec {
             Executable::Simple(path) => vec![path_to_string(path)],
             &Executable::Multiple(x) => x.clone(),
         }

@@ -23,7 +23,7 @@ impl TryFrom<&TestDataIn> for std::fs::File {
     type Error = Error;
 
     fn try_from(x: &TestDataIn) -> Result<Self, Self::Error> {
-        std::fs::File::open(&x.0).map_err(|e| Error::InvalidInputData(e))
+        std::fs::File::open(&x.0).map_err(Error::InvalidInputData)
     }
 }
 
@@ -40,7 +40,7 @@ impl TryFrom<&TestDataOut> for std::fs::File {
     type Error = Error;
 
     fn try_from(x: &TestDataOut) -> Result<std::fs::File, Self::Error> {
-        std::fs::File::open(&x.0).map_err(|e| Error::InvalidOutputData(e))
+        std::fs::File::open(&x.0).map_err(Error::InvalidOutputData)
     }
 }
 
@@ -77,7 +77,7 @@ impl Actions {
                 Action::TestInputOutput(input, output) => {
                     let executable = executable.as_ref().ok_or(Error::NoExecutable)?;
                     use crate::test::data::test;
-                    result = Some(test(&executable, input, output)?);
+                    result = Some(test(executable, input, output)?);
                 }
             }
         }

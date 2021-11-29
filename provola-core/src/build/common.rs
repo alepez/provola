@@ -1,12 +1,13 @@
+use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
 use std::process::Output;
 
-use crate::Executable;
 use crate::actions::Source;
 use crate::errors::Error;
+use crate::Executable;
 
-pub(crate) type CommandGenerator = fn(&PathBuf, &Source) -> Command;
+pub(crate) type CommandGenerator = fn(&Path, &Source) -> Command;
 
 pub(crate) fn build(source: &Source, gen_command: CommandGenerator) -> Result<Executable, Error> {
     let exec = PathBuf::from("./tmp.exe");
