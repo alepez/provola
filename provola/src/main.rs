@@ -1,5 +1,5 @@
 use provola_core::*;
-use std::{convert::TryFrom, path::PathBuf};
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -44,30 +44,6 @@ impl From<&Opt> for Actions {
     }
 }
 
-fn run_actions(actions: &Actions) -> Result<(), Box<dyn std::error::Error>> {
-    log::info!("Run actions");
-
-    let mut executable: Option<Executable> = Default::default();
-    let mut result: Option<TestResult> = Default::default();
-
-    for action in actions.0.iter() {
-        match action {
-            Action::Build(lang, source) => {
-                executable = Some(Executable::try_from((*lang, source))?);
-            }
-            Action::TestInputOutput(input, output) => {
-                let executable = executable.as_ref().expect("No executable");
-                use provola_core::test::data::test;
-                result = Some(test(&executable, input, output)?);
-            }
-        }
-    }
-
-    log::info!("{:?}", result);
-
-    Ok(())
-}
-
 fn main() {
     env_logger::init();
 
@@ -76,5 +52,5 @@ fn main() {
     log::info!("{:?}", opt);
     log::info!("{:?}", actions);
 
-    run_actions(&actions).unwrap();
+    actions.run().unwrap();
 }

@@ -1,6 +1,5 @@
+use crate::{Error, Executable, Language, TestResult};
 use std::{convert::TryFrom, io::Read, path::PathBuf};
-
-use crate::Language;
 
 #[derive(Debug)]
 pub struct Source(pub PathBuf);
@@ -64,3 +63,31 @@ pub enum Action {
 
 #[derive(Debug)]
 pub struct Actions(pub Vec<Action>);
+
+impl Actions {
+    pub fn run(&self) -> Result<TestResult, Box<dyn std::error::Error>> {
+        let mut executable: Option<Executable> = Default::default();
+        let mut result: Option<TestResult> = Default::default();
+
+        for action in self.0.iter() {
+            match action {
+                Action::Build(lang, source) => {
+                    executable = Some(Executable::try_from((*lang, source))?);
+                }
+                Action::TestInputOutput(input, output) => {
+                    let executable = executable.as_ref().ok_or(Error::NoExecutable)?;
+                    use crate::test::data::test;
+                    result = Some(test(&executable, input, output)?);
+                }
+            }
+        }
+
+        log::info!("{:?}", result);
+
+        if let Some(result) = result {
+            Ok(result)
+        } else {
+            Err(Box::new(Error::NoResult))
+        }
+    }
+}

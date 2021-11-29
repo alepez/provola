@@ -3,6 +3,7 @@ mod build;
 mod exec;
 mod lang;
 mod result;
+mod errors;
 pub mod test;
 
 pub use actions::Action;
@@ -13,3 +14,4 @@ pub use actions::TestDataOut;
 pub use exec::Executable;
 pub use lang::Language;
 pub use result::TestResult;
+pub use errors::Error;
