@@ -52,5 +52,6 @@ fn main() {
     log::info!("{:?}", opt);
     log::info!("{:?}", actions);
 
-    actions.run().unwrap();
+    let result = actions.run().unwrap();
+    log::info!("{:?}", result);
 }

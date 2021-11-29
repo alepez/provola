@@ -33,7 +33,13 @@ pub fn test(
     let actual_output = out.unwrap();
     let expected_output: String = output.try_into()?;
     let eq = expected_output == actual_output;
-    let result = TestResult::from(eq);
+
+    let result = if eq {
+        TestResult::Pass
+    } else {
+        let msg = format!("Expected\n\n{}\n\nActual\n\n{}", expected_output, actual_output);
+        TestResult::Fail(msg.into())
+    };
 
     Ok(result)
 }

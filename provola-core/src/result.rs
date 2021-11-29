@@ -1,15 +1,16 @@
 #[derive(Debug)]
 pub enum TestResult {
     Pass,
-    Fail,
+    Fail(Reason),
 }
 
-impl From<bool> for TestResult {
-    fn from(x: bool) -> Self {
-        if x {
-            TestResult::Pass
-        } else {
-            TestResult::Fail
-        }
+#[derive(Debug)]
+pub struct Reason {
+    text: String,
+}
+
+impl From<String> for Reason {
+    fn from(text: String) -> Self {
+        Reason { text }
     }
 }
