@@ -1,8 +1,5 @@
 use provola_core::*;
-use std::{
-    convert::{TryFrom, TryInto},
-    path::PathBuf,
-};
+use std::{convert::TryFrom, path::PathBuf};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -47,53 +44,11 @@ impl From<&Opt> for Actions {
     }
 }
 
-fn test_input_output(
-    executable: &Executable,
-    input: &TestDataIn,
-    output: &TestDataOut,
-) -> Result<TestResult, Box<dyn std::error::Error>> {
-    use subprocess::*;
-
-    let path = executable.path();
-
-    log::debug!("Executing {:?}", path);
-
-    let mut p = Popen::create(
-        &[path],
-        PopenConfig {
-            stdin: Redirection::File(input.try_into()?),
-            stdout: Redirection::Pipe,
-            ..Default::default()
-        },
-    )?;
-
-    let (out, _err) = p.communicate(None)?;
-
-    if let Some(_exit_status) = p.poll() {
-        log::debug!("Test done");
-    } else {
-        log::warn!("Terminate subprocess");
-        p.terminate()?;
-    }
-
-    let actual_output = out.unwrap();
-    let expected_output: String = output.try_into()?;
-
-    let result = if expected_output == actual_output {
-        TestResult::Pass
-    } else {
-        TestResult::Fail
-    };
-
-    log::debug!("{:?}", result);
-
-    Ok(result)
-}
-
 fn run_actions(actions: &Actions) -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Run actions");
 
     let mut executable: Option<Executable> = Default::default();
+    let mut result: Option<TestResult> = Default::default();
 
     for action in actions.0.iter() {
         match action {
@@ -102,10 +57,13 @@ fn run_actions(actions: &Actions) -> Result<(), Box<dyn std::error::Error>> {
             }
             Action::TestInputOutput(input, output) => {
                 let executable = executable.as_ref().expect("No executable");
-                test_input_output(&executable, input, output)?;
+                use provola_core::test::data::test;
+                result = Some(test(&executable, input, output)?);
             }
         }
     }
+
+    log::info!("{:?}", result);
 
     Ok(())
 }

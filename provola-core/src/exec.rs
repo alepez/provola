@@ -1,4 +1,5 @@
-use std::{convert::TryFrom, path::PathBuf};
+use std::convert::TryFrom;
+use std::path::PathBuf;
 
 use crate::{build::gen_executable, Language, Source};
 
@@ -16,7 +17,7 @@ impl TryFrom<(Language, &Source)> for Executable {
 }
 
 impl Executable {
-    pub fn path(&self) -> &PathBuf {
+    pub(crate) fn path(&self) -> &PathBuf {
         &self.0
     }
 }

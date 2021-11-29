@@ -3,6 +3,7 @@ mod build;
 mod exec;
 mod lang;
 mod result;
+pub mod test;
 
 pub use actions::Action;
 pub use actions::Actions;
