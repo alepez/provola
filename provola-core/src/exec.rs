@@ -1,4 +1,4 @@
-use std::convert::TryFrom;
+use std::{convert::TryFrom, path::Path};
 use std::path::PathBuf;
 
 use crate::{build::gen_executable, Language, Source};
@@ -25,10 +25,14 @@ impl TryFrom<(Language, &Source)> for Executable {
     }
 }
 
+fn path_to_string(path: &Path) -> String {
+    path.as_os_str().to_str().unwrap().to_string()
+}
+
 impl Into<Vec<String>> for &Executable {
     fn into(self) -> Vec<String> {
         match &self {
-            Executable::Simple(path) => vec![path.as_os_str().to_str().unwrap().to_string()],
+            Executable::Simple(path) => vec![path_to_string(path)],
             &Executable::Multiple(x) => x.clone(),
         }
     }
@@ -36,7 +40,7 @@ impl Into<Vec<String>> for &Executable {
 
 impl Executable {
     pub fn interpreted(interpreter: String, source: &Source) -> Self {
-        let source = source.0.as_os_str().to_str().unwrap().to_string();
+        let source = path_to_string(&source.0);
         let argv = vec![interpreter, source];
         Executable::Multiple(argv)
     }
