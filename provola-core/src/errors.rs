@@ -6,6 +6,6 @@ pub enum Error {
     NoExecutable,
     #[error("cannot build: {0}")]
     BuildFailed(String),
-    #[error("cannot read input file")]
-    NoInputFile(#[from] std::io::Error),
+    #[error("i/o error")]
+    IoError(#[from] std::io::Error),
 }
