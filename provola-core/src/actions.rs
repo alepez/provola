@@ -65,7 +65,7 @@ pub enum Action {
 pub struct Actions(pub Vec<Action>);
 
 impl Actions {
-    pub fn run(&self) -> Result<TestResult, Box<dyn std::error::Error>> {
+    pub fn run(&self) -> Result<TestResult, Error> {
         let mut executable: Option<Executable> = Default::default();
         let mut result: Option<TestResult> = Default::default();
 
@@ -85,7 +85,7 @@ impl Actions {
         if let Some(result) = result {
             Ok(result)
         } else {
-            Err(Box::new(Error::NoResult))
+            Err(Error::NoResult)
         }
     }
 }

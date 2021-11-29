@@ -10,4 +10,6 @@ pub enum Error {
     IoError(#[from] std::io::Error),
     #[error("language not supported: {0}")]
     LangNotSupported(String),
+    #[error("cannot execute")]
+    ExecError(#[from] subprocess::PopenError),
 }

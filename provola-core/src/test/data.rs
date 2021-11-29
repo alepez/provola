@@ -1,11 +1,11 @@
-use crate::{Executable, TestDataIn, TestDataOut, TestResult};
+use crate::{Error, Executable, TestDataIn, TestDataOut, TestResult};
 use std::convert::TryInto;
 
 pub fn test(
     executable: &Executable,
     input: &TestDataIn,
     output: &TestDataOut,
-) -> Result<TestResult, Box<dyn std::error::Error>> {
+) -> Result<TestResult, Error> {
     use subprocess::*;
 
     let path = executable.path();
@@ -37,7 +37,10 @@ pub fn test(
     let result = if eq {
         TestResult::Pass
     } else {
-        let msg = format!("Expected\n\n{}\n\nActual\n\n{}", expected_output, actual_output);
+        let msg = format!(
+            "Expected\n\n{}\n\nActual\n\n{}",
+            expected_output, actual_output
+        );
         TestResult::Fail(msg.into())
     };
 
