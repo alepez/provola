@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(Debug)]
 pub enum TestResult {
     Pass,
@@ -7,10 +9,19 @@ pub enum TestResult {
 #[derive(Debug)]
 pub enum Reason {
     Generic(String),
+    NotExpected { actual: String, expected: String },
 }
 
 impl From<String> for Reason {
     fn from(text: String) -> Self {
         Reason::Generic(text)
+    }
+}
+
+impl Reason {
+    pub fn not_expected(actual: impl Display, expected: impl Display) -> Self {
+        let actual = actual.to_string();
+        let expected = expected.to_string();
+        Reason::NotExpected { actual, expected }
     }
 }

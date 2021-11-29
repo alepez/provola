@@ -1,4 +1,4 @@
-use crate::{Error, Executable, TestDataIn, TestDataOut, TestResult};
+use crate::{result::Reason, Error, Executable, TestDataIn, TestDataOut, TestResult};
 use std::convert::TryInto;
 
 pub fn test(
@@ -37,11 +37,8 @@ pub fn test(
     let result = if eq {
         TestResult::Pass
     } else {
-        let msg = format!(
-            "Expected\n\n{}\n\nActual\n\n{}",
-            expected_output, actual_output
-        );
-        TestResult::Fail(msg.into())
+        let reason = Reason::not_expected(actual_output, expected_output);
+        TestResult::Fail(reason)
     };
 
     Ok(result)
