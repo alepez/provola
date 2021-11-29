@@ -8,4 +8,6 @@ pub enum Error {
     BuildFailed(String),
     #[error("i/o error")]
     IoError(#[from] std::io::Error),
+    #[error("language not supported: {0}")]
+    LangNotSupported(String),
 }
