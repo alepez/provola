@@ -8,18 +8,16 @@ pub fn test(
 ) -> Result<TestResult, Error> {
     use subprocess::*;
 
-    let path = executable.path();
-
-    log::debug!("Executing {:?}", path);
-
     // Read from file
     let stdin = Redirection::File(input.try_into()?);
 
     // Intercept output, so we can compare it later
     let stdout = Redirection::Pipe;
 
+    let argv: Vec<String> = executable.into();
+
     let mut p = Popen::create(
-        &[path],
+        &argv,
         PopenConfig {
             stdin,
             stdout,
