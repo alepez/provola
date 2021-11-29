@@ -1,5 +1,5 @@
 use crate::{result::Reason, Error, Executable, TestDataIn, TestDataOut, TestResult};
-use std::convert::TryInto;
+use std::{convert::TryInto, time::Duration};
 
 pub fn test(
     executable: &Executable,
@@ -29,7 +29,9 @@ pub fn test(
 
     let (out, _err) = p.communicate(None)?;
 
-    if let Some(_exit_status) = p.poll() {
+    let timeout = Duration::from_secs(5);
+
+    if let Some(_exit_status) = p.wait_timeout(timeout)? {
         log::debug!("Test done");
     } else {
         log::warn!("Terminate subprocess");
