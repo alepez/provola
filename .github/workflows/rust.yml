@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
 
@@ -20,12 +20,10 @@ jobs:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-        profile: minimal
+        profile: default
         override: true
 
-    - uses: ./
-      with:
-        cache-on-failure: true
+    - uses: Swatinem/rust-cache@v1.3.0
 
     - run: |
         cargo install cargo-deny --locked
