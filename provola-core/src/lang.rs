@@ -124,6 +124,7 @@ impl Language {
                 "c" => Some(Language::C),
                 "cpp" | "cxx" | "c++" => Some(Language::CPlusPlus),
                 "hs" => Some(Language::Haskell),
+                "rs" => Some(Language::Rust),
                 _ => None,
             })
     }
@@ -131,10 +132,12 @@ impl Language {
 
 #[cfg(test)]
 mod test {
+    use std::path::PathBuf;
+
     use super::*;
 
     #[test]
-    fn from_string_to_string() {
+    fn lang_from_string_to_string() {
         use strum::IntoEnumIterator;
 
         for lang in Language::iter() {
@@ -142,5 +145,17 @@ mod test {
             let l = Language::from_str(&s).expect(&s);
             assert_eq!(lang, l);
         }
+    }
+
+    #[test]
+    fn lang_from_source() {
+        assert_eq!(
+            Language::from_source(&PathBuf::from("foo.rs")),
+            Some(Language::Rust)
+        );
+        assert_eq!(
+            Language::from_source(&PathBuf::from("foo.hs")),
+            Some(Language::Haskell)
+        );
     }
 }
