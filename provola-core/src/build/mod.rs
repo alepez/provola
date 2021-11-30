@@ -1,8 +1,31 @@
+mod ada;
 mod bash;
 mod c;
+mod caml;
+mod clojure;
 mod cpp;
+mod csharp;
+mod dart;
+mod elixir;
+mod erlang;
+mod fsharp;
+mod go;
+mod groovy;
 mod haskell;
+mod javascript;
+mod java;
+mod kotlin;
+mod lisp;
+mod objectivec;
+mod php;
+mod python;
+mod r;
+mod ruby;
 mod rust;
+mod scala;
+mod swift;
+mod typescript;
+mod vba;
 
 use crate::actions::Source;
 use crate::errors::Error;
@@ -16,29 +39,29 @@ pub fn gen_executable(lang: Language, source: &Source) -> Result<Executable, Err
         Language::CPlusPlus => cpp::build(source),
         Language::Haskell => haskell::build(source),
         Language::Rust => rust::build(source),
-        Language::Ada => todo!(),
-        Language::Caml => todo!(),
-        Language::CSharp => todo!(),
-        Language::Clojure => todo!(),
-        Language::Dart => todo!(),
-        Language::Elixir => todo!(),
-        Language::Erlang => todo!(),
-        Language::FSharp => todo!(),
-        Language::Go => todo!(),
-        Language::Groovy => todo!(),
-        Language::Java => todo!(),
-        Language::JavaScript => todo!(),
-        Language::Kotlin => todo!(),
-        Language::Lisp => todo!(),
-        Language::ObjectiveC => todo!(),
-        Language::PHP => todo!(),
-        Language::Python => todo!(),
-        Language::R => todo!(),
-        Language::Ruby => todo!(),
-        Language::Scala => todo!(),
-        Language::Swift => todo!(),
-        Language::TypeScript => todo!(),
-        Language::VBA => todo!(),
+        Language::Ada => ada::build(source),
+        Language::Caml => caml::build(source),
+        Language::CSharp => csharp::build(source),
+        Language::Clojure => clojure::build(source),
+        Language::Dart => dart::build(source),
+        Language::Elixir => elixir::build(source),
+        Language::Erlang => erlang::build(source),
+        Language::FSharp => fsharp::build(source),
+        Language::Go => go::build(source),
+        Language::Groovy => groovy::build(source),
+        Language::Java => java::build(source),
+        Language::JavaScript => javascript::build(source),
+        Language::Kotlin => kotlin::build(source),
+        Language::Lisp => lisp::build(source),
+        Language::ObjectiveC => objectivec::build(source),
+        Language::PHP => php::build(source),
+        Language::Python => python::build(source),
+        Language::R => r::build(source),
+        Language::Ruby => ruby::build(source),
+        Language::Scala => scala::build(source),
+        Language::Swift => swift::build(source),
+        Language::TypeScript => typescript::build(source),
+        Language::VBA => vba::build(source),
     }
 }
 
