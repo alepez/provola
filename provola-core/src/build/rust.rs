@@ -12,7 +12,7 @@ fn gen_command(exec: &Path, source: &Source) -> Command {
 }
 
 pub(crate) fn build(source: &Source) -> Result<Executable, Error> {
-    super::common::build(source, gen_command)
+    super::build(source, gen_command)
 }
 
 #[cfg(test)]
