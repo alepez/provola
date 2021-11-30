@@ -54,8 +54,10 @@ fn main() {
     let opt = Opt::from_args();
     let actions = Actions::from(&opt);
 
-    let result = actions.run().unwrap();
-
-    let reporter = SimpleReporter::new();
-    reporter.report(result);
+    if let Ok(result) = actions.run() {
+        let reporter = SimpleReporter::new();
+        reporter.report(result);
+    } else {
+        Opt::clap().print_long_help().unwrap();
+    }
 }
