@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "provola", about = "provola, your personal tester")]
+#[structopt(name = "provola", about = "provola, the quick tester")]
 struct Opt {
     /// Activate debug mode
     #[structopt(long)]
