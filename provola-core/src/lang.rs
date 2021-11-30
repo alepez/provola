@@ -1,3 +1,4 @@
+use lazy_static::lazy_static;
 use std::{fmt::Display, path::Path, str::FromStr};
 use strum_macros::EnumIter;
 
@@ -114,19 +115,36 @@ impl Display for Language {
     }
 }
 
+type Extensions = Vec<(&'static str, Language)>;
+
+lazy_static! {
+    static ref EXTENSIONS: Extensions = extensions();
+}
+
+fn extensions() -> Extensions {
+    let mut xs = Vec::new();
+
+    let mut add = |lang: Language, exts: &[&'static str]| {
+        for &ext in exts {
+            xs.push((ext, lang));
+        }
+    };
+
+    add(Language::Bash, &["sh"]);
+    add(Language::C, &["c", "c++", "cxx"]);
+    add(Language::Haskell, &["hs"]);
+    add(Language::Rust, &["rs"]);
+
+    xs
+}
+
 impl Language {
     pub fn from_source(source: &Path) -> Option<Language> {
         source
             .extension()
             .and_then(|x| x.to_str())
-            .and_then(|ext| match ext {
-                "sh" => Some(Language::Bash),
-                "c" => Some(Language::C),
-                "cpp" | "cxx" | "c++" => Some(Language::CPlusPlus),
-                "hs" => Some(Language::Haskell),
-                "rs" => Some(Language::Rust),
-                _ => None,
-            })
+            .and_then(|ext| EXTENSIONS.iter().find(|x| x.0 == ext))
+            .map(|x| x.1)
     }
 }
 
