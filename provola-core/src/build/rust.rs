@@ -18,6 +18,7 @@ pub(crate) fn build(source: &Source) -> Result<Executable, Error> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::path::PathBuf;
 
     fn gen_source(s: &str) -> Source {
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
