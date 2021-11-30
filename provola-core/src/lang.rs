@@ -1,6 +1,7 @@
 use std::{fmt::Display, path::Path, str::FromStr};
+use strum_macros::EnumIter;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, EnumIter, PartialEq, Eq)]
 pub enum Language {
     Ada,
     Bash,
@@ -69,7 +70,7 @@ impl FromStr for Language {
             "rust" => Ok(Rust),
             "scala" => Ok(Scala),
             "swift" => Ok(Swift),
-            "typeScript" => Ok(TypeScript),
+            "typescript" => Ok(TypeScript),
             "vba" => Ok(VBA),
             _ => Err("Invalid language".to_string()),
         }
@@ -125,5 +126,21 @@ impl Language {
                 "hs" => Some(Language::Haskell),
                 _ => None,
             })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn from_string_to_string() {
+        use strum::IntoEnumIterator;
+
+        for lang in Language::iter() {
+            let s = lang.to_string();
+            let l = Language::from_str(&s).expect(&s);
+            assert_eq!(lang, l);
+        }
     }
 }
