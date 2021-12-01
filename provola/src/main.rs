@@ -48,16 +48,35 @@ impl From<&Opt> for Actions {
     }
 }
 
+fn watch(opt: Opt) -> Result<(), Box<dyn std::error::Error>> {
+    todo!();
+}
+
+fn run_once(opt: Opt) -> Result<(), Box<dyn std::error::Error>> {
+    let actions = Actions::from(&opt);
+    let result = actions.run()?;
+    let reporter = SimpleReporter::new();
+
+    reporter.report(result);
+
+    Ok(())
+}
+
+fn run(opt: Opt) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(_watch_files) = &opt.watch {
+        watch(opt)
+    } else {
+        run_once(opt)
+    }
+}
+
 fn main() {
     env_logger::init();
 
     let opt = Opt::from_args();
-    let actions = Actions::from(&opt);
 
-    if let Ok(result) = actions.run() {
-        let reporter = SimpleReporter::new();
-        reporter.report(result);
-    } else {
+    if let Err(e) = run(opt) {
+        log::error!("{}", e);
         Opt::clap().print_long_help().unwrap();
     }
 }
