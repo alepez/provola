@@ -1,5 +1,5 @@
 use provola_core::*;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -48,12 +48,35 @@ impl From<&Opt> for Actions {
     }
 }
 
-fn watch(opt: Opt) -> Result<(), Box<dyn std::error::Error>> {
-    todo!();
+fn watch(opt: &Opt, watch_files: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    use notify::{watcher, RecursiveMode, Watcher};
+    use std::sync::mpsc::channel;
+    use std::time::Duration;
+
+    let (tx, rx) = channel();
+
+    let debounce_time = Duration::from_secs(1);
+    let mut watcher = watcher(tx, debounce_time).unwrap();
+
+    watcher
+        .watch(&watch_files, RecursiveMode::Recursive)
+        .unwrap();
+
+    loop {
+        match rx.recv() {
+            Ok(e) => {
+                log::trace!("{:?}", e);
+                run_once(opt).ok(); // TODO Print error and continue
+            }
+            Err(e) => {
+                return Err(Box::new(e));
+            }
+        }
+    }
 }
 
-fn run_once(opt: Opt) -> Result<(), Box<dyn std::error::Error>> {
-    let actions = Actions::from(&opt);
+fn run_once(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
+    let actions = Actions::from(opt);
     let result = actions.run()?;
     let reporter = SimpleReporter::new();
 
@@ -62,9 +85,10 @@ fn run_once(opt: Opt) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn run(opt: Opt) -> Result<(), Box<dyn std::error::Error>> {
-    if let Some(_watch_files) = &opt.watch {
-        watch(opt)
+fn run(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(watch_files) = &opt.watch {
+        run_once(opt).ok(); // TODO Print error and continue
+        watch(opt, watch_files)
     } else {
         run_once(opt)
     }
@@ -75,7 +99,7 @@ fn main() {
 
     let opt = Opt::from_args();
 
-    if let Err(e) = run(opt) {
+    if let Err(e) = run(&opt) {
         log::error!("{}", e);
         Opt::clap().print_long_help().unwrap();
     }

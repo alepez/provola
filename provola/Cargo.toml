@@ -12,5 +12,6 @@ license = "Apache-2.0"
 [dependencies]
 env_logger = "0.9"
 log = "0.4"
+notify = "4"
 provola-core = "0.1"
 structopt = { version = "0.3" }
