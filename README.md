@@ -2,7 +2,6 @@
 
 > Provola, provalo, just test it!
 
-
 `provola` is your best ~~cheese~~ friend when you need to test code quickly.
 
 Just create an *input* file, an *expected output* file and a program digest the
