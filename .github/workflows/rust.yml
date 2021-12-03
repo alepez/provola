@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
+
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
@@ -27,15 +27,15 @@ jobs:
 
     - run: |
         cargo install cargo-deny --locked
-        cargo check
-        cargo test
-        cargo clippy
+        cargo check -p provola-core
+        cargo test -p provola-core
+        cargo clippy -p provola-core
 
     - name: Run cargo-tarpaulin
       uses: actions-rs/tarpaulin@v0.1
       with:
         version: '0.18.5'
-        args: '-- --test-threads 1'
+        args: '-p provola-core -- --test-threads 1'
 
     - name: Upload to codecov.io
       uses: codecov/codecov-action@v1.0.2
