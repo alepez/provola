@@ -1,4 +1,5 @@
-use clap::Parser;
+use clap::{App, IntoApp, Parser};
+use clap_generate::{generate, Generator, Shell};
 use provola_core::*;
 use std::path::{Path, PathBuf};
 
@@ -23,6 +24,9 @@ struct Opt {
     /// Source code
     #[clap(short, long)]
     source: Option<PathBuf>,
+    /// If provided, outputs the completion file for given shell
+    #[clap(long = "generate", arg_enum)]
+    generator: Option<Shell>,
 }
 
 impl From<&Opt> for Actions {
@@ -94,10 +98,20 @@ fn run(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
     }
 }
 
+fn print_completions<G: Generator>(gen: G, app: &mut App) {
+    generate(gen, app, app.get_name().to_string(), &mut std::io::stdout());
+}
+
 fn main() {
     env_logger::init();
 
     let opt = Opt::parse();
+
+    if let Some(generator) = opt.generator {
+        let mut app = Opt::into_app();
+        print_completions(generator, &mut app);
+        return;
+    }
 
     if let Err(e) = run(&opt) {
         log::error!("{}", e);
