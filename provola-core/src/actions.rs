@@ -88,4 +88,8 @@ impl Actions {
             Err(Error::NoResult)
         }
     }
+
+    pub fn is_valid(&self) -> bool {
+        !self.0.is_empty()
+    }
 }

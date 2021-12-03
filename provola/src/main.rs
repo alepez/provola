@@ -81,6 +81,11 @@ fn watch(opt: &Opt, watch_files: &Path) -> Result<(), Box<dyn std::error::Error>
 
 fn run_once(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
     let actions = Actions::from(opt);
+
+    if !actions.is_valid() {
+        return Err(Error::NothingToDo.into());
+    }
+
     let result = actions.run()?;
     let reporter = SimpleReporter::new();
 

@@ -16,4 +16,6 @@ pub enum Error {
     InvalidInputData(std::io::Error),
     #[error(transparent)]
     InvalidOutputData(std::io::Error),
+    #[error("nothing to do")]
+    NothingToDo,
 }
