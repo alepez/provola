@@ -21,3 +21,13 @@ echo -n dcba > out.txt
 # Run provola!
 provola -i in.txt -o out.txt -s reverse.hs -w .
 ```
+
+## Shell auto completion
+
+`provola` provides shell autocompletion for even faster usage.
+
+You can install autocompletion for yout favourite shell:
+
+```shell
+provola --generate zsh > ~/.zfunc/_provola
+```
