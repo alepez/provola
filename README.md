@@ -4,9 +4,9 @@
 
 `provola` is your best ~~cheese~~ friend when you need to test code quickly.
 
-Just create an *input* file, an *expected output* file and a program digest the
-input and `provola` will test your program automatically whenever
-you change the code.
+Just create an *input* file, an *expected output* file and a program to digest
+the input and `provola` will test your program automatically whenever you change
+the code.
 
 ```shell
 # Create a simple haskell program
@@ -31,3 +31,16 @@ You can install autocompletion for yout favourite shell:
 ```shell
 provola --generate zsh > ~/.zfunc/_provola
 ```
+
+## Supported languages
+
+| Language   | Build       | Run      |
+|------------|-------------|----------|
+| Bash       | /           | ✓        |
+| C++        | `gcc`       | ✓        |
+| C          | `gcc`       | ✓        |
+| Haskell    | `stack ghc` | ✓        |
+| JavaScript |             | ✓ `node` |
+| PHP        |             | ✓        |
+| Python     |             | ✓        |
+| Rust       | `rustc`     | ✓        |
