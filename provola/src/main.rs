@@ -1,27 +1,27 @@
+use clap::Parser;
 use provola_core::*;
 use std::path::{Path, PathBuf};
-use structopt::StructOpt;
 
-#[derive(Debug, StructOpt)]
-#[structopt(name = "provola", about = "provola, the quick tester")]
+#[derive(Debug, Parser)]
+#[clap(name = "provola", about = "provola, the quick tester")]
 struct Opt {
     /// Activate debug mode
-    #[structopt(long)]
+    #[clap(long)]
     debug: bool,
     /// Watch files or directories for changes
-    #[structopt(short, long, parse(from_os_str))]
+    #[clap(short, long, parse(from_os_str))]
     watch: Option<PathBuf>,
     /// Input file
-    #[structopt(short, long, parse(from_os_str))]
+    #[clap(short, long, parse(from_os_str))]
     input: Option<PathBuf>,
     /// Expected output
-    #[structopt(short, long, parse(from_os_str))]
+    #[clap(short, long, parse(from_os_str))]
     output: Option<PathBuf>,
     /// Language
-    #[structopt(short, long)]
+    #[clap(short, long)]
     lang: Option<Language>,
     /// Source code
-    #[structopt(short, long)]
+    #[clap(short, long)]
     source: Option<PathBuf>,
 }
 
@@ -97,10 +97,9 @@ fn run(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
 fn main() {
     env_logger::init();
 
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     if let Err(e) = run(&opt) {
         log::error!("{}", e);
-        Opt::clap().print_long_help().unwrap();
     }
 }
