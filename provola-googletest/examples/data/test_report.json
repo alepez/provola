@@ -1,0 +1,71 @@
+{
+  "tests": 4,
+  "failures": 1,
+  "disabled": 0,
+  "errors": 0,
+  "timestamp": "2021-12-05T23:54:55Z",
+  "time": "0s",
+  "name": "AllTests",
+  "testsuites": [
+    {
+      "name": "Foo",
+      "tests": 2,
+      "failures": 1,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2021-12-05T23:54:55Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "Foo1",
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2021-12-05T23:54:55Z",
+          "time": "0s",
+          "classname": "Foo",
+          "failures": [
+            {
+              "failure": "\/home\/pez\/workspace\/personal\/provola-googletest\/examples\/data\/src\/tests.cpp:4\nValue of: true\n  Actual: true\nExpected: false",
+              "type": ""
+            }
+          ]
+        },
+        {
+          "name": "Foo2",
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2021-12-05T23:54:55Z",
+          "time": "0s",
+          "classname": "Foo"
+        }
+      ]
+    },
+    {
+      "name": "Bar",
+      "tests": 2,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2021-12-05T23:54:55Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "Bar1",
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2021-12-05T23:54:55Z",
+          "time": "0s",
+          "classname": "Bar"
+        },
+        {
+          "name": "Bar2",
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2021-12-05T23:54:55Z",
+          "time": "0s",
+          "classname": "Bar"
+        }
+      ]
+    }
+  ]
+}
