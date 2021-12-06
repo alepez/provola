@@ -22,7 +22,7 @@ pub struct Report {
     pub timestamp: Option<Timestamp>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct TestSuite {
     // TODO properties
     // TODO system-err
@@ -38,10 +38,10 @@ pub struct TestSuite {
     pub testcases: Vec<TestCase>,
     pub tests: Count,
     pub time: Option<Duration>,
-    pub timestamp: Option<Duration>,
+    pub timestamp: Option<Timestamp>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct TestCase {
     // TODO error
     // TODO assertions

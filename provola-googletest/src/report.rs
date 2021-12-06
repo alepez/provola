@@ -1,4 +1,6 @@
 use provola_core::Report as CoreReport;
+use provola_core::TestCase as CoreTestCase;
+use provola_core::TestSuite as CoreTestSuite;
 use serde::{Deserialize, Serialize};
 
 type Duration = String;
@@ -67,26 +69,50 @@ struct TestInfo {
 
 impl From<UnitTest> for CoreReport {
     fn from(x: UnitTest) -> Self {
-        let mut y = CoreReport::default();
+        CoreReport {
+            disabled: Some(x.disabled),
+            errors: Some(x.errors),
+            failures: Some(x.failures),
+            name: Some(x.name),
+            tests: Some(x.tests),
+            time: parse_duration(&x.time),
+            timestamp: parse_timestamp(&x.timestamp),
+            testsuites: x.testsuites.into_iter().map(|x| x.into()).collect(),
+            ..Default::default()
+        }
+    }
+}
 
-        y.disabled = Some(x.disabled);
-        y.errors = Some(x.errors);
-        y.failures = Some(x.failures);
-        y.name = Some(x.name);
-        y.tests = Some(x.tests);
-        y.time = parse_duration(&x.time);
-        y.timestamp = parse_timestamp(&x.timestamp);
+impl From<TestCase> for CoreTestSuite {
+    fn from(x: TestCase) -> Self {
+        CoreTestSuite {
+            name: x.name,
+            tests: x.tests,
+            disabled: Some(x.disabled),
+            errors: Some(x.errors),
+            failures: Some(x.failures),
+            testcases: x.testsuite.into_iter().map(|x| x.into()).collect(),
+            time: parse_duration(&x.time),
+            timestamp: parse_timestamp(&x.timestamp),
+            ..Default::default()
+        }
+    }
+}
 
-        y
+impl From<TestInfo> for CoreTestCase {
+    fn from(x: TestInfo) -> Self {
+        CoreTestCase {
+            name: x.name,
+            status: None, // TODO Convert to string, but to which format? Some(x.status),
+            time: parse_duration(&x.time),
+            ..Default::default()
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        fs::File,
-        io::{BufReader, BufWriter},
-    };
+    use std::{fs::File, io::BufReader};
 
     use super::*;
 
@@ -95,10 +121,6 @@ mod tests {
         let path = "examples/data/test_report.json";
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let u: UnitTest = serde_json::from_reader(reader).unwrap();
-        // let path_out = "examples/data/test_report_out.json";
-        // let file_out = File::create(path_out).unwrap();
-        // let writer = BufWriter::new(file_out);
-        // serde_json::to_writer(writer, &u).unwrap();
+        let _u: UnitTest = serde_json::from_reader(reader).unwrap();
     }
 }
