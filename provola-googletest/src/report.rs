@@ -4,13 +4,9 @@ use provola_core::TestSuite as CoreTestSuite;
 use serde::{Deserialize, Serialize};
 
 type Duration = String;
-type Timestamp = String;
+type Timestamp = provola_core::report::Timestamp;
 
 fn parse_duration(s: &str) -> Option<std::time::Duration> {
-    todo!()
-}
-
-fn parse_timestamp(s: &str) -> Option<std::time::SystemTime> {
     todo!()
 }
 
@@ -76,7 +72,7 @@ impl From<UnitTest> for CoreReport {
             name: Some(x.name),
             tests: Some(x.tests),
             time: parse_duration(&x.time),
-            timestamp: parse_timestamp(&x.timestamp),
+            timestamp: Some(x.timestamp),
             testsuites: x.testsuites.into_iter().map(|x| x.into()).collect(),
             ..Default::default()
         }
@@ -93,7 +89,7 @@ impl From<TestCase> for CoreTestSuite {
             failures: Some(x.failures),
             testcases: x.testsuite.into_iter().map(|x| x.into()).collect(),
             time: parse_duration(&x.time),
-            timestamp: parse_timestamp(&x.timestamp),
+            timestamp: Some(x.timestamp),
             ..Default::default()
         }
     }

@@ -1,14 +1,14 @@
 use serde::{Deserialize, Serialize};
 
-type Timestamp = std::time::SystemTime;
-type Duration = std::time::Duration;
-type Count = usize;
-type Name = String;
-type Status = String;
-type Hostname = String;
-type Id = String;
-type Package = String;
-type ClassName = String;
+pub type Timestamp = chrono::DateTime<chrono::Utc>;
+pub type Duration = std::time::Duration;
+pub type Count = usize;
+pub type Name = String;
+pub type Status = String;
+pub type Hostname = String;
+pub type Id = String;
+pub type Package = String;
+pub type ClassName = String;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Report {
