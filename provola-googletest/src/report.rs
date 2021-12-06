@@ -6,8 +6,17 @@ use serde::{Deserialize, Serialize};
 type Duration = String;
 type Timestamp = provola_core::report::Timestamp;
 
+/// Parse "1s" as 1 second, "10s" as 10 seconds...
 fn parse_duration(s: &str) -> Option<std::time::Duration> {
-    todo!()
+    if s.len() < 2 {
+        return None;
+    }
+
+    let s = &s[0..(s.len() - 1)];
+    let secs: f32 = s.parse().ok()?;
+    let millis: u64 = (secs * 1000.0).round() as u64;
+    let duration = std::time::Duration::from_millis(millis);
+    Some(duration)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -118,5 +127,16 @@ mod tests {
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
         let _u: UnitTest = serde_json::from_reader(reader).unwrap();
+    }
+
+    #[test]
+    fn parse_duration_from_str() {
+        assert_eq!(parse_duration(""), None);
+        assert_eq!(parse_duration("s"), None);
+        assert_eq!(parse_duration("ss"), None);
+        assert_eq!(
+            parse_duration("1s"),
+            Some(std::time::Duration::from_secs(1))
+        );
     }
 }
