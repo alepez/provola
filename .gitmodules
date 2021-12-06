@@ -1,0 +1,3 @@
+[submodule "provola-googletest/examples/data/googletest"]
+	path = provola-googletest/examples/data/googletest
+	url = https://github.com/google/googletest.git

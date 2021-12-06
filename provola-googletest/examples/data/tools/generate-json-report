@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+mkdir build
+cd build
+cmake ..
+cmake --build .
+./example --gtest_output=json
+mv test_detail.json ../test_report.json
