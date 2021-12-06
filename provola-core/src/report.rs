@@ -10,7 +10,7 @@ type Id = String;
 type Package = String;
 type ClassName = String;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Report {
     pub disabled: Option<Count>,
     pub errors: Option<Count>,

@@ -1,14 +1,23 @@
+use provola_core::Report as CoreReport;
 use serde::{Deserialize, Serialize};
 
 type Duration = String;
 type Timestamp = String;
 
+fn parse_duration(s: &str) -> Option<std::time::Duration> {
+    todo!()
+}
+
+fn parse_timestamp(s: &str) -> Option<std::time::SystemTime> {
+    todo!()
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct UnitTest {
-    tests: u32,
-    failures: u32,
-    disabled: u32,
-    errors: u32,
+    tests: usize,
+    failures: usize,
+    disabled: usize,
+    errors: usize,
     timestamp: Timestamp,
     time: Duration,
     name: String,
@@ -18,10 +27,10 @@ struct UnitTest {
 #[derive(Serialize, Deserialize, Debug)]
 struct TestCase {
     name: String,
-    tests: u32,
-    failures: u32,
-    disabled: u32,
-    errors: u32,
+    tests: usize,
+    failures: usize,
+    disabled: usize,
+    errors: usize,
     time: Duration,
     testsuite: Vec<TestInfo>,
     timestamp: Timestamp,
@@ -54,6 +63,22 @@ struct TestInfo {
     failures: Vec<Failure>,
     result: String,
     timestamp: Timestamp,
+}
+
+impl From<UnitTest> for CoreReport {
+    fn from(x: UnitTest) -> Self {
+        let mut y = CoreReport::default();
+
+        y.disabled = Some(x.disabled);
+        y.errors = Some(x.errors);
+        y.failures = Some(x.failures);
+        y.name = Some(x.name);
+        y.tests = Some(x.tests);
+        y.time = parse_duration(&x.time);
+        y.timestamp = parse_timestamp(&x.timestamp);
+
+        y
+    }
 }
 
 #[cfg(test)]
