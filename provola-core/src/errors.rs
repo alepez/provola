@@ -18,4 +18,6 @@ pub enum Error {
     InvalidOutputData(std::io::Error),
     #[error("nothing to do")]
     NothingToDo,
+    #[error("not implemented")]
+    NotImplemented,
 }

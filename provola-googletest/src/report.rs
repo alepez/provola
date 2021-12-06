@@ -20,7 +20,7 @@ fn parse_duration(s: &str) -> Option<std::time::Duration> {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct UnitTest {
+pub(crate) struct UnitTest {
     tests: usize,
     failures: usize,
     disabled: usize,
@@ -32,7 +32,7 @@ struct UnitTest {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct TestCase {
+pub(crate) struct TestCase {
     name: String,
     tests: usize,
     failures: usize,
@@ -44,7 +44,7 @@ struct TestCase {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-enum Status {
+pub(crate) enum Status {
     #[serde(rename = "RUN")]
     Run,
     #[serde(rename = "NOTRUN")]
@@ -52,14 +52,14 @@ enum Status {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Failure {
+pub(crate) struct Failure {
     failure: String,
     #[serde(rename = "type")]
     ttype: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct TestInfo {
+pub(crate) struct TestInfo {
     name: String,
     status: Status,
     time: Duration,
