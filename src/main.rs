@@ -1,5 +1,6 @@
 use clap::{App, IntoApp, Parser};
 use clap_generate::{generate, Generator, Shell};
+use provola_core::test_runners::TestRunnerType;
 use provola_core::*;
 use std::path::{Path, PathBuf};
 
@@ -27,6 +28,12 @@ struct Opt {
     /// If provided, outputs the completion file for given shell
     #[clap(long = "generate", arg_enum)]
     generator: Option<Shell>,
+    /// Execute a test runner
+    #[clap(short = 't')]
+    test_runner: Option<PathBuf>,
+    /// Select test runner type
+    #[clap(short = 'T')]
+    test_runner_type: Option<TestRunnerType>,
 }
 
 impl From<&Opt> for Actions {
@@ -46,6 +53,11 @@ impl From<&Opt> for Actions {
             let input = TestDataIn::new(input.clone());
             let output = TestDataOut::new(output.clone());
             actions.push(Action::TestInputOutput(input, output));
+        }
+
+        if let (Some(exec), Some(trt)) = (&opt.test_runner, opt.test_runner_type) {
+            let exec = exec.clone().into();
+            actions.push(Action::TestRunner(exec, trt));
         }
 
         Actions(actions)

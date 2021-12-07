@@ -7,6 +7,7 @@ pub mod report;
 mod reporter;
 mod result;
 pub mod test;
+pub mod test_runners;
 
 pub use actions::Action;
 pub use actions::Actions;
