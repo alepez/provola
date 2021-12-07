@@ -43,14 +43,16 @@ impl Opt {
         self.lang
             .or_else(|| source.and_then(|x| Language::from_source(x)))
     }
+
+    fn infer_options(&mut self) {
+        self.lang = self.lang_or_guess();
+    }
 }
 
 impl From<&Opt> for Action {
     fn from(opt: &Opt) -> Self {
-        let lang = opt.lang_or_guess();
-
         if let (Some(lang), Some(source), Some(input), Some(output)) =
-            (lang, &opt.source, &opt.input, &opt.output)
+            (opt.lang, &opt.source, &opt.input, &opt.output)
         {
             let source = Source::new(source.clone());
             let input = TestDataIn::new(input.clone());
@@ -122,7 +124,8 @@ fn print_completions<G: Generator>(gen: G, app: &mut App) {
 fn main() {
     env_logger::init();
 
-    let opt = Opt::parse();
+    let mut opt = Opt::parse();
+    opt.infer_options();
 
     if let Some(shell_compl) = opt.shell_compl {
         let mut app = Opt::into_app();
