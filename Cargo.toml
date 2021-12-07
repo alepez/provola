@@ -1,6 +1,6 @@
 [package]
 name = "provola"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
 edition = "2018"
 description = "A tool for quick development/test cycle in any language"
@@ -15,6 +15,6 @@ clap_generate = "3.0.0-beta.5"
 env_logger = "0.9"
 log = "0.4"
 notify = "4"
-provola-core = { version = "0.1.4", path = "provola-core" }
-provola-googletest = { version = "0.1.4", path = "provola-googletest" }
-provola-testrunners = { version = "0.1.4", path = "provola-testrunners" }
+provola-core = { version = "0.1.5", path = "provola-core" }
+provola-googletest = { version = "0.1.5", path = "provola-googletest" }
+provola-testrunners = { version = "0.1.5", path = "provola-testrunners" }

@@ -1,8 +1,8 @@
 [package]
 name = "provola-testrunners"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2018"
 
 [dependencies]
-provola-core = { version = "0.1.4", path = "../provola-core" }
-provola-googletest = { version = "0.1.4", path = "../provola-googletest" }
+provola-core = { version = "0.1.5", path = "../provola-core" }
+provola-googletest = { version = "0.1.5", path = "../provola-googletest" }
