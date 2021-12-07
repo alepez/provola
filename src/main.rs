@@ -46,6 +46,10 @@ impl Opt {
 
     fn infer_options(&mut self) {
         self.lang = self.lang_or_guess();
+
+        if let Some(test_runner) = &self.test_runner {
+            self.watch = Some(test_runner.clone());
+        }
     }
 }
 
