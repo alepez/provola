@@ -29,7 +29,7 @@ provola -i in.txt -o out.txt -s reverse.hs -w .
 You can install autocompletion for yout favourite shell:
 
 ```shell
-provola --generate zsh > ~/.zfunc/_provola
+provola --shell-compl zsh > ~/.zfunc/_provola
 ```
 
 ## Supported languages

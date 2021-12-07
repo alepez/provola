@@ -12,8 +12,8 @@ struct Opt {
     #[clap(long)]
     debug: bool,
     /// If provided, outputs the completion file for given shell
-    #[clap(long = "generate", arg_enum)]
-    generator: Option<Shell>,
+    #[clap(long, arg_enum)]
+    shell_compl: Option<Shell>,
     /// Watch files or directories for changes
     #[clap(short, long, parse(from_os_str))]
     watch: Option<PathBuf>,
@@ -124,9 +124,9 @@ fn main() {
 
     let opt = Opt::parse();
 
-    if let Some(generator) = opt.generator {
+    if let Some(shell_compl) = opt.shell_compl {
         let mut app = Opt::into_app();
-        print_completions(generator, &mut app);
+        print_completions(shell_compl, &mut app);
         return;
     }
 
