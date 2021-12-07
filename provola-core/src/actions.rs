@@ -1,4 +1,4 @@
-use crate::test_runners::{TestRunner, TestRunnerType};
+use crate::test_runners::{TestRunnerInfo, TestRunner};
 use crate::{Error, Executable, Language, TestResult};
 use std::{convert::TryFrom, io::Read, path::PathBuf};
 
@@ -56,14 +56,12 @@ impl TryFrom<&TestDataOut> for String {
     }
 }
 
-#[derive(Debug)]
 pub enum Action {
     Build(Language, Source),
     TestInputOutput(TestDataIn, TestDataOut),
-    TestRunner(Executable, TestRunnerType),
+    TestRunner(Box<dyn TestRunner>),
 }
 
-#[derive(Debug)]
 pub struct Actions(pub Vec<Action>);
 
 impl Actions {
@@ -81,9 +79,8 @@ impl Actions {
                     use crate::test::data::test;
                     result = Some(test(executable, input, output)?);
                 }
-                Action::TestRunner(exec, trt) => {
-                    let test_runner = TestRunner::new(exec.clone(), *trt);
-                    result = Some(test_runner.run()?);
+                Action::TestRunner(info) => {
+                    todo!()
                 }
             }
         }

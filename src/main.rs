@@ -1,7 +1,8 @@
 use clap::{App, IntoApp, Parser};
 use clap_generate::{generate, Generator, Shell};
-use provola_core::test_runners::TestRunnerType;
+use provola_core::test_runners::{TestRunnerInfo, TestRunnerType};
 use provola_core::*;
+use provola_testrunners::make_test_runner;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Parser)]
@@ -57,7 +58,9 @@ impl From<&Opt> for Actions {
 
         if let (Some(exec), Some(trt)) = (&opt.test_runner, opt.test_runner_type) {
             let exec = exec.clone().into();
-            actions.push(Action::TestRunner(exec, trt));
+            let info = TestRunnerInfo { exec, trt };
+            let test_runner = make_test_runner(info);
+            actions.push(Action::TestRunner(test_runner));
         }
 
         Actions(actions)

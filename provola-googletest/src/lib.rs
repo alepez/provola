@@ -15,7 +15,7 @@ fn add_arguments(mut argv: Vec<String>, report_path: &str) -> Vec<String> {
     argv
 }
 
-fn run(executable: &Executable) -> Result<Report, Error> {
+pub fn run(executable: &Executable) -> Result<Report, Error> {
     let report_path = "googletest_report.json";
     let argv = add_arguments(executable.into(), report_path);
 

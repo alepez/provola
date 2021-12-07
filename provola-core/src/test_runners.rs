@@ -5,21 +5,18 @@ pub enum TestRunnerType {
     GoogleTest,
 }
 
-pub struct TestRunner {
-    exec: Executable,
-    trt: TestRunnerType,
+pub trait TestRunner {
+    fn run(&self) -> Result<TestResult, Error>;
 }
 
-impl TestRunner {
+#[derive(Debug)]
+pub struct TestRunnerInfo {
+    pub exec: Executable,
+    pub trt: TestRunnerType,
+}
+
+impl TestRunnerInfo {
     pub fn new(exec: Executable, trt: TestRunnerType) -> Self {
         Self { exec, trt }
-    }
-
-    pub fn run(&self) -> Result<TestResult, Error> {
-        match self.trt {
-            TestRunnerType::GoogleTest => {
-                todo!()
-            }
-        }
     }
 }
