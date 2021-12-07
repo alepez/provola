@@ -83,7 +83,8 @@ impl Display for Reason {
                     writeln!(f)?;
 
                     for testcase in &testsuite.testcases {
-                        let result = "OK"; // TODO
+                        let ok = testcase.failures.is_empty();
+                        let result = if ok { "PASS" } else { "FAIL" };
                         writeln!(f, "        {} {}", testcase.name, result)?;
                     }
                 }

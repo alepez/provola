@@ -9,6 +9,8 @@ pub type Hostname = String;
 pub type Id = String;
 pub type Package = String;
 pub type ClassName = String;
+pub type FailureType = String;
+pub type Message = String;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Report {
@@ -45,7 +47,6 @@ pub struct TestSuite {
 pub struct TestCase {
     // TODO error
     // TODO assertions
-    // TODO failure
     // TODO skipped
     // TODO system-err
     // TODO system-out
@@ -53,4 +54,11 @@ pub struct TestCase {
     pub name: Name,
     pub status: Option<Status>,
     pub time: Option<Duration>,
+    pub failures: Vec<Failure>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct Failure {
+    pub ttype: FailureType,
+    pub message: Message,
 }

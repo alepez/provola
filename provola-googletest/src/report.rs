@@ -1,3 +1,4 @@
+use provola_core::Failure as CoreFailure;
 use provola_core::Report as CoreReport;
 use provola_core::TestCase as CoreTestCase;
 use provola_core::TestSuite as CoreTestSuite;
@@ -110,7 +111,17 @@ impl From<TestInfo> for CoreTestCase {
             name: x.name,
             status: None, // TODO Convert to string, but to which format? Some(x.status),
             time: parse_duration(&x.time),
+            failures: x.failures.into_iter().map(|x| x.into()).collect(),
             ..Default::default()
+        }
+    }
+}
+
+impl From<Failure> for CoreFailure {
+    fn from(x: Failure) -> Self {
+        CoreFailure {
+            message: x.failure,
+            ttype: x.ttype,
         }
     }
 }
