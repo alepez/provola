@@ -2,6 +2,9 @@
 name = "provola-googletest"
 version = "0.1.5"
 edition = "2018"
+homepage = "https://github.com/alepez/provola"
+repository = "https://github.com/alepez/provola"
+license = "Apache-2.0"
 
 [dependencies]
 chrono = "0.4"
