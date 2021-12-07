@@ -37,33 +37,35 @@ struct Opt {
     test_runner_type: Option<TestRunnerType>,
 }
 
-impl From<&Opt> for Actions {
+impl Opt {
+    fn lang_or_guess(&self) -> Option<Language> {
+        let source = self.source.as_ref();
+        self.lang
+            .or_else(|| source.and_then(|x| Language::from_source(x)))
+    }
+}
+
+impl From<&Opt> for Action {
     fn from(opt: &Opt) -> Self {
-        let mut actions = Vec::new();
+        let lang = opt.lang_or_guess();
 
-        let lang = opt
-            .lang
-            .or_else(|| opt.source.as_ref().and_then(|x| Language::from_source(x)));
-
-        if let (Some(lang), Some(source)) = (lang, &opt.source) {
+        if let (Some(lang), Some(source), Some(input), Some(output)) =
+            (lang, &opt.source, &opt.input, &opt.output)
+        {
             let source = Source::new(source.clone());
-            actions.push(Action::Build(lang, source));
-        }
-
-        if let (Some(input), Some(output)) = (&opt.input, &opt.output) {
             let input = TestDataIn::new(input.clone());
             let output = TestDataOut::new(output.clone());
-            actions.push(Action::TestInputOutput(input, output));
+            return Action::BuildTestInputOutput(lang, source, input, output);
         }
 
         if let (Some(exec), Some(trt)) = (&opt.test_runner, opt.test_runner_type) {
             let exec = exec.clone().into();
             let info = TestRunnerInfo { exec, trt };
             let test_runner = make_test_runner(info);
-            actions.push(Action::TestRunner(test_runner));
+            return Action::TestRunner(test_runner);
         }
 
-        Actions(actions)
+        Action::Nothing
     }
 }
 
@@ -95,13 +97,8 @@ fn watch(opt: &Opt, watch_files: &Path) -> Result<(), Box<dyn std::error::Error>
 }
 
 fn run_once(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
-    let actions = Actions::from(opt);
-
-    if !actions.is_valid() {
-        return Err(Error::NothingToDo.into());
-    }
-
-    let result = actions.run()?;
+    let action = Action::from(opt);
+    let result = action.run()?;
     let reporter = SimpleReporter::new();
 
     reporter.report(result);

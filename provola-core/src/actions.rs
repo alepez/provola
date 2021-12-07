@@ -57,42 +57,21 @@ impl TryFrom<&TestDataOut> for String {
 }
 
 pub enum Action {
-    Build(Language, Source),
-    TestInputOutput(TestDataIn, TestDataOut),
+    Nothing,
+    BuildTestInputOutput(Language, Source, TestDataIn, TestDataOut),
     TestRunner(Box<dyn TestRunner>),
 }
 
-pub struct Actions(pub Vec<Action>);
-
-impl Actions {
+impl Action {
     pub fn run(&self) -> Result<TestResult, Error> {
-        let mut executable: Option<Executable> = Default::default();
-        let mut result: Option<TestResult> = Default::default();
-
-        for action in self.0.iter() {
-            match action {
-                Action::Build(lang, source) => {
-                    executable = Some(Executable::try_from((*lang, source))?);
-                }
-                Action::TestInputOutput(input, output) => {
-                    let executable = executable.as_ref().ok_or(Error::NoExecutable)?;
-                    use crate::test::data::test;
-                    result = Some(test(executable, input, output)?);
-                }
-                Action::TestRunner(runner) => {
-                    result = Some(runner.run()?);
-                }
+        match self {
+            Action::Nothing => Err(Error::NoResult),
+            Action::BuildTestInputOutput(lang, source, input, output) => {
+                let executable = Some(Executable::try_from((*lang, source))?);
+                let executable = executable.as_ref().ok_or(Error::NoExecutable)?;
+                crate::test::data::test(executable, input, output)
             }
+            Action::TestRunner(runner) => runner.run(),
         }
-
-        if let Some(result) = result {
-            Ok(result)
-        } else {
-            Err(Error::NoResult)
-        }
-    }
-
-    pub fn is_valid(&self) -> bool {
-        !self.0.is_empty()
     }
 }
