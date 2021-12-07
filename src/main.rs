@@ -11,24 +11,24 @@ struct Opt {
     /// Activate debug mode
     #[clap(long)]
     debug: bool,
-    /// Watch files or directories for changes
-    #[clap(short, long, parse(from_os_str))]
-    watch: Option<PathBuf>,
-    /// Input file
-    #[clap(short, long, parse(from_os_str))]
-    input: Option<PathBuf>,
-    /// Expected output
-    #[clap(short, long, parse(from_os_str))]
-    output: Option<PathBuf>,
-    /// Language
-    #[clap(short, long)]
-    lang: Option<Language>,
-    /// Source code
-    #[clap(short, long)]
-    source: Option<PathBuf>,
     /// If provided, outputs the completion file for given shell
     #[clap(long = "generate", arg_enum)]
     generator: Option<Shell>,
+    /// Watch files or directories for changes
+    #[clap(short, long, parse(from_os_str))]
+    watch: Option<PathBuf>,
+    /// Input file to be used for data test
+    #[clap(short, long, parse(from_os_str))]
+    input: Option<PathBuf>,
+    /// Expected output to be used for data test
+    #[clap(short, long, parse(from_os_str))]
+    output: Option<PathBuf>,
+    /// Language of the source code. If not provided, it is automatically detected
+    #[clap(short, long)]
+    lang: Option<Language>,
+    /// Source code file
+    #[clap(short, long)]
+    source: Option<PathBuf>,
     /// Execute a test runner
     #[clap(short = 't')]
     test_runner: Option<PathBuf>,
