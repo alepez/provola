@@ -41,7 +41,8 @@ impl Display for Reason {
                 write!(f, "Expected\n\n{}\n\nActual\n\n{}", expected, actual)
             }
             Reason::Report(report) => {
-                write!(f, "TODO Report not available")
+                // TODO Pretty print instead of debug
+                write!(f, "{:#?}", &report)
             }
         }
     }
