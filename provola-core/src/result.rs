@@ -41,8 +41,54 @@ impl Display for Reason {
                 write!(f, "Expected\n\n{}\n\nActual\n\n{}", expected, actual)
             }
             Reason::Report(report) => {
-                // TODO Pretty print instead of debug
-                write!(f, "{:#?}", &report)
+                if let Some(name) = &report.name {
+                    write!(f, "{} | ", name)?;
+                }
+
+                if let Some(tests) = report.tests {
+                    write!(f, "tests: {} | ", tests)?;
+                }
+
+                if let Some(errors) = report.errors {
+                    write!(f, "errors: {} | ", errors)?;
+                }
+
+                if let Some(failures) = report.failures {
+                    write!(f, "failures: {} | ", failures)?;
+                }
+
+                if let Some(disabled) = report.disabled {
+                    write!(f, "- disabled: {} | ", disabled)?;
+                }
+
+                writeln!(f)?;
+
+                for testsuite in &report.testsuites {
+                    write!(f, "    {} | ", testsuite.name)?;
+
+                    write!(f, "tests: {} | ", testsuite.tests)?;
+
+                    if let Some(errors) = testsuite.errors {
+                        write!(f, "errors: {} | ", errors)?;
+                    }
+
+                    if let Some(failures) = testsuite.failures {
+                        write!(f, "failures: {} | ", failures)?;
+                    }
+
+                    if let Some(disabled) = testsuite.disabled {
+                        write!(f, "disabled: {} | ", disabled)?;
+                    }
+
+                    writeln!(f)?;
+
+                    for testcase in &testsuite.testcases {
+                        let result = "OK"; // TODO
+                        writeln!(f, "        {} {}", testcase.name, result)?;
+                    }
+                }
+
+                Ok(())
             }
         }
     }
