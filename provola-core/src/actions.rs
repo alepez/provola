@@ -1,4 +1,4 @@
-use crate::test_runners::{TestRunnerInfo, TestRunner};
+use crate::test_runners::TestRunner;
 use crate::{Error, Executable, Language, TestResult};
 use std::{convert::TryFrom, io::Read, path::PathBuf};
 
@@ -79,8 +79,8 @@ impl Actions {
                     use crate::test::data::test;
                     result = Some(test(executable, input, output)?);
                 }
-                Action::TestRunner(info) => {
-                    todo!()
+                Action::TestRunner(runner) => {
+                    result = Some(runner.run()?);
                 }
             }
         }

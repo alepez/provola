@@ -1,7 +1,6 @@
 use provola_core::{Error, Executable, Report};
 use std::fs::File;
 use std::io::BufReader;
-use std::path::Path;
 use std::time::Duration;
 use subprocess::Popen;
 use subprocess::PopenConfig;
@@ -15,7 +14,7 @@ fn add_arguments(mut argv: Vec<String>, report_path: &str) -> Vec<String> {
     argv
 }
 
-pub fn run(executable: &Executable) -> Result<Report, Error> {
+fn run_exec(executable: &Executable) -> Result<Report, Error> {
     let report_path = "googletest_report.json";
     let argv = add_arguments(executable.into(), report_path);
 
@@ -46,6 +45,25 @@ pub fn run(executable: &Executable) -> Result<Report, Error> {
     let gtest_rep: report::UnitTest = serde_json::from_reader(reader).unwrap();
     let core_rep = Report::from(gtest_rep);
     Ok(core_rep)
+}
+
+pub struct TestRunner {
+    executable: Executable,
+}
+
+impl provola_core::test_runners::TestRunner for TestRunner {
+    fn from_executable(
+        executable: Executable,
+    ) -> Box<(dyn provola_core::test_runners::TestRunner)> {
+        Box::new(TestRunner { executable })
+    }
+
+    fn run(&self) -> Result<provola_core::TestResult, provola_core::Error> {
+        let report = run_exec(&self.executable)?;
+        let report = provola_core::Report::from(report);
+        let result = report.into();
+        Ok(result)
+    }
 }
 
 #[cfg(test)]

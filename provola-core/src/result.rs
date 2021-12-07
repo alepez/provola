@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use crate::Report;
+
 #[derive(Debug)]
 pub enum TestResult {
     Pass,
@@ -10,6 +12,7 @@ pub enum TestResult {
 pub enum Reason {
     Generic(String),
     NotExpected { actual: String, expected: String },
+    Report(Report),
 }
 
 impl From<String> for Reason {
@@ -24,6 +27,10 @@ impl Reason {
         let expected = expected.to_string();
         Reason::NotExpected { actual, expected }
     }
+
+    fn from_report(report: Report) -> Self {
+        Reason::Report(report)
+    }
 }
 
 impl Display for Reason {
@@ -33,6 +40,21 @@ impl Display for Reason {
             Reason::NotExpected { actual, expected } => {
                 write!(f, "Expected\n\n{}\n\nActual\n\n{}", expected, actual)
             }
+            Reason::Report(report) => {
+                write!(f, "TODO Report not available")
+            }
+        }
+    }
+}
+
+impl From<Report> for TestResult {
+    fn from(x: Report) -> Self {
+        let failures = x.failures.unwrap_or(0);
+        if failures == 0 {
+            TestResult::Pass
+        } else {
+            let reason = Reason::from_report(x);
+            TestResult::Fail(reason)
         }
     }
 }
