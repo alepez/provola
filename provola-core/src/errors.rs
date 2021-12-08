@@ -20,4 +20,6 @@ pub enum Error {
     NothingToDo,
     #[error("not implemented")]
     NotImplemented,
+    #[error("cannot watch file: {0}")]
+    CannotWatch(String),
 }

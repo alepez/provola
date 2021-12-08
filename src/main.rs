@@ -87,7 +87,7 @@ fn watch(opt: &Opt, watch_files: &Path) -> Result<(), Box<dyn std::error::Error>
 
     watcher
         .watch(&watch_files, RecursiveMode::Recursive)
-        .unwrap();
+        .map_err(|e| Error::CannotWatch(e.to_string()))?;
 
     loop {
         match rx.recv() {
