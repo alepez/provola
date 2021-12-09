@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+
+cd "${PROJECT_DIR}"
+
+(
+git submodule update --init --recursive
+)
+
+(
+cd provola-googletest/examples/data
+./tools/generate-json-report
+)
