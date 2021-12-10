@@ -1,8 +1,9 @@
 use clap::{App, IntoApp, Parser};
 use clap_generate::{generate, Generator, Shell};
-use provola_core::test_runners::{TestRunnerInfo, TestRunnerType};
 use provola_core::*;
 use provola_testrunners::make_test_runner;
+use provola_testrunners::{TestRunnerInfo, TestRunnerType};
+use std::convert::TryFrom;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Parser)]
@@ -53,25 +54,29 @@ impl Opt {
     }
 }
 
-impl From<&Opt> for Action {
-    fn from(opt: &Opt) -> Self {
+impl TryFrom<&Opt> for Action {
+    type Error = Error;
+
+    fn try_from(opt: &Opt) -> Result<Self, Error> {
         if let (Some(lang), Some(source), Some(input), Some(output)) =
             (opt.lang, &opt.source, &opt.input, &opt.output)
         {
             let source = Source::new(source.clone());
             let input = TestDataIn::new(input.clone());
             let output = TestDataOut::new(output.clone());
-            return Action::BuildTestInputOutput(lang, source, input, output);
+            let a = Action::BuildTestInputOutput(lang, source, input, output);
+            return Ok(a);
         }
 
         if let (Some(exec), Some(trt)) = (&opt.test_runner, opt.test_runner_type) {
             let exec = exec.clone().into();
             let info = TestRunnerInfo { exec, trt };
             let test_runner = make_test_runner(info);
-            return Action::TestRunner(test_runner);
+            let a = Action::TestRunner(test_runner?);
+            return Ok(a);
         }
 
-        Action::Nothing
+        Ok(Action::Nothing)
     }
 }
 
@@ -103,7 +108,7 @@ fn watch(opt: &Opt, watch_files: &Path) -> Result<(), Box<dyn std::error::Error>
 }
 
 fn run_once(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
-    let action = Action::from(opt);
+    let action = Action::try_from(opt)?;
     let result = action.run()?;
     let reporter = SimpleReporter::new();
 

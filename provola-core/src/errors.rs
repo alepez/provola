@@ -22,4 +22,6 @@ pub enum Error {
     NotImplemented,
     #[error("cannot watch file: {0}")]
     CannotWatch(String),
+    #[error("test runner not supported: {0}")]
+    TestRunnerNotSupported(String),
 }
