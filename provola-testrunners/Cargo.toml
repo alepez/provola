@@ -14,3 +14,10 @@ path = "../provola-core"
 [dependencies.provola-googletest]
 version = "0.1.5"
 path = "../provola-googletest"
+optional = true
+
+[features]
+default = [
+  "googletest",
+]
+googletest = [ "provola-googletest" ]
