@@ -15,5 +15,11 @@ clap_generate = "3.0.0-beta.5"
 env_logger = "0.9"
 log = "0.4"
 notify = "4"
-provola-core = { version = "0.1.5", path = "provola-core" }
-provola-testrunners = { version = "0.1.5", path = "provola-testrunners" }
+
+[dependencies.provola-core]
+version = "0.1.5"
+path = "provola-core"
+
+[dependencies.provola-testrunners]
+version = "0.1.5"
+path = "provola-testrunners"
