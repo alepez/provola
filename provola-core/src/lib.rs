@@ -22,3 +22,4 @@ pub use report::TestCase;
 pub use report::TestSuite;
 pub use reporter::Reporter;
 pub use result::TestResult;
+pub use result::Reason;
