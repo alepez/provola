@@ -421,6 +421,7 @@ dependencies = [
  "log",
  "notify",
  "provola-core",
+ "provola-reporters",
  "provola-testrunners",
 ]
 
@@ -449,6 +450,21 @@ dependencies = [
  "serde",
  "serde_json",
  "subprocess",
+]
+
+[[package]]
+name = "provola-reporters"
+version = "0.1.5"
+dependencies = [
+ "provola-core",
+ "provola-terminalreporter",
+]
+
+[[package]]
+name = "provola-terminalreporter"
+version = "0.1.5"
+dependencies = [
+ "provola-core",
 ]
 
 [[package]]

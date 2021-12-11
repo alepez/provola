@@ -110,7 +110,8 @@ fn watch(opt: &Opt, watch_files: &Path) -> Result<(), Box<dyn std::error::Error>
 fn run_once(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
     let action = Action::try_from(opt)?;
     let result = action.run()?;
-    let reporter = SimpleReporter::new();
+    // TODO Select reporter by option
+    let reporter = provola_reporters::TerminalReporter::new();
 
     reporter.report(result);
 

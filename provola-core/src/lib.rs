@@ -21,5 +21,4 @@ pub use report::Report;
 pub use report::TestCase;
 pub use report::TestSuite;
 pub use reporter::Reporter;
-pub use reporter::SimpleReporter;
 pub use result::TestResult;
