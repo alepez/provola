@@ -27,3 +27,13 @@ path = "provola-testrunners"
 [dependencies.provola-reporters]
 version = "0.1.5"
 path = "provola-reporters"
+
+[workspace]
+
+members = [
+  "provola-core",
+  "provola-reporters",
+  "provola-googletest",
+  "provola-testrunners",
+  "provola-terminalreporter",
+]
