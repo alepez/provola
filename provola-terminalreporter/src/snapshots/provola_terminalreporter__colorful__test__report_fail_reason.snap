@@ -3,4 +3,4 @@ source: src/colorful.rs
 expression: s
 
 ---
-"FAIL\n\nExpected\n\nbar\n\nActual\n\nfoo\n"
+"Expected\n\nbar\n\nActual\n\nfoo\n\u{1b}[1;31mFAIL\u{1b}[0m\n"

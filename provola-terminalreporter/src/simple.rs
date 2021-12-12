@@ -116,7 +116,8 @@ mod test {
     #[test]
     fn report_pass() {
         let mut s = String::new();
-        let res = TestResult::Pass;
+        let reason = Reason::Unknown;
+        let res = TestResult::Pass(reason);
         let res = res.to_tr_wrapper();
         write!(s, "{}", res).unwrap();
         insta::assert_debug_snapshot!(s);
