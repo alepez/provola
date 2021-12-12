@@ -60,7 +60,6 @@ impl provola_core::test_runners::TestRunner for TestRunner {
 
     fn run(&self) -> Result<provola_core::TestResult, provola_core::Error> {
         let report = run_exec(&self.executable)?;
-        let report = provola_core::Report::from(report);
         let result = report.into();
         Ok(result)
     }
