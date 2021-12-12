@@ -24,4 +24,6 @@ pub enum Error {
     CannotWatch(String),
     #[error("test runner not supported: {0}")]
     TestRunnerNotSupported(String),
+    #[error("reporter error")]
+    ReporterError(#[from] crate::reporter::Error),
 }

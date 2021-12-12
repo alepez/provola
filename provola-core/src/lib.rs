@@ -20,6 +20,7 @@ pub use report::Failure;
 pub use report::Report;
 pub use report::TestCase;
 pub use report::TestSuite;
+pub use reporter::Error as ReporterError;
 pub use reporter::Reporter;
-pub use result::TestResult;
 pub use result::Reason;
+pub use result::TestResult;

@@ -1,5 +1,6 @@
 use provola_core::Reason;
 use provola_core::Reporter;
+use provola_core::ReporterError;
 use provola_core::TestResult;
 use std::io::Write;
 
@@ -32,9 +33,9 @@ impl TerminalReporter {
 }
 
 impl Reporter for TerminalReporter {
-    fn report(&self, result: TestResult) {
+    fn report(&self, result: TestResult) -> Result<(), ReporterError> {
         let mut writer = std::io::stdout();
-        write!(writer, "{}", result.to_tr_wrapper()).unwrap(); // FIXME
+        write!(writer, "{}", result.to_tr_wrapper()).map_err(ReporterError::IoError)
     }
 }
 

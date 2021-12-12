@@ -113,7 +113,7 @@ fn run_once(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
     // TODO Select reporter by option
     let reporter = provola_reporters::TerminalReporter::new();
 
-    reporter.report(result);
+    reporter.report(result)?;
 
     Ok(())
 }
