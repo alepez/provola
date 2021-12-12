@@ -27,15 +27,15 @@ jobs:
 
     - run: |
         cargo install cargo-deny --locked
-        cargo check -p provola-core
-        cargo test -p provola-core
-        cargo clippy -p provola-core
+        cargo check
+        cargo test
+        cargo clippy
 
     - name: Run cargo-tarpaulin
       uses: actions-rs/tarpaulin@v0.1
       with:
         version: '0.18.5'
-        args: '-p provola-core -- --test-threads 1'
+        args: '--all -- --test-threads 1'
 
     - name: Upload to codecov.io
       uses: codecov/codecov-action@v1.0.2
