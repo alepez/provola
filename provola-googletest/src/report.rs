@@ -83,8 +83,7 @@ impl From<UnitTest> for CoreReport {
             tests: Some(x.tests),
             time: parse_duration(&x.time),
             timestamp: Some(x.timestamp),
-            testsuites: x.testsuites.into_iter().map(|x| x.into()).collect(),
-            ..Default::default()
+            testsuites: x.testsuites.into_iter().map(|x| x.into()).collect()
         }
     }
 }
