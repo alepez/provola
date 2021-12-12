@@ -1,6 +1,6 @@
 # Provola
 
-> ~~Test it!~~ ➡ ~~Provalo~~~ ➡ Provola!
+> ~~Test it!~~ → ~~Provalo!~~ → Provola!
 
 `provola` is your best ~~cheese~~ friend when you need to test code quickly.
 
