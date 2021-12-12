@@ -1,5 +1,5 @@
-mod simple;
 mod colorful;
+mod simple;
 
-pub use simple::TerminalReporter;
 pub use colorful::ThisReporter as ColorfulTerminalReporter;
+pub use simple::ThisReporter as TerminalReporter;

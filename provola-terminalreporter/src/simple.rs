@@ -5,41 +5,41 @@ use provola_core::TestResult;
 use std::io::Write;
 
 #[derive(Default)]
-pub struct TerminalReporter;
+pub struct ThisReporter;
 
-trait TerminalReporterDisplay: Sized {
+trait ThisDisplay: Sized {
     fn tr_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 
-    fn to_tr_wrapper(&self) -> TerminalReporterWrapper<Self> {
-        TerminalReporterWrapper(self)
+    fn to_tr_wrapper(&self) -> ThisWrapper<Self> {
+        ThisWrapper(self)
     }
 }
 
-struct TerminalReporterWrapper<'a, T: TerminalReporterDisplay>(&'a T);
+struct ThisWrapper<'a, T: ThisDisplay>(&'a T);
 
-impl<T> std::fmt::Display for TerminalReporterWrapper<'_, T>
+impl<T> std::fmt::Display for ThisWrapper<'_, T>
 where
-    T: TerminalReporterDisplay,
+    T: ThisDisplay,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.tr_fmt(f)
     }
 }
 
-impl TerminalReporter {
+impl ThisReporter {
     pub fn new() -> Self {
-        TerminalReporter {}
+        ThisReporter {}
     }
 }
 
-impl Reporter for TerminalReporter {
+impl Reporter for ThisReporter {
     fn report(&self, result: TestResult) -> Result<(), ReporterError> {
         let mut writer = std::io::stdout();
         write!(writer, "{}", result.to_tr_wrapper()).map_err(ReporterError::IoError)
     }
 }
 
-impl TerminalReporterDisplay for TestResult {
+impl ThisDisplay for TestResult {
     fn tr_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let TestResult::Fail(reason) = &self {
             writeln!(f, "FAIL\n")?;
@@ -51,7 +51,7 @@ impl TerminalReporterDisplay for TestResult {
     }
 }
 
-impl TerminalReporterDisplay for Reason {
+impl ThisDisplay for Reason {
     fn tr_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
             Reason::Generic(description) => std::write!(f, "{}", description),
