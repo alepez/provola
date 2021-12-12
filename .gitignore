@@ -1,1 +1,7 @@
 target
+
+# Ignore Cargo.lock for sub crates
+Cargo.lock
+
+# Do not ignore Cargo.lock for main crate
+!/Cargo.lock
