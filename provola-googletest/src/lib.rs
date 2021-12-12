@@ -76,6 +76,6 @@ mod tests {
     fn run_valid_executable() {
         let path = PathBuf::from("./examples/data/build/example");
         let exec = Executable::from(path);
-        assert!(run(&exec).is_ok());
+        assert!(run_exec(&exec).is_ok());
     }
 }
