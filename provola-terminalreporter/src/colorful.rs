@@ -1,3 +1,4 @@
+use colored::*;
 use provola_core::Reason;
 use provola_core::Reporter;
 use provola_core::ReporterError;
@@ -41,13 +42,17 @@ impl Reporter for ThisReporter {
 
 impl ThisDisplay for TestResult {
     fn tr_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let TestResult::Fail(reason) = &self {
-            writeln!(f, "FAIL\n")?;
-            writeln!(f, "{}", reason.to_tr_wrapper())?;
-            Ok(())
-        } else {
-            writeln!(f, "PASS")
+        match &self {
+            TestResult::Fail(reason) => {
+                writeln!(f, "{}", reason.to_tr_wrapper())?;
+                writeln!(f, "{}", "FAIL".red().bold())?;
+            }
+            TestResult::Pass(reason) => {
+                writeln!(f, "{}", reason.to_tr_wrapper())?;
+                writeln!(f, "{}", "PASS".green().bold())?;
+            }
         }
+        Ok(())
     }
 }
 
@@ -61,50 +66,16 @@ impl ThisDisplay for Reason {
             }
             Reason::Report(report) => {
                 if let Some(name) = &report.name {
-                    write!(f, "{} | ", name)?;
+                    writeln!(f, "{}", name.bold())?;
                 }
-
-                if let Some(tests) = report.tests {
-                    write!(f, "tests: {} | ", tests)?;
-                }
-
-                if let Some(errors) = report.errors {
-                    write!(f, "errors: {} | ", errors)?;
-                }
-
-                if let Some(failures) = report.failures {
-                    write!(f, "failures: {} | ", failures)?;
-                }
-
-                if let Some(disabled) = report.disabled {
-                    write!(f, "- disabled: {} | ", disabled)?;
-                }
-
-                writeln!(f)?;
 
                 for testsuite in &report.testsuites {
-                    write!(f, "    {} | ", testsuite.name)?;
-
-                    write!(f, "tests: {} | ", testsuite.tests)?;
-
-                    if let Some(errors) = testsuite.errors {
-                        write!(f, "errors: {} | ", errors)?;
-                    }
-
-                    if let Some(failures) = testsuite.failures {
-                        write!(f, "failures: {} | ", failures)?;
-                    }
-
-                    if let Some(disabled) = testsuite.disabled {
-                        write!(f, "disabled: {} | ", disabled)?;
-                    }
-
-                    writeln!(f)?;
+                    writeln!(f, "  {}", testsuite.name.bold())?;
 
                     for testcase in &testsuite.testcases {
                         let ok = testcase.failures.is_empty();
-                        let result = if ok { "PASS" } else { "FAIL" };
-                        writeln!(f, "        {} {}", testcase.name, result)?;
+                        let symbol = if ok { "✔".green() } else { "✖".red() };
+                        writeln!(f, "    {} {}", symbol, testcase.name)?;
                     }
                 }
 
