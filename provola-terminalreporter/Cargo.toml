@@ -17,4 +17,5 @@ version = "0.1.5"
 path = "../provola-core"
 
 [dev-dependencies]
-insta = "1.8.0"
+# backtrace feature is enabled so we can run tests without concurrency
+insta = { version = "1.8.0", features = [ "backtrace" ] }
