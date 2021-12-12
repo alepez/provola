@@ -39,9 +39,10 @@ pub struct BasicReporter;
 impl Reporter for BasicReporter {
     fn report(&self, result: TestResult) -> Result<(), provola_core::ReporterError> {
         match result {
-            TestResult::Pass(_) => Ok(println!("PASS")),
-            TestResult::Fail(_) => Ok(println!("FAIL")),
+            TestResult::Pass(_) => println!("PASS"),
+            TestResult::Fail(_) => println!("FAIL"),
         }
+        Ok(())
     }
 }
 
