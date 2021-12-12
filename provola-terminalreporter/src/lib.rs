@@ -40,7 +40,7 @@ impl Reporter for TerminalReporter {
 
 impl TerminalReporterDisplay for TestResult {
     fn tr_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let TestResult::Fail(reason) = &self { // FIXME
+        if let TestResult::Fail(reason) = &self {
             writeln!(f, "FAIL\n")?;
             writeln!(f, "{}", reason.to_tr_wrapper())?;
             Ok(())
