@@ -4,12 +4,13 @@ use crate::Report;
 
 #[derive(Debug)]
 pub enum TestResult {
-    Pass,
+    Pass(Reason),
     Fail(Reason),
 }
 
 #[derive(Debug)]
 pub enum Reason {
+    Unknown,
     Generic(String),
     NotExpected { actual: String, expected: String },
     Report(Report),
@@ -36,10 +37,10 @@ impl Reason {
 impl From<Report> for TestResult {
     fn from(x: Report) -> Self {
         let failures = x.failures.unwrap_or(0);
+        let reason = Reason::from_report(x);
         if failures == 0 {
-            TestResult::Pass
+            TestResult::Pass(reason)
         } else {
-            let reason = Reason::from_report(x);
             TestResult::Fail(reason)
         }
     }

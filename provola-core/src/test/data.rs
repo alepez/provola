@@ -41,7 +41,7 @@ pub fn test(
     let eq = expected_output == actual_output;
 
     let result = if eq {
-        TestResult::Pass
+        TestResult::Pass(Reason::Unknown)
     } else {
         let reason = Reason::not_expected(actual_output, expected_output);
         TestResult::Fail(reason)

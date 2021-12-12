@@ -54,6 +54,7 @@ impl ThisDisplay for TestResult {
 impl ThisDisplay for Reason {
     fn tr_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
+            Reason::Unknown => std::write!(f, ""),
             Reason::Generic(description) => std::write!(f, "{}", description),
             Reason::NotExpected { actual, expected } => {
                 write!(f, "Expected\n\n{}\n\nActual\n\n{}", expected, actual)
