@@ -1,7 +1,7 @@
 [package]
 name = "provola-googletest"
-version = "0.1.5"
-edition = "2018"
+version = "0.1.6"
+edition = "2021"
 description = "provola extension for googletest"
 homepage = "https://github.com/alepez/provola"
 repository = "https://github.com/alepez/provola"

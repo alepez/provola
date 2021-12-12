@@ -1,8 +1,8 @@
 [package]
 name = "provola-terminalreporter"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
-edition = "2018"
+edition = "2021"
 description = "A tool for quick development/test cycle in any language"
 homepage = "https://github.com/alepez/provola"
 repository = "https://github.com/alepez/provola"
