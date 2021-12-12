@@ -5,3 +5,5 @@ Cargo.lock
 
 # Do not ignore Cargo.lock for main crate
 !/Cargo.lock
+target-coverage
+provola-core/tmp.exe
