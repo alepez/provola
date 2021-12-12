@@ -8,19 +8,19 @@ pub use provola_terminalreporter::TerminalReporter;
 #[cfg(feature = "terminalreporter")]
 pub use provola_terminalreporter::ColorfulTerminalReporter;
 
+fn make<T: Reporter + Default + 'static>() -> Result<Box<dyn Reporter>, Error> {
+    Ok(Box::new(T::default()))
+}
+
 pub fn make_reporter(rt: ReporterType) -> Result<Box<dyn Reporter>, Error> {
     match rt {
-        ReporterType::Basic => Ok(Box::new(BasicReporter::default())),
+        ReporterType::Basic => make::<BasicReporter>(),
 
         #[cfg(feature = "terminalreporter")]
-        ReporterType::Terminal => Ok(Box::new(
-            provola_terminalreporter::TerminalReporter::default(),
-        )),
+        ReporterType::Terminal => make::<TerminalReporter>(),
 
         #[cfg(feature = "terminalreporter")]
-        ReporterType::ColorfulTerminal => Ok(Box::new(
-            provola_terminalreporter::ColorfulTerminalReporter::default(),
-        )),
+        ReporterType::ColorfulTerminal => make::<ColorfulTerminalReporter>(),
     }
 }
 
