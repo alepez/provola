@@ -467,8 +467,11 @@ dependencies = [
 name = "provola-reporters"
 version = "0.1.5"
 dependencies = [
+ "lazy_static",
  "provola-core",
  "provola-terminalreporter",
+ "strum",
+ "strum_macros",
 ]
 
 [[package]]

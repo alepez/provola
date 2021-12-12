@@ -1,6 +1,7 @@
 use clap::{App, IntoApp, Parser};
 use clap_generate::{generate, Generator, Shell};
 use provola_core::*;
+use provola_reporters::{ReporterType, DEFAULT_REPORTER_STR};
 use provola_testrunners::make_test_runner;
 use provola_testrunners::{TestRunnerInfo, TestRunnerType};
 use std::convert::TryFrom;
@@ -36,6 +37,8 @@ struct Opt {
     /// Select test runner type
     #[clap(short = 'T')]
     test_runner_type: Option<TestRunnerType>,
+    #[clap(short = 'R', default_value = &DEFAULT_REPORTER_STR)]
+    reporter: ReporterType,
 }
 
 impl Opt {
@@ -51,6 +54,10 @@ impl Opt {
         if let Some(test_runner) = &self.test_runner {
             self.watch = Some(test_runner.clone());
         }
+    }
+
+    fn reporter(&self) -> Result<Box<dyn Reporter>, Error> {
+        provola_reporters::make_reporter(self.reporter)
     }
 }
 
@@ -110,8 +117,7 @@ fn watch(opt: &Opt, watch_files: &Path) -> Result<(), Box<dyn std::error::Error>
 fn run_once(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
     let action = Action::try_from(opt)?;
     let result = action.run()?;
-    // TODO Select reporter by option
-    let reporter = provola_reporters::TerminalReporter::new();
+    let reporter = opt.reporter()?;
 
     reporter.report(result)?;
 

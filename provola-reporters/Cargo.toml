@@ -10,6 +10,9 @@ readme = "../README.md"
 license = "Apache-2.0"
 
 [dependencies]
+lazy_static = "1.0"
+strum = "0.23"
+strum_macros = "0.23"
 
 [dependencies.provola-core]
 version = "0.1.5"
