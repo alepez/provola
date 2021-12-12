@@ -26,12 +26,6 @@ where
     }
 }
 
-impl ThisReporter {
-    pub fn new() -> Self {
-        ThisReporter {}
-    }
-}
-
 impl Reporter for ThisReporter {
     fn report(&self, result: TestResult) -> Result<(), ReporterError> {
         let mut writer = std::io::stdout();

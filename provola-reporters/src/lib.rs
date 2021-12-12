@@ -10,12 +10,16 @@ pub use provola_terminalreporter::ColorfulTerminalReporter;
 
 pub fn make_reporter(rt: ReporterType) -> Result<Box<dyn Reporter>, Error> {
     match rt {
-        ReporterType::Basic => Ok(Box::new(BasicReporter::new())),
+        ReporterType::Basic => Ok(Box::new(BasicReporter::default())),
+
         #[cfg(feature = "terminalreporter")]
-        ReporterType::Terminal => Ok(Box::new(provola_terminalreporter::TerminalReporter::new())),
+        ReporterType::Terminal => Ok(Box::new(
+            provola_terminalreporter::TerminalReporter::default(),
+        )),
+
         #[cfg(feature = "terminalreporter")]
         ReporterType::ColorfulTerminal => Ok(Box::new(
-            provola_terminalreporter::ColorfulTerminalReporter::new(),
+            provola_terminalreporter::ColorfulTerminalReporter::default(),
         )),
     }
 }
@@ -31,12 +35,6 @@ pub enum ReporterType {
 
 #[derive(Default)]
 pub struct BasicReporter;
-
-impl BasicReporter {
-    pub fn new() -> Self {
-        BasicReporter {}
-    }
-}
 
 impl Reporter for BasicReporter {
     fn report(&self, result: TestResult) -> Result<(), provola_core::ReporterError> {
