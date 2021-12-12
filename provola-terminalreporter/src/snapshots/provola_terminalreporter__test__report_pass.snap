@@ -1,0 +1,6 @@
+---
+source: src/lib.rs
+expression: s
+
+---
+"PASS\n"

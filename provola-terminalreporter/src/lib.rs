@@ -1,12 +1,28 @@
 use provola_core::Reason;
 use provola_core::Reporter;
 use provola_core::TestResult;
+use std::io::Write;
 
 #[derive(Default)]
 pub struct TerminalReporter;
 
-trait TerminalReporterDisplay {
-    fn print(&self);
+trait TerminalReporterDisplay: Sized {
+    fn tr_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
+
+    fn to_tr_wrapper(&self) -> TerminalReporterWrapper<Self> {
+        TerminalReporterWrapper(self)
+    }
+}
+
+struct TerminalReporterWrapper<'a, T: TerminalReporterDisplay>(&'a T);
+
+impl<T> std::fmt::Display for TerminalReporterWrapper<'_, T>
+where
+    T: TerminalReporterDisplay,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.tr_fmt(f)
+    }
 }
 
 impl TerminalReporter {
@@ -17,71 +33,106 @@ impl TerminalReporter {
 
 impl Reporter for TerminalReporter {
     fn report(&self, result: TestResult) {
-        if let TestResult::Fail(reason) = result {
-            println!("FAIL\n");
-            reason.print();
+        let mut writer = std::io::stdout();
+        write!(writer, "{}", result.to_tr_wrapper()).unwrap(); // FIXME
+    }
+}
+
+impl TerminalReporterDisplay for TestResult {
+    fn tr_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let TestResult::Fail(reason) = &self { // FIXME
+            writeln!(f, "FAIL\n")?;
+            writeln!(f, "{}", reason.to_tr_wrapper())?;
+            Ok(())
         } else {
-            println!("PASS");
+            writeln!(f, "PASS")
         }
     }
 }
 
 impl TerminalReporterDisplay for Reason {
-    fn print(&self) {
+    fn tr_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
-            Reason::Generic(description) => print!("{}", description),
+            Reason::Generic(description) => std::write!(f, "{}", description),
             Reason::NotExpected { actual, expected } => {
-                print!("Expected\n\n{}\n\nActual\n\n{}", expected, actual)
+                write!(f, "Expected\n\n{}\n\nActual\n\n{}", expected, actual)
             }
             Reason::Report(report) => {
                 if let Some(name) = &report.name {
-                    print!("{} | ", name);
+                    write!(f, "{} | ", name)?;
                 }
 
                 if let Some(tests) = report.tests {
-                    print!("tests: {} | ", tests);
+                    write!(f, "tests: {} | ", tests)?;
                 }
 
                 if let Some(errors) = report.errors {
-                    print!("errors: {} | ", errors);
+                    write!(f, "errors: {} | ", errors)?;
                 }
 
                 if let Some(failures) = report.failures {
-                    print!("failures: {} | ", failures);
+                    write!(f, "failures: {} | ", failures)?;
                 }
 
                 if let Some(disabled) = report.disabled {
-                    print!("- disabled: {} | ", disabled);
+                    write!(f, "- disabled: {} | ", disabled)?;
                 }
 
-                println!();
+                writeln!(f)?;
 
                 for testsuite in &report.testsuites {
-                    print!("    {} | ", testsuite.name);
+                    write!(f, "    {} | ", testsuite.name)?;
 
-                    print!("tests: {} | ", testsuite.tests);
+                    write!(f, "tests: {} | ", testsuite.tests)?;
 
                     if let Some(errors) = testsuite.errors {
-                        print!("errors: {} | ", errors);
+                        write!(f, "errors: {} | ", errors)?;
                     }
 
                     if let Some(failures) = testsuite.failures {
-                        print!("failures: {} | ", failures);
+                        write!(f, "failures: {} | ", failures)?;
                     }
 
                     if let Some(disabled) = testsuite.disabled {
-                        print!("disabled: {} | ", disabled);
+                        write!(f, "disabled: {} | ", disabled)?;
                     }
 
-                    println!();
+                    writeln!(f)?;
 
                     for testcase in &testsuite.testcases {
                         let ok = testcase.failures.is_empty();
                         let result = if ok { "PASS" } else { "FAIL" };
-                        println!("        {} {}", testcase.name, result);
+                        writeln!(f, "        {} {}", testcase.name, result)?;
                     }
                 }
+
+                Ok(())
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::fmt::Write;
+
+    #[test]
+    fn report_pass() {
+        let mut s = String::new();
+        let res = TestResult::Pass;
+        let res = res.to_tr_wrapper();
+        write!(s, "{}", res).unwrap();
+        insta::assert_debug_snapshot!(s);
+    }
+
+    #[test]
+    fn report_fail_reason() {
+        let mut s = String::new();
+        let reason = Reason::not_expected("foo", "bar");
+        let res = TestResult::Fail(reason);
+        let res = res.to_tr_wrapper();
+        write!(s, "{}", res).unwrap();
+        insta::assert_debug_snapshot!(s);
     }
 }

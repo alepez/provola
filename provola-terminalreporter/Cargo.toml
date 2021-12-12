@@ -14,3 +14,6 @@ license = "Apache-2.0"
 [dependencies.provola-core]
 version = "0.1.5"
 path = "../provola-core"
+
+[dev-dependencies]
+insta = "1.8.0"
