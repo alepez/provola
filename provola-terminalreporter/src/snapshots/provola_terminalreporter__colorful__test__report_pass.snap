@@ -1,0 +1,6 @@
+---
+source: src/colorful.rs
+expression: s
+
+---
+"PASS\n"
