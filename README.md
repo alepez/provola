@@ -54,6 +54,7 @@ This is a (work in progress) list of supported frameworks:
 | Framework   | Language |
 |-------------|----------|
 | Google Test | C++      |
+| Catch2      | C++      |
 
 ## Shell auto completion
 
