@@ -15,5 +15,5 @@ cd provola-googletest/examples/data
 
 (
 cd provola-catch2/examples/data
-./tools/generate-json-report
+./tools/generate-junit-report
 )
