@@ -6,14 +6,18 @@ expression: "&report"
 Report {
     disabled: None,
     errors: None,
-    failures: None,
+    failures: Some(
+        1,
+    ),
     name: None,
     tests: None,
     testsuites: [
         TestSuite {
             disabled: None,
             errors: None,
-            failures: None,
+            failures: Some(
+                1,
+            ),
             hostname: None,
             id: None,
             name: "",

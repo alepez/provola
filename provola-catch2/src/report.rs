@@ -22,12 +22,24 @@ pub struct Report {
     pub testsuites: Vec<TestSuite>,
 }
 
+impl Report {
+    fn failures_count(&self) -> usize {
+        self.testsuites.iter().map(|x| x.failures_count()).sum()
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct TestSuite {
     // // TODO system-err
     // // TODO system-out
     #[serde(rename = "testcase", default)]
     pub testcases: Vec<TestCase>,
+}
+
+impl TestSuite {
+    fn failures_count(&self) -> usize {
+        self.testcases.iter().map(|x| x.failures.len()).sum()
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -49,8 +61,10 @@ pub struct Failure {
 
 impl From<Report> for CoreReport {
     fn from(x: Report) -> Self {
+        let failures = Some(x.failures_count());
         CoreReport {
             testsuites: x.testsuites.into_iter().map(|x| x.into()).collect(),
+            failures,
             ..Default::default()
         }
     }
@@ -58,8 +72,10 @@ impl From<Report> for CoreReport {
 
 impl From<TestSuite> for CoreTestSuite {
     fn from(x: TestSuite) -> Self {
+        let failures = Some(x.failures_count());
         CoreTestSuite {
             testcases: x.testcases.into_iter().map(|x| x.into()).collect(),
+            failures,
             ..Default::default()
         }
     }
