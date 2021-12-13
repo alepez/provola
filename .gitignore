@@ -7,3 +7,12 @@ Cargo.lock
 !/Cargo.lock
 target-coverage
 provola-core/tmp.exe
+
+# Added for cargo watch
+tmp*
+*.snap.new
+
+# Added to ignore changes in submodules
+provola-catch2/examples/data/catch2
+provola-googletest/examples/data/googletest
+

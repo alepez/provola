@@ -1,0 +1,39 @@
+---
+source: provola-catch2/src/report.rs
+expression: "&u"
+
+---
+Report {
+    testsuites: [
+        TestSuite {
+            testcases: [
+                TestCase {
+                    classname: "example.global",
+                    name: "Foo",
+                    status: "run",
+                    time: "0.000",
+                    failures: [
+                        Failure {
+                            ttype: "REQUIRE",
+                            message: "false",
+                        },
+                    ],
+                },
+                TestCase {
+                    classname: "example.Bar",
+                    name: "Bar1",
+                    status: "run",
+                    time: "0.000",
+                    failures: [],
+                },
+                TestCase {
+                    classname: "example.Bar",
+                    name: "Bar2",
+                    status: "run",
+                    time: "0.000",
+                    failures: [],
+                },
+            ],
+        },
+    ],
+}

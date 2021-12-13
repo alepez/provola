@@ -8,15 +8,14 @@ use subprocess::Redirection;
 
 mod report;
 
-fn add_arguments(mut argv: Vec<String>, report_path: &str) -> Vec<String> {
-    argv.push(format!("--gtest_output=json:{}", report_path));
-    argv.push("--gtest_color=no".to_string());
+fn add_arguments(mut argv: Vec<String>) -> Vec<String> {
+    argv.push("-r".into());
+    argv.push("junit".into());
     argv
 }
 
 fn run_exec(executable: &Executable) -> Result<Report, Error> {
-    let report_path = "googletest_report.json";
-    let argv = add_arguments(executable.into(), report_path);
+    let argv = add_arguments(executable.into());
 
     let mut p = Popen::create(
         &argv,
@@ -28,7 +27,7 @@ fn run_exec(executable: &Executable) -> Result<Report, Error> {
         },
     )?;
 
-    let (_out, _err) = p.communicate(None)?;
+    let (out, _err) = p.communicate(None)?;
 
     // TODO Timeout from configuration
     let timeout = Duration::from_secs(3600);
@@ -40,11 +39,14 @@ fn run_exec(executable: &Executable) -> Result<Report, Error> {
         p.terminate()?;
     }
 
-    let file = File::open(report_path).unwrap();
-    let reader = BufReader::new(file);
-    let gtest_rep: report::UnitTest = serde_json::from_reader(reader).unwrap();
-    let core_rep = Report::from(gtest_rep);
-    Ok(core_rep)
+    if let Some(out) = out {
+        // FIXME unwrap
+        let rep: report::Report = serde_xml_rs::from_str(&out).unwrap();
+        let core_rep = Report::from(rep);
+        Ok(core_rep)
+    } else {
+        Err(Error::ReportUnavailable)
+    }
 }
 
 pub struct TestRunner {
@@ -71,12 +73,6 @@ mod tests {
 
     use super::*;
 
-    // Ignored because example must be built first
-    #[ignore]
     #[test]
-    fn run_valid_executable() {
-        let path = PathBuf::from("./examples/data/build/example");
-        let exec = Executable::from(path);
-        assert!(run_exec(&exec).is_ok());
-    }
+    fn example() {}
 }

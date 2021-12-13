@@ -26,4 +26,6 @@ pub enum Error {
     TestRunnerNotSupported(String),
     #[error("reporter error")]
     ReporterError(#[from] crate::reporter::Error),
+    #[error("report unavailable")]
+    ReportUnavailable,
 }

@@ -20,8 +20,15 @@ version = "0.1.5"
 path = "../provola-googletest"
 optional = true
 
+[dependencies.provola-catch2]
+version = "0.1.5"
+path = "../provola-catch2"
+optional = true
+
 [features]
 default = [
   "googletest",
+  "catch2",
 ]
 googletest = [ "provola-googletest" ]
+catch2 = [ "provola-catch2" ]
