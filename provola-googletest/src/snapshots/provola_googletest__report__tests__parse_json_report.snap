@@ -1,0 +1,83 @@
+---
+source: provola-googletest/src/report.rs
+expression: "&report"
+
+---
+UnitTest {
+    tests: 4,
+    failures: 1,
+    disabled: 0,
+    errors: 0,
+    timestamp: 2021-12-05T23:54:55Z,
+    time: "0s",
+    name: "AllTests",
+    testsuites: [
+        TestCase {
+            name: "Foo",
+            tests: 2,
+            failures: 1,
+            disabled: 0,
+            errors: 0,
+            time: "0s",
+            testsuite: [
+                TestInfo {
+                    name: "Foo1",
+                    status: Run,
+                    time: "0s",
+                    classname: "Foo",
+                    failure: None,
+                    failures: [
+                        Failure {
+                            failure: "/home/pez/workspace/personal/provola-googletest/examples/data/src/tests.cpp:4\nValue of: true\n  Actual: true\nExpected: false",
+                            ttype: "",
+                        },
+                    ],
+                    result: "COMPLETED",
+                    timestamp: 2021-12-05T23:54:55Z,
+                },
+                TestInfo {
+                    name: "Foo2",
+                    status: Run,
+                    time: "0s",
+                    classname: "Foo",
+                    failure: None,
+                    failures: [],
+                    result: "COMPLETED",
+                    timestamp: 2021-12-05T23:54:55Z,
+                },
+            ],
+            timestamp: 2021-12-05T23:54:55Z,
+        },
+        TestCase {
+            name: "Bar",
+            tests: 2,
+            failures: 0,
+            disabled: 0,
+            errors: 0,
+            time: "0s",
+            testsuite: [
+                TestInfo {
+                    name: "Bar1",
+                    status: Run,
+                    time: "0s",
+                    classname: "Bar",
+                    failure: None,
+                    failures: [],
+                    result: "COMPLETED",
+                    timestamp: 2021-12-05T23:54:55Z,
+                },
+                TestInfo {
+                    name: "Bar2",
+                    status: Run,
+                    time: "0s",
+                    classname: "Bar",
+                    failure: None,
+                    failures: [],
+                    result: "COMPLETED",
+                    timestamp: 2021-12-05T23:54:55Z,
+                },
+            ],
+            timestamp: 2021-12-05T23:54:55Z,
+        },
+    ],
+}

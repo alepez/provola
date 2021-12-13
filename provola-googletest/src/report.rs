@@ -136,7 +136,8 @@ mod tests {
         let path = "examples/data/test_report.json";
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let _u: UnitTest = serde_json::from_reader(reader).unwrap();
+        let report: UnitTest = serde_json::from_reader(reader).unwrap();
+        insta::assert_debug_snapshot!(&report);
     }
 
     #[test]
@@ -148,5 +149,15 @@ mod tests {
             parse_duration("1s"),
             Some(std::time::Duration::from_secs(1))
         );
+    }
+
+    #[test]
+    fn convert_to_core_report() {
+        let path = "examples/data/test_report.json";
+        let file = File::open(path).unwrap();
+        let reader = BufReader::new(file);
+        let report: UnitTest = serde_json::from_reader(reader).unwrap();
+        let report = CoreReport::from(report);
+        insta::assert_debug_snapshot!(&report);
     }
 }

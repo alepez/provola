@@ -17,3 +17,7 @@ subprocess = "0.2"
 [dependencies.provola-core]
 version = "0.1.5"
 path = "../provola-core"
+
+[dev-dependencies]
+# backtrace feature is enabled so we can run tests without concurrency
+insta = { version = "1.8.0", features = [ "backtrace" ] }

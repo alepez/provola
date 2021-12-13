@@ -1,0 +1,121 @@
+---
+source: provola-googletest/src/report.rs
+expression: "&report"
+
+---
+Report {
+    disabled: Some(
+        0,
+    ),
+    errors: Some(
+        0,
+    ),
+    failures: Some(
+        1,
+    ),
+    name: Some(
+        "AllTests",
+    ),
+    tests: Some(
+        4,
+    ),
+    testsuites: [
+        TestSuite {
+            disabled: Some(
+                0,
+            ),
+            errors: Some(
+                0,
+            ),
+            failures: Some(
+                1,
+            ),
+            hostname: None,
+            id: None,
+            name: "Foo",
+            package: None,
+            skipped: None,
+            testcases: [
+                TestCase {
+                    classname: None,
+                    name: "Foo1",
+                    status: None,
+                    time: Some(
+                        0ns,
+                    ),
+                    failures: [
+                        Failure {
+                            ttype: "",
+                            message: "/home/pez/workspace/personal/provola-googletest/examples/data/src/tests.cpp:4\nValue of: true\n  Actual: true\nExpected: false",
+                        },
+                    ],
+                },
+                TestCase {
+                    classname: None,
+                    name: "Foo2",
+                    status: None,
+                    time: Some(
+                        0ns,
+                    ),
+                    failures: [],
+                },
+            ],
+            tests: 2,
+            time: Some(
+                0ns,
+            ),
+            timestamp: Some(
+                2021-12-05T23:54:55Z,
+            ),
+        },
+        TestSuite {
+            disabled: Some(
+                0,
+            ),
+            errors: Some(
+                0,
+            ),
+            failures: Some(
+                0,
+            ),
+            hostname: None,
+            id: None,
+            name: "Bar",
+            package: None,
+            skipped: None,
+            testcases: [
+                TestCase {
+                    classname: None,
+                    name: "Bar1",
+                    status: None,
+                    time: Some(
+                        0ns,
+                    ),
+                    failures: [],
+                },
+                TestCase {
+                    classname: None,
+                    name: "Bar2",
+                    status: None,
+                    time: Some(
+                        0ns,
+                    ),
+                    failures: [],
+                },
+            ],
+            tests: 2,
+            time: Some(
+                0ns,
+            ),
+            timestamp: Some(
+                2021-12-05T23:54:55Z,
+            ),
+        },
+    ],
+    time: Some(
+        0ns,
+    ),
+    timestamp: Some(
+        2021-12-05T23:54:55Z,
+    ),
+}
