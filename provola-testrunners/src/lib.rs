@@ -9,6 +9,10 @@ pub fn make_test_runner(info: TestRunnerInfo) -> Result<Box<dyn TestRunner>, Err
         TestRunnerType::GoogleTest => {
             Ok(provola_googletest::TestRunner::from_executable(info.exec))
         }
+        #[cfg(feature = "catch2")]
+        TestRunnerType::Catch2 => {
+            Ok(provola_catch2::TestRunner::from_executable(info.exec))
+        }
     }
 }
 
@@ -16,6 +20,8 @@ pub fn make_test_runner(info: TestRunnerInfo) -> Result<Box<dyn TestRunner>, Err
 pub enum TestRunnerType {
     #[cfg(feature = "googletest")]
     GoogleTest,
+    #[cfg(feature = "catch2")]
+    Catch2,
 }
 
 #[derive(Debug)]
