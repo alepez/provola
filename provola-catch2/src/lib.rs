@@ -64,13 +64,3 @@ impl provola_core::test_runners::TestRunner for TestRunner {
         Ok(result)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use std::path::PathBuf;
-
-    use super::*;
-
-    #[test]
-    fn example() {}
-}
