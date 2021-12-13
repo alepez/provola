@@ -1,0 +1,19 @@
+[package]
+name = "provola-catch2"
+version = "0.1.6"
+edition = "2021"
+description = "provola extension for catch2"
+homepage = "https://github.com/alepez/provola"
+repository = "https://github.com/alepez/provola"
+license = "Apache-2.0"
+
+[dependencies]
+chrono = "0.4"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+subprocess = "0.2"
+
+[dependencies.provola-core]
+version = "0.1.5"
+path = "../provola-core"

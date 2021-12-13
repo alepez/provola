@@ -1,3 +1,6 @@
 [submodule "provola-googletest/examples/data/googletest"]
 	path = provola-googletest/examples/data/googletest
 	url = https://github.com/google/googletest.git
+[submodule "provola-catch2/examples/data/catch2"]
+	path = provola-catch2/examples/data/catch2
+	url = https://github.com/catchorg/Catch2.git
