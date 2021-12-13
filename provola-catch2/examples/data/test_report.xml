@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="example" errors="0" failures="1" tests="3" hostname="tbd" time="0.000" timestamp="2021-12-13T21:04:24Z">
+    <testcase classname="example.global" name="Foo" time="0.000" status="run">
+      <failure message="false" type="REQUIRE">
+FAILED:
+  REQUIRE( false )
+at /home/alepez/workspace/personal/provola/provola-catch2/examples/data/src/tests.cpp:4
+      </failure>
+    </testcase>
+    <testcase classname="example.Bar" name="Bar1" time="0.000" status="run"/>
+    <testcase classname="example.Bar" name="Bar2" time="0.000" status="run"/>
+    <system-out/>
+    <system-err/>
+  </testsuite>
+</testsuites>

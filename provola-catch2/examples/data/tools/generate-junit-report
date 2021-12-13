@@ -10,4 +10,4 @@ mkdir build
 cd build
 cmake ..
 cmake --build .
-./example -r junit ../test_report.xml
+./example -r junit -o ../test_report.xml
