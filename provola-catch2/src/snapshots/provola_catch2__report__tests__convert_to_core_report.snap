@@ -1,0 +1,69 @@
+---
+source: provola-catch2/src/report.rs
+expression: "&report"
+
+---
+Report {
+    disabled: None,
+    errors: None,
+    failures: None,
+    name: None,
+    tests: None,
+    testsuites: [
+        TestSuite {
+            disabled: None,
+            errors: None,
+            failures: None,
+            hostname: None,
+            id: None,
+            name: "",
+            package: None,
+            skipped: None,
+            testcases: [
+                TestCase {
+                    classname: Some(
+                        "example.global",
+                    ),
+                    name: "Foo",
+                    status: Some(
+                        "run",
+                    ),
+                    time: None,
+                    failures: [
+                        Failure {
+                            ttype: "REQUIRE",
+                            message: "false",
+                        },
+                    ],
+                },
+                TestCase {
+                    classname: Some(
+                        "example.Bar",
+                    ),
+                    name: "Bar1",
+                    status: Some(
+                        "run",
+                    ),
+                    time: None,
+                    failures: [],
+                },
+                TestCase {
+                    classname: Some(
+                        "example.Bar",
+                    ),
+                    name: "Bar2",
+                    status: Some(
+                        "run",
+                    ),
+                    time: None,
+                    failures: [],
+                },
+            ],
+            tests: 0,
+            time: None,
+            timestamp: None,
+        },
+    ],
+    time: None,
+    timestamp: None,
+}

@@ -12,6 +12,10 @@ pub type ClassName = String;
 pub type FailureType = String;
 pub type Message = String;
 
+fn parse_duration(s: &str) -> Option<std::time::Duration> {
+    s.parse().ok().map(std::time::Duration::from_secs)
+}
+
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Report {
     #[serde(rename = "testsuite")]
@@ -45,9 +49,40 @@ pub struct Failure {
 
 impl From<Report> for CoreReport {
     fn from(x: Report) -> Self {
-        // TODO
         CoreReport {
+            testsuites: x.testsuites.into_iter().map(|x| x.into()).collect(),
             ..Default::default()
+        }
+    }
+}
+
+impl From<TestSuite> for CoreTestSuite {
+    fn from(x: TestSuite) -> Self {
+        CoreTestSuite {
+            testcases: x.testcases.into_iter().map(|x| x.into()).collect(),
+            ..Default::default()
+        }
+    }
+}
+
+impl From<TestCase> for CoreTestCase {
+    fn from(x: TestCase) -> Self {
+        CoreTestCase {
+            name: x.name,
+            classname: Some(x.classname),
+            status: Some(x.status),
+            time: parse_duration(&x.time),
+            failures: x.failures.into_iter().map(|x| x.into()).collect(),
+            ..Default::default()
+        }
+    }
+}
+
+impl From<Failure> for CoreFailure {
+    fn from(x: Failure) -> Self {
+        CoreFailure {
+            message: x.message,
+            ttype: x.ttype,
         }
     }
 }
@@ -63,7 +98,17 @@ mod tests {
         let path = "examples/data/test_report.xml";
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let u: Report = serde_xml_rs::from_reader(reader).unwrap();
-        insta::assert_debug_snapshot!(&u);
+        let report: Report = serde_xml_rs::from_reader(reader).unwrap();
+        insta::assert_debug_snapshot!(&report);
+    }
+
+    #[test]
+    fn convert_to_core_report() {
+        let path = "examples/data/test_report.xml";
+        let file = File::open(path).unwrap();
+        let reader = BufReader::new(file);
+        let report: Report = serde_xml_rs::from_reader(reader).unwrap();
+        let report = CoreReport::from(report);
+        insta::assert_debug_snapshot!(&report);
     }
 }
