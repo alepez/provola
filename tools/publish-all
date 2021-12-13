@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+for i in \
+  ./provola-core/Cargo.toml \
+  ./provola-googletest/Cargo.toml \
+  ./provola-catch2/Cargo.toml \
+  ./provola-terminalreporter/Cargo.toml \
+  ./provola-reporters/Cargo.toml \
+  ./provola-testrunners/Cargo.toml \
+  ./Cargo.toml; do (
+  d=$( dirname $i );
+  cd $d ;
+  cargo publish
+) done
