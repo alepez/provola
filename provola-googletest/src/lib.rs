@@ -71,6 +71,8 @@ mod tests {
 
     use super::*;
 
+    // Ignored because example must be built first
+    #[ignore]
     #[test]
     fn run_valid_executable() {
         let path = PathBuf::from("./examples/data/build/example");
