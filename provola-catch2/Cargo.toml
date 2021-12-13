@@ -1,6 +1,6 @@
 [package]
 name = "provola-catch2"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 description = "provola extension for catch2"
 homepage = "https://github.com/alepez/provola"
@@ -15,7 +15,7 @@ serde-xml-rs = "0.5.1"
 subprocess = "0.2"
 
 [dependencies.provola-core]
-version = "0.1.5"
+version = "0.1.7"
 path = "../provola-core"
 
 [dev-dependencies]

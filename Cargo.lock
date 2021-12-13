@@ -532,7 +532,7 @@ dependencies = [
 
 [[package]]
 name = "provola"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "clap",
  "clap_generate",
@@ -546,7 +546,7 @@ dependencies = [
 
 [[package]]
 name = "provola-catch2"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "chrono",
  "insta",
@@ -559,7 +559,7 @@ dependencies = [
 
 [[package]]
 name = "provola-core"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "chrono",
  "lazy_static",
@@ -574,7 +574,7 @@ dependencies = [
 
 [[package]]
 name = "provola-googletest"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "chrono",
  "insta",
@@ -587,7 +587,7 @@ dependencies = [
 
 [[package]]
 name = "provola-reporters"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "lazy_static",
  "provola-core",
@@ -598,7 +598,7 @@ dependencies = [
 
 [[package]]
 name = "provola-terminalreporter"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "colored",
  "insta",
@@ -607,7 +607,7 @@ dependencies = [
 
 [[package]]
 name = "provola-testrunners"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "provola-catch2",
  "provola-core",
