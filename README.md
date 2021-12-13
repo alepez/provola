@@ -47,6 +47,8 @@ Example:
 provola -T GoogleTest -t path/to/gtest/executable
 ```
 
+![GoogleTest example](/.doc/googletest-screenshot.png)
+
 This is a (work in progress) list of supported frameworks:
 
 | Framework   | Language |
