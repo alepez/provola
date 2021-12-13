@@ -89,7 +89,6 @@ impl From<TestCase> for CoreTestCase {
             status: Some(x.status),
             time: parse_duration(&x.time),
             failures: x.failures.into_iter().map(|x| x.into()).collect(),
-            ..Default::default()
         }
     }
 }

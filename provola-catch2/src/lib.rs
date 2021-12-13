@@ -1,6 +1,4 @@
 use provola_core::{Error, Executable, Report};
-use std::fs::File;
-use std::io::BufReader;
 use std::time::Duration;
 use subprocess::Popen;
 use subprocess::PopenConfig;
