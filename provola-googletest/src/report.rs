@@ -83,7 +83,7 @@ impl From<UnitTest> for CoreReport {
             tests: Some(x.tests),
             time: parse_duration(&x.time),
             timestamp: Some(x.timestamp),
-            testsuites: x.testsuites.into_iter().map(|x| x.into()).collect()
+            testsuites: x.testsuites.into_iter().map(|x| x.into()).collect(),
         }
     }
 }
@@ -131,12 +131,16 @@ mod tests {
 
     use super::*;
 
-    #[test]
-    fn parse_json_report() {
+    fn read_example_file() -> UnitTest {
         let path = "examples/data/test_report.json";
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let report: UnitTest = serde_json::from_reader(reader).unwrap();
+        serde_json::from_reader(reader).unwrap()
+    }
+
+    #[test]
+    fn parse_json_report() {
+        let report = read_example_file();
         insta::assert_debug_snapshot!(&report);
     }
 
@@ -153,10 +157,7 @@ mod tests {
 
     #[test]
     fn convert_to_core_report() {
-        let path = "examples/data/test_report.json";
-        let file = File::open(path).unwrap();
-        let reader = BufReader::new(file);
-        let report: UnitTest = serde_json::from_reader(reader).unwrap();
+        let report = read_example_file();
         let report = CoreReport::from(report);
         insta::assert_debug_snapshot!(&report);
     }

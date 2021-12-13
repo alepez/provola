@@ -108,21 +108,22 @@ mod tests {
 
     use super::*;
 
-    #[test]
-    fn parse_xml_report() {
+    fn read_example_file() -> Report {
         let path = "examples/data/test_report.xml";
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let report: Report = serde_xml_rs::from_reader(reader).unwrap();
+        serde_xml_rs::from_reader(reader).unwrap()
+    }
+
+    #[test]
+    fn parse_xml_report() {
+        let report = read_example_file();
         insta::assert_debug_snapshot!(&report);
     }
 
     #[test]
     fn convert_to_core_report() {
-        let path = "examples/data/test_report.xml";
-        let file = File::open(path).unwrap();
-        let reader = BufReader::new(file);
-        let report: Report = serde_xml_rs::from_reader(reader).unwrap();
+        let report = read_example_file();
         let report = CoreReport::from(report);
         insta::assert_debug_snapshot!(&report);
     }
