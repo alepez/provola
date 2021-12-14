@@ -5,8 +5,9 @@ use provola_reporters::{ReporterType, DEFAULT_REPORTER_STR};
 use provola_testrunners::make_test_runner;
 use provola_testrunners::{TestRunnerInfo, TestRunnerType};
 use std::convert::TryFrom;
-use std::path::{Path, PathBuf};
-use std::time::Duration;
+use std::path::PathBuf;
+
+mod cli;
 
 #[derive(Debug, Parser)]
 #[clap(name = "provola", about = "provola, the quick tester")]
@@ -88,45 +89,6 @@ impl TryFrom<&Opt> for Action {
     }
 }
 
-fn run_forever(opt: &Opt, watch_file: &Path) -> Result<(), Error> {
-    run_once_or_log_error(opt);
-
-    let watch_opt = WatchOptions {
-        file: watch_file.to_path_buf(),
-        debounce_time: Duration::from_secs(1),
-    };
-
-    Watcher::try_from(watch_opt)?.watch(&mut || {
-        run_once_or_log_error(opt);
-    })?;
-
-    Ok(())
-}
-
-fn run_once_or_log_error(opt: &Opt) {
-    if let Err(e) = run_once(opt) {
-        log::error!("{}", e);
-    }
-}
-
-fn run_once(opt: &Opt) -> Result<(), Error> {
-    let action = Action::try_from(opt)?;
-    let result = action.run()?;
-    let reporter = opt.reporter()?;
-
-    reporter.report(result)?;
-
-    Ok(())
-}
-
-fn run(opt: &Opt) -> Result<(), Error> {
-    if let Some(watch_files) = &opt.watch {
-        run_forever(opt, watch_files)
-    } else {
-        run_once(opt)
-    }
-}
-
 fn print_completions<G: Generator>(gen: G, app: &mut App) {
     generate(gen, app, app.get_name().to_string(), &mut std::io::stdout());
 }
@@ -143,7 +105,7 @@ fn main() {
         return;
     }
 
-    if let Err(e) = run(&opt) {
+    if let Err(e) = cli::run(&opt) {
         log::error!("{}", e);
     }
 }
