@@ -31,7 +31,7 @@ impl TryFrom<WatchOptions> for ProvolaWatcher {
 }
 
 impl ProvolaWatcher {
-    pub fn watch(&self) -> &Receiver<DebouncedEvent> {
+    pub fn rx(&self) -> &Receiver<DebouncedEvent> {
         &self.rx
     }
 }

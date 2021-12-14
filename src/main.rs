@@ -105,7 +105,7 @@ fn run_forever(opt: &Opt, watch_file: &Path) -> Result<(), Error> {
 
     let watcher = Watcher::try_from(watch_opt)?;
 
-    let rx = watcher.watch();
+    let rx = watcher.rx();
 
     loop {
         match rx.recv() {
