@@ -87,34 +87,41 @@ impl TryFrom<&Opt> for Action {
     }
 }
 
-fn watch(opt: &Opt, watch_files: &Path) -> Result<(), Box<dyn std::error::Error>> {
-    use notify::{watcher, RecursiveMode, Watcher};
-    use std::sync::mpsc::channel;
+fn notify_error(error: Error) {
+    log::error!("{}", error);
+}
+
+fn run_forever(opt: &Opt, watch_file: &Path) -> Result<(), Error> {
+    if let Err(e) = run_once(opt) {
+        notify_error(e);
+    }
+
     use std::time::Duration;
 
-    let (tx, rx) = channel();
+    let watch_opt = WatchOptions {
+        file: watch_file.to_path_buf(),
+        debounce_time: Duration::from_secs(1),
+    };
 
-    let debounce_time = Duration::from_secs(1);
-    let mut watcher = watcher(tx, debounce_time).unwrap();
+    let watcher = Watcher::try_from(watch_opt)?;
 
-    watcher
-        .watch(&watch_files, RecursiveMode::Recursive)
-        .map_err(|e| Error::CannotWatch(e.to_string()))?;
+    let rx = watcher.watch();
 
     loop {
         match rx.recv() {
-            Ok(e) => {
-                log::trace!("{:?}", e);
-                run_once(opt).ok(); // TODO Print error and continue
+            Ok(_) => {
+                if let Err(e) = run_once(opt) {
+                    notify_error(e);
+                }
             }
             Err(e) => {
-                return Err(Box::new(e));
+                return Err(Error::CannotWatch(e.to_string()));
             }
         }
     }
 }
 
-fn run_once(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
+fn run_once(opt: &Opt) -> Result<(), Error> {
     let action = Action::try_from(opt)?;
     let result = action.run()?;
     let reporter = opt.reporter()?;
@@ -124,10 +131,9 @@ fn run_once(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn run(opt: &Opt) -> Result<(), Box<dyn std::error::Error>> {
+fn run(opt: &Opt) -> Result<(), Error> {
     if let Some(watch_files) = &opt.watch {
-        run_once(opt).ok(); // TODO Print error and continue
-        watch(opt, watch_files)
+        run_forever(opt, watch_files)
     } else {
         run_once(opt)
     }

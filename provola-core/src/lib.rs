@@ -8,6 +8,7 @@ mod reporter;
 mod result;
 pub mod test;
 pub mod test_runners;
+mod watch;
 
 pub use actions::Action;
 pub use actions::Source;
@@ -24,3 +25,5 @@ pub use reporter::Error as ReporterError;
 pub use reporter::Reporter;
 pub use result::Reason;
 pub use result::TestResult;
+pub use watch::WatchOptions;
+pub use watch::ProvolaWatcher as Watcher;
