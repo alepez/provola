@@ -1,8 +1,7 @@
 use futures::{channel::mpsc, StreamExt};
 use gtk::glib;
 use gtk::prelude::*;
-use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, Button, Label};
+use gtk::{ApplicationWindow, Label};
 use provola_core::Error;
 use std::thread;
 
