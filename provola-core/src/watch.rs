@@ -35,7 +35,7 @@ impl ProvolaWatcher {
         &self.rx
     }
 
-    pub fn watch(self, f: &mut dyn FnMut() -> ()) -> Result<(), Error> {
+    pub fn watch(self, f: &mut dyn FnMut()) -> Result<(), Error> {
         let rx = self.rx();
 
         loop {
