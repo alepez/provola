@@ -1,0 +1,14 @@
+[package]
+name = "provola-gtk"
+version = "0.1.7"
+edition = "2021"
+description = "provola GTK gui"
+homepage = "https://github.com/alepez/provola"
+repository = "https://github.com/alepez/provola"
+license = "Apache-2.0"
+
+[dependencies]
+
+[dependencies.provola-core]
+version = "0.1.7"
+path = "../provola-core"

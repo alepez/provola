@@ -586,6 +586,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "provola-gtk"
+version = "0.1.7"
+dependencies = [
+ "provola-core",
+]
+
+[[package]]
 name = "provola-reporters"
 version = "0.1.7"
 dependencies = [

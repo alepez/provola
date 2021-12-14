@@ -36,4 +36,5 @@ members = [
   "provola-catch2",
   "provola-testrunners",
   "provola-terminalreporter",
+  "provola-gtk",
 ]

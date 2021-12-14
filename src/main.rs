@@ -39,6 +39,7 @@ struct Opt {
     /// Select test runner type
     #[clap(short = 'T')]
     test_runner_type: Option<TestRunnerType>,
+    // Select reporter type
     #[clap(short = 'R', default_value = &DEFAULT_REPORTER_STR)]
     reporter: ReporterType,
 }
