@@ -1,7 +1,8 @@
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow, Button};
+use provola_core::Error;
 
-fn run() {
+pub fn run() -> Result<(), Error> {
     let application = Application::builder()
         .application_id("dev.alepez.provola")
         .build();
@@ -25,5 +26,9 @@ fn run() {
         window.show_all();
     });
 
-    application.run();
+    // We must use run_with_args or GTK will try to parse command line arguments
+    let args: [&str; 0] = [];
+    application.run_with_args(&args);
+
+    Ok(())
 }

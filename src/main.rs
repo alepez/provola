@@ -98,7 +98,7 @@ fn print_completions<G: Generator>(gen: G, app: &mut App) {
 }
 
 #[cfg(feature = "gtk")]
-fn run_gui(opt: &Opt) {
+fn run_gui(_opt: &Opt) {
     if let Err(e) = provola_gtk::run() {
         log::error!("{}", e);
     }
