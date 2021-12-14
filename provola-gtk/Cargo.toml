@@ -12,3 +12,6 @@ license = "Apache-2.0"
 [dependencies.provola-core]
 version = "0.1.7"
 path = "../provola-core"
+
+[dependencies.gtk]
+version = "0.14.3"

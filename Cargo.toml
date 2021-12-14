@@ -27,6 +27,15 @@ path = "provola-testrunners"
 version = "0.1.7"
 path = "provola-reporters"
 
+[dependencies.provola-gtk]
+version = "0.1.7"
+path = "provola-gtk"
+optional = true
+
+[features]
+default = []
+gtk = [ "provola-gtk" ]
+
 [workspace]
 
 members = [

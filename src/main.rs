@@ -15,6 +15,9 @@ struct Opt {
     /// Activate debug mode
     #[clap(long)]
     debug: bool,
+    /// Activate gui mode
+    #[clap(long)]
+    gui: bool,
     /// If provided, outputs the completion file for given shell
     #[clap(long, arg_enum)]
     shell_compl: Option<Shell>,
@@ -94,6 +97,18 @@ fn print_completions<G: Generator>(gen: G, app: &mut App) {
     generate(gen, app, app.get_name().to_string(), &mut std::io::stdout());
 }
 
+#[cfg(feature = "gtk")]
+fn run_gui(opt: &Opt) {
+    if let Err(e) = provola_gtk::run() {
+        log::error!("{}", e);
+    }
+}
+
+#[cfg(not(feature = "gtk"))]
+fn run_gui(_opt: &Opt) {
+    log::error!("GUI not avaiable");
+}
+
 fn main() {
     env_logger::init();
 
@@ -104,6 +119,10 @@ fn main() {
         let mut app = Opt::into_app();
         print_completions(shell_compl, &mut app);
         return;
+    }
+
+    if opt.gui {
+        return run_gui(&opt);
     }
 
     if let Err(e) = cli::run(&opt) {
