@@ -8,6 +8,8 @@ repository = "https://github.com/alepez/provola"
 license = "Apache-2.0"
 
 [dependencies]
+futures = "0.3"
+log = "0.4"
 
 [dependencies.provola-core]
 version = "0.1.7"
