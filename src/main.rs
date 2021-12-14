@@ -6,6 +6,7 @@ use provola_testrunners::make_test_runner;
 use provola_testrunners::{TestRunnerInfo, TestRunnerType};
 use std::convert::TryFrom;
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 #[derive(Debug, Parser)]
 #[clap(name = "provola", about = "provola, the quick tester")]
@@ -87,37 +88,24 @@ impl TryFrom<&Opt> for Action {
     }
 }
 
-fn notify_error(error: Error) {
-    log::error!("{}", error);
-}
-
 fn run_forever(opt: &Opt, watch_file: &Path) -> Result<(), Error> {
-    if let Err(e) = run_once(opt) {
-        notify_error(e);
-    }
-
-    use std::time::Duration;
+    run_once_or_log_error(opt);
 
     let watch_opt = WatchOptions {
         file: watch_file.to_path_buf(),
         debounce_time: Duration::from_secs(1),
     };
 
-    let watcher = Watcher::try_from(watch_opt)?;
+    Watcher::try_from(watch_opt)?.watch(&mut || {
+        run_once_or_log_error(opt);
+    })?;
 
-    let rx = watcher.rx();
+    Ok(())
+}
 
-    loop {
-        match rx.recv() {
-            Ok(_) => {
-                if let Err(e) = run_once(opt) {
-                    notify_error(e);
-                }
-            }
-            Err(e) => {
-                return Err(Error::CannotWatch(e.to_string()));
-            }
-        }
+fn run_once_or_log_error(opt: &Opt) {
+    if let Err(e) = run_once(opt) {
+        log::error!("{}", e);
     }
 }
 

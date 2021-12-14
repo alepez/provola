@@ -34,4 +34,19 @@ impl ProvolaWatcher {
     pub fn rx(&self) -> &Receiver<DebouncedEvent> {
         &self.rx
     }
+
+    pub fn watch(self, f: &mut dyn FnMut() -> ()) -> Result<(), Error> {
+        let rx = self.rx();
+
+        loop {
+            match rx.recv() {
+                Ok(_) => {
+                    f();
+                }
+                Err(e) => {
+                    return Err(Error::CannotWatch(e.to_string()));
+                }
+            }
+        }
+    }
 }
