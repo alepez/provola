@@ -1,16 +1,36 @@
+use super::{Message, MessageReceiver, MessageSender};
+use crossbeam_channel::select;
 use eframe::{egui, epi};
+use provola_core::{Language, TestResult};
+use provola_testrunners::TestRunnerType;
+use std::path::PathBuf;
+use std::time::Duration;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
-#[derive(Default)]
-struct Config {
+#[derive(Default, Clone, Debug)]
+pub struct Config {
     // Persistent configuration
+    pub watch: Option<PathBuf>,
+    pub input: Option<PathBuf>,
+    pub output: Option<PathBuf>,
+    pub lang: Option<Language>,
+    pub source: Option<PathBuf>,
+    pub test_runner: Option<PathBuf>,
+    pub test_runner_type: Option<TestRunnerType>,
+}
+
+#[derive(Default)]
+pub struct State {
+    last_result: Option<TestResult>,
 }
 
 pub struct ProvolaGuiApp {
     config: Config,
-    receiver: futures::channel::mpsc::Receiver<String>,
+    state: State,
+    s: MessageSender,
+    r: MessageReceiver,
 }
 
 impl epi::App for ProvolaGuiApp {
@@ -29,8 +49,11 @@ impl epi::App for ProvolaGuiApp {
         // Note that you must enable the `persistence` feature for this to work.
         #[cfg(feature = "persistence")]
         if let Some(storage) = _storage {
-            self.config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default()
+            // TODO merge storage with overrides (from self.config)
+            // self.config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default()
         }
+
+        self.s.send(Message::Setup(self.config.clone())).unwrap();
     }
 
     /// Called by the frame work to save state before shutdown.
@@ -41,6 +64,21 @@ impl epi::App for ProvolaGuiApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::CtxRef, frame: &mut epi::Frame<'_>) {
+        let state = &mut self.state;
+
+        select! {
+            recv(self.r) -> msg => {
+                match msg {
+                    Ok(Message::Result(new_result)) => {
+                        log::info!("Result!");
+                        state.last_result = Some(new_result);
+                    }
+                    _ => {}
+                }
+            },
+            default(Duration::from_millis(1)) => {}
+        }
+
         // Top panel contains the main menu
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
@@ -61,8 +99,20 @@ impl epi::App for ProvolaGuiApp {
         });
 
         // Side panel for global actions and feedbacks
-        egui::SidePanel::left("side_panel").show(ctx, |_ui| {
-            // TODO
+        egui::SidePanel::left("side_panel").show(ctx, |ui| {
+            let result_str = match state.last_result {
+                None => "-",
+                Some(TestResult::Pass(_)) => "PASS",
+                Some(TestResult::Fail(_)) => "FAIL",
+            };
+
+            ui.strong(result_str);
+
+            if ui.button("Run all").clicked() {
+                log::debug!("Send Message::RunAll");
+                state.last_result = None;
+                self.s.send(Message::RunAll).unwrap();
+            }
         });
 
         // Central panel for test results
@@ -73,10 +123,13 @@ impl epi::App for ProvolaGuiApp {
 }
 
 impl ProvolaGuiApp {
-    pub(crate) fn new(receiver: futures::channel::mpsc::Receiver<String>) -> Self {
+    pub(crate) fn new(config: Config, s: MessageSender, r: MessageReceiver) -> Self {
+        let state = State::default();
         Self {
-            config: Config::default(),
-            receiver,
+            config,
+            state,
+            s,
+            r,
         }
     }
 }

@@ -10,6 +10,8 @@ license = "Apache-2.0"
 [dependencies]
 futures = "0.3"
 log = "0.4"
+crossbeam-channel = "0.5"
+serde = { version = "1", features = ["derive"], optional = true }
 
 [dependencies.provola-core]
 version = "0.1.7"
@@ -25,11 +27,6 @@ path = "../provola-reporters"
 
 [dependencies.eframe]
 eframe = "0.15.0"
-
-[dependencies.serde]
-version = "1"
-features = ["derive"]
-optional = true
 
 [features]
 default = ["persistence"]

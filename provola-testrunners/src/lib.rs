@@ -10,13 +10,11 @@ pub fn make_test_runner(info: TestRunnerInfo) -> Result<Box<dyn TestRunner>, Err
             Ok(provola_googletest::TestRunner::from_executable(info.exec))
         }
         #[cfg(feature = "catch2")]
-        TestRunnerType::Catch2 => {
-            Ok(provola_catch2::TestRunner::from_executable(info.exec))
-        }
+        TestRunnerType::Catch2 => Ok(provola_catch2::TestRunner::from_executable(info.exec)),
     }
 }
 
-#[derive(Debug, EnumString, Clone, Copy, Display)]
+#[derive(Debug, EnumString, Clone, Copy, Display, serde::Deserialize, serde::Serialize)]
 pub enum TestRunnerType {
     #[cfg(feature = "googletest")]
     GoogleTest,

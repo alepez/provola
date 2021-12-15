@@ -1,86 +1,95 @@
-#![forbid(unsafe_code)]
-#![cfg_attr(not(debug_assertions), deny(warnings))] // Forbid warnings in release builds
-#![warn(clippy::all, rust_2018_idioms)]
-
-use std::path::PathBuf;
 mod app;
+
+pub use app::Config as GuiOpt;
 use app::ProvolaGuiApp;
-use futures::{channel::mpsc, StreamExt};
-use provola_core::*;
+use crossbeam_channel::{bounded, select, Receiver, Sender};
+use provola_core::{
+    Action, Error, Language, Source, TestDataIn, TestDataOut, WatchOptions, Watcher,
+};
 use provola_testrunners::{make_test_runner, TestRunnerInfo, TestRunnerType};
 use std::thread;
-use std::time::Duration;
 
-#[derive(Clone)]
-pub struct GuiOpt {
-    pub watch: Option<PathBuf>,
-    pub input: Option<PathBuf>,
-    pub output: Option<PathBuf>,
-    pub lang: Option<Language>,
-    pub source: Option<PathBuf>,
-    pub test_runner: Option<PathBuf>,
-    pub test_runner_type: Option<TestRunnerType>,
+enum Message {
+    Setup(GuiOpt),
+    Result(provola_core::TestResult),
+    RunAll,
 }
+
+type MessageSender = Sender<Message>;
+type MessageReceiver = Receiver<Message>;
 
 pub fn run(opt: GuiOpt) -> Result<(), Error> {
     // Create a channel between working thread and main event loop:
-    let (sender, receiver) = mpsc::channel(1000);
+    let (action_s, action_r) = bounded(1000);
+    let (feedback_s, feedback_r) = bounded(1000);
 
-    let app = ProvolaGuiApp::new(receiver);
+    start_working_thread(feedback_s, action_r);
+
+    let app = ProvolaGuiApp::new(opt, action_s, feedback_r);
     let native_options = eframe::NativeOptions::default();
-
-    // FIXME Options can be changed by gui, so this must be shared between threads
-    start_working_thread(sender, opt.clone());
 
     eframe::run_native(Box::new(app), native_options);
 }
 
-fn start_working_thread(sender: mpsc::Sender<String>, opt: GuiOpt) {
+fn start_working_thread(s: MessageSender, r: MessageReceiver) {
+    log::debug!("start_working_thread");
     thread::spawn(move || {
+        log::debug!("start_working_thread, spawned");
         // TODO Handle error
-        run_forever(opt, sender).unwrap();
+        run_forever(s, r).unwrap();
     });
 }
 
-fn run_forever(opt: GuiOpt, mut sender: mpsc::Sender<String>) -> Result<(), Error> {
-    // TODO Handle error
-    run_once(&opt, &mut sender).unwrap();
+fn run_forever(mut s: MessageSender, mut r: MessageReceiver) -> Result<(), Error> {
+    log::debug!("run_forever");
 
-    let watch_opt = WatchOptions {
-        // TODO Handle error
-        file: opt.watch.as_ref().unwrap().into(),
-        debounce_time: Duration::from_secs(1),
-    };
+    let mut opt = Option::<GuiOpt>::default();
 
-    Watcher::try_from(watch_opt)?.watch(&mut || {
-        // TODO Handle error
-        run_once(&opt, &mut sender).unwrap();
-    })?;
+    loop {
+        select! {
+            recv(r) -> msg => {
+                match msg {
+                    Ok(Message::Setup(new_opt)) => {
+                        log::info!("Setup!");
+                        opt = Some(new_opt);
+                    }
+                    Ok(Message::RunAll) => {
+                        log::debug!("Receive Message::RunAll");
+                        // TODO Give a feedback if run_once return an error
+                        run_once(&opt, s.clone()).ok();
+                    }
+                    _ => {
+                    }
+                }
+            },
+        }
+    }
+
+    // // TODO Handle error
+    // run_once(&opt, &mut s).unwrap();
+
+    // let watch_opt = WatchOptions {
+    //     // TODO Handle error
+    //     file: opt.watch.as_ref().unwrap().into(),
+    //     debounce_time: Duration::from_secs(1),
+    // };
+
+    // Watcher::try_from(watch_opt)?.watch(&mut || {
+    //     // TODO Handle error
+    //     run_once(&opt, &mut s).unwrap();
+    // })?;
 
     Ok(())
 }
 
-fn run_once(opt: &GuiOpt, sender: &mut mpsc::Sender<String>) -> Result<(), Error> {
+fn run_once(opt: &Option<GuiOpt>, s: MessageSender) -> Result<(), Error> {
+    let opt = opt.as_ref().ok_or(Error::NoResult)?;
+
     let action = Action::try_from(opt)?;
     let result = action.run()?;
 
-    // TODO Use reason
-    let data = match result {
-        TestResult::Pass(_reason) => "PASS".to_string(),
-        TestResult::Fail(_reason) => "FAIL".to_string(),
-    };
-
-    match sender.try_send(data) {
-        Ok(_) => {}
-        Err(err) => {
-            if err.is_full() {
-                log::warn!("Data is produced too fast for GUI");
-            } else if err.is_disconnected() {
-                log::warn!("GUI stopped, stopping thread.");
-                return Ok(()); // TODO Return an error
-            }
-        }
-    }
+    log::info!("Result is ready, sending");
+    s.send(Message::Result(result)).unwrap();
 
     Ok(())
 }

@@ -2062,6 +2062,7 @@ dependencies = [
 name = "provola-egui"
 version = "0.1.7"
 dependencies = [
+ "crossbeam-channel",
  "eframe",
  "futures",
  "log",
@@ -2123,6 +2124,7 @@ dependencies = [
  "provola-catch2",
  "provola-core",
  "provola-googletest",
+ "serde",
  "strum 0.23.0",
  "strum_macros 0.23.1",
 ]

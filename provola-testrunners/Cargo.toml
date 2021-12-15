@@ -25,6 +25,10 @@ version = "0.1.7"
 path = "../provola-catch2"
 optional = true
 
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
 [features]
 default = [
   "googletest",
