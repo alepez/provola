@@ -38,7 +38,7 @@ pub fn run(opt: GuiOpt) -> Result<(), Error> {
         spawn_local_handler(label, receiver);
 
         // TODO Avoid clone
-        start_communication_thread(sender, opt.clone());
+        start_watch_thread(sender, opt.clone());
         window.show_all();
     });
 
@@ -60,13 +60,7 @@ fn spawn_local_handler(label: gtk::Label, mut receiver: mpsc::Receiver<String>) 
     main_context.spawn_local(future);
 }
 
-/// Spawn separate thread to handle communication.
-fn start_communication_thread(sender: mpsc::Sender<String>, opt: GuiOpt) {
-    // Note that blocking I/O with threads can be prevented
-    // by using asynchronous code, which is often a better
-    // choice. For the sake of this example, we showcase the
-    // way to use a thread when there is no other option.
-
+fn start_watch_thread(sender: mpsc::Sender<String>, opt: GuiOpt) {
     thread::spawn(move || {
         // TODO Handle error
         run_forever(opt, sender).unwrap();
