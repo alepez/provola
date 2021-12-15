@@ -28,103 +28,115 @@ type ActionReceiver = Receiver<ActionMessage>;
 type FeedbackSender = Sender<FeedbackMessage>;
 type FeedbackReceiver = Receiver<FeedbackMessage>;
 
+struct Server {}
+
 pub fn run(opt: GuiOpt) -> Result<(), Error> {
-    // Create a channel between working thread and main event loop:
-    let (action_s, action_r) = bounded(1000);
-    let (feedback_s, feedback_r) = bounded(1000);
-
-    start_working_thread(feedback_s.clone(), action_r.clone());
-
-    let app = ProvolaGuiApp::new(opt, action_s, feedback_r);
-    let native_options = eframe::NativeOptions::default();
-
-    eframe::run_native(Box::new(app), native_options);
+    Server::run(opt)
 }
 
-fn start_working_thread(s: FeedbackSender, r: ActionReceiver) {
-    log::debug!("start_working_thread");
-    thread::spawn(move || {
-        log::debug!("start_working_thread, spawned");
-        run_forever(s, r);
-    });
-}
+impl Server {
+    pub fn run(opt: GuiOpt) -> Result<(), Error> {
+        // Create a channel between working thread and main event loop:
+        let (action_s, action_r) = bounded(1000);
+        let (feedback_s, feedback_r) = bounded(1000);
 
-fn handle_message(
-    msg: Result<ActionMessage, crossbeam_channel::RecvError>,
-    s: &mut FeedbackSender,
-    opt: &mut Option<GuiOpt>,
-    repaint_signal: &mut Option<Arc<dyn RepaintSignal>>,
-) {
-    match msg {
-        Ok(ActionMessage::Setup(setup)) => {
-            let new_opt = setup.opt;
-            let new_repaint_signal = setup.repaint_signal;
+        Server::start_working_thread(feedback_s.clone(), action_r.clone());
 
-            log::info!("Setup!");
-            if let Some(file_to_watch) = &new_opt.watch {
-                // FIXME Make this thread stoppable (when file_to_watch changes)
-                start_watch_thread(file_to_watch.clone(), s.clone(), new_repaint_signal.clone());
-            }
+        let app = ProvolaGuiApp::new(opt, action_s, feedback_r);
+        let native_options = eframe::NativeOptions::default();
 
-            *opt = Some(new_opt);
-            *repaint_signal = Some(new_repaint_signal);
-        }
-        Ok(ActionMessage::RunAll) => {
-            log::debug!("Receive Message::RunAll");
-            // TODO Give a feedback if run_once return an error
-            run_once(&opt, s.clone()).ok();
-            if let Some(repaint_signal) = repaint_signal {
-                repaint_signal.request_repaint();
-            }
-        }
-        _ => {}
+        eframe::run_native(Box::new(app), native_options);
     }
-}
 
-fn run_forever(mut s: FeedbackSender, r: ActionReceiver) {
-    log::debug!("run_forever");
+    fn start_working_thread(s: FeedbackSender, r: ActionReceiver) {
+        log::debug!("start_working_thread");
+        thread::spawn(move || {
+            log::debug!("start_working_thread, spawned");
+            Server::run_forever(s, r);
+        });
+    }
 
-    let mut opt = Option::<GuiOpt>::default();
-    let mut repaint_signal: Option<Arc<dyn RepaintSignal>> = None;
+    fn handle_message(
+        msg: Result<ActionMessage, crossbeam_channel::RecvError>,
+        s: &mut FeedbackSender,
+        opt: &mut Option<GuiOpt>,
+        repaint_signal: &mut Option<Arc<dyn RepaintSignal>>,
+    ) {
+        match msg {
+            Ok(ActionMessage::Setup(setup)) => {
+                let new_opt = setup.opt;
+                let new_repaint_signal = setup.repaint_signal;
 
-    loop {
-        select! {
-            recv(r) -> msg => {
-                handle_message(msg, &mut s, &mut opt, &mut repaint_signal);
-            },
+                log::info!("Setup!");
+                if let Some(file_to_watch) = &new_opt.watch {
+                    // FIXME Make this thread stoppable (when file_to_watch changes)
+                    Server::start_watch_thread(
+                        file_to_watch.clone(),
+                        s.clone(),
+                        new_repaint_signal.clone(),
+                    );
+                }
+
+                *opt = Some(new_opt);
+                *repaint_signal = Some(new_repaint_signal);
+            }
+            Ok(ActionMessage::RunAll) => {
+                log::debug!("Receive Message::RunAll");
+                // TODO Give a feedback if run_once return an error
+                Server::run_once(&opt, s.clone()).ok();
+                if let Some(repaint_signal) = repaint_signal {
+                    repaint_signal.request_repaint();
+                }
+            }
+            _ => {}
         }
     }
-}
 
-fn start_watch_thread(w: PathBuf, s: FeedbackSender, repaint_signal: Arc<dyn RepaintSignal>) {
-    s.send(FeedbackMessage::WatchedChanged).unwrap();
+    fn run_forever(mut s: FeedbackSender, r: ActionReceiver) {
+        log::debug!("run_forever");
 
-    thread::spawn(move || {
-        let watch_opt = WatchOptions {
-            file: w,
-            debounce_time: Duration::from_secs(1),
-        };
+        let mut opt = Option::<GuiOpt>::default();
+        let mut repaint_signal: Option<Arc<dyn RepaintSignal>> = None;
 
-        Watcher::try_from(watch_opt)
-            .unwrap()
-            .watch(&mut || {
-                repaint_signal.request_repaint();
-                s.send(FeedbackMessage::WatchedChanged).unwrap();
-            })
-            .unwrap();
-    });
-}
+        loop {
+            select! {
+                recv(r) -> msg => {
+                    Server::handle_message(msg, &mut s, &mut opt, &mut repaint_signal);
+                },
+            }
+        }
+    }
 
-fn run_once(opt: &Option<GuiOpt>, s: FeedbackSender) -> Result<(), Error> {
-    let opt = opt.as_ref().ok_or(Error::NoResult)?;
+    fn start_watch_thread(w: PathBuf, s: FeedbackSender, repaint_signal: Arc<dyn RepaintSignal>) {
+        s.send(FeedbackMessage::WatchedChanged).unwrap();
 
-    let action = Action::try_from(opt)?;
-    let result = action.run()?;
+        thread::spawn(move || {
+            let watch_opt = WatchOptions {
+                file: w,
+                debounce_time: Duration::from_secs(1),
+            };
 
-    log::info!("Result is ready, sending");
-    s.send(FeedbackMessage::Result(result)).unwrap();
+            Watcher::try_from(watch_opt)
+                .unwrap()
+                .watch(&mut || {
+                    repaint_signal.request_repaint();
+                    s.send(FeedbackMessage::WatchedChanged).unwrap();
+                })
+                .unwrap();
+        });
+    }
 
-    Ok(())
+    fn run_once(opt: &Option<GuiOpt>, s: FeedbackSender) -> Result<(), Error> {
+        let opt = opt.as_ref().ok_or(Error::NoResult)?;
+
+        let action = Action::try_from(opt)?;
+        let result = action.run()?;
+
+        log::info!("Result is ready, sending");
+        s.send(FeedbackMessage::Result(result)).unwrap();
+
+        Ok(())
+    }
 }
 
 impl TryFrom<&GuiOpt> for Action {
