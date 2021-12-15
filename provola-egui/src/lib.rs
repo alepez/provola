@@ -28,40 +28,38 @@ type ActionReceiver = Receiver<ActionMessage>;
 type FeedbackSender = Sender<FeedbackMessage>;
 type FeedbackReceiver = Receiver<FeedbackMessage>;
 
-struct Server {}
+struct Server {
+    opt: Option<GuiOpt>,
+    repaint_signal: Option<Arc<dyn RepaintSignal>>,
+    action_r: ActionReceiver,
+    feedback_s: FeedbackSender,
+}
 
 pub fn run(opt: GuiOpt) -> Result<(), Error> {
-    Server::run(opt)
+    // Create a channel between working thread and main event loop:
+    let (action_s, action_r) = bounded(1000);
+    let (feedback_s, feedback_r) = bounded(1000);
+
+    let app = ProvolaGuiApp::new(opt, action_s, feedback_r);
+    let native_options = eframe::NativeOptions::default();
+
+    let mut server = Server {
+        opt: None,
+        repaint_signal: None,
+        action_r,
+        feedback_s,
+    };
+
+    thread::spawn(move || {
+        log::debug!("start_working_thread, spawned");
+        server.run();
+    });
+
+    eframe::run_native(Box::new(app), native_options)
 }
 
 impl Server {
-    pub fn run(opt: GuiOpt) -> Result<(), Error> {
-        // Create a channel between working thread and main event loop:
-        let (action_s, action_r) = bounded(1000);
-        let (feedback_s, feedback_r) = bounded(1000);
-
-        Server::start_working_thread(feedback_s.clone(), action_r.clone());
-
-        let app = ProvolaGuiApp::new(opt, action_s, feedback_r);
-        let native_options = eframe::NativeOptions::default();
-
-        eframe::run_native(Box::new(app), native_options);
-    }
-
-    fn start_working_thread(s: FeedbackSender, r: ActionReceiver) {
-        log::debug!("start_working_thread");
-        thread::spawn(move || {
-            log::debug!("start_working_thread, spawned");
-            Server::run_forever(s, r);
-        });
-    }
-
-    fn handle_message(
-        msg: Result<ActionMessage, crossbeam_channel::RecvError>,
-        s: &mut FeedbackSender,
-        opt: &mut Option<GuiOpt>,
-        repaint_signal: &mut Option<Arc<dyn RepaintSignal>>,
-    ) {
+    fn handle_message(&mut self, msg: Result<ActionMessage, crossbeam_channel::RecvError>) {
         match msg {
             Ok(ActionMessage::Setup(setup)) => {
                 let new_opt = setup.opt;
@@ -72,19 +70,19 @@ impl Server {
                     // FIXME Make this thread stoppable (when file_to_watch changes)
                     Server::start_watch_thread(
                         file_to_watch.clone(),
-                        s.clone(),
+                        self.feedback_s.clone(),
                         new_repaint_signal.clone(),
                     );
                 }
 
-                *opt = Some(new_opt);
-                *repaint_signal = Some(new_repaint_signal);
+                self.opt = Some(new_opt);
+                self.repaint_signal = Some(new_repaint_signal);
             }
             Ok(ActionMessage::RunAll) => {
                 log::debug!("Receive Message::RunAll");
                 // TODO Give a feedback if run_once return an error
-                Server::run_once(&opt, s.clone()).ok();
-                if let Some(repaint_signal) = repaint_signal {
+                Server::run_once(&self.opt, self.feedback_s.clone()).ok();
+                if let Some(repaint_signal) = &self.repaint_signal {
                     repaint_signal.request_repaint();
                 }
             }
@@ -92,16 +90,13 @@ impl Server {
         }
     }
 
-    fn run_forever(mut s: FeedbackSender, r: ActionReceiver) {
+    fn run(&mut self) {
         log::debug!("run_forever");
-
-        let mut opt = Option::<GuiOpt>::default();
-        let mut repaint_signal: Option<Arc<dyn RepaintSignal>> = None;
 
         loop {
             select! {
-                recv(r) -> msg => {
-                    Server::handle_message(msg, &mut s, &mut opt, &mut repaint_signal);
+                recv(self.action_r) -> msg => {
+                    self.handle_message(msg);
                 },
             }
         }
