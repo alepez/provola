@@ -3,14 +3,20 @@ mod app;
 pub use app::Config as GuiOpt;
 use app::ProvolaGuiApp;
 use crossbeam_channel::{bounded, select, Receiver, Sender};
+use eframe::epi::RepaintSignal;
 use provola_core::{
     Action, Error, Language, Source, TestDataIn, TestDataOut, WatchOptions, Watcher,
 };
 use provola_testrunners::{make_test_runner, TestRunnerInfo, TestRunnerType};
-use std::{path::PathBuf, thread, time::Duration};
+use std::{path::PathBuf, sync::Arc, thread, time::Duration};
+
+struct Setup {
+    opt: GuiOpt,
+    repaint_signal: Arc<dyn RepaintSignal>,
+}
 
 enum Message {
-    Setup(GuiOpt),
+    Setup(Setup),
     Result(provola_core::TestResult),
     RunAll,
     WatchedChanged,
@@ -45,20 +51,29 @@ fn handle_message(
     msg: Result<Message, crossbeam_channel::RecvError>,
     s: &mut MessageSender,
     opt: &mut Option<GuiOpt>,
+    repaint_signal: &mut Option<Arc< dyn RepaintSignal>>,
 ) {
     match msg {
-        Ok(Message::Setup(new_opt)) => {
+        Ok(Message::Setup(setup)) => {
+            let new_opt = setup.opt;
+            let new_repaint_signal = setup.repaint_signal;
+
             log::info!("Setup!");
             if let Some(file_to_watch) = &new_opt.watch {
                 // FIXME Make this thread stoppable (when file_to_watch changes)
-                start_watch_thread(file_to_watch.clone(), s.clone());
+                start_watch_thread(file_to_watch.clone(), s.clone(), new_repaint_signal.clone());
             }
+
             *opt = Some(new_opt);
+            *repaint_signal = Some(new_repaint_signal);
         }
         Ok(Message::RunAll) => {
             log::debug!("Receive Message::RunAll");
             // TODO Give a feedback if run_once return an error
             run_once(&opt, s.clone()).ok();
+            if let Some(repaint_signal) = repaint_signal {
+                repaint_signal.request_repaint();
+            }
         }
         _ => {}
     }
@@ -68,11 +83,12 @@ fn run_forever(mut s: MessageSender, mut r: MessageReceiver) -> Result<(), Error
     log::debug!("run_forever");
 
     let mut opt = Option::<GuiOpt>::default();
+    let mut repaint_signal: Option<Arc<dyn RepaintSignal>> = None;
 
     loop {
         select! {
             recv(r) -> msg => {
-                handle_message(msg, &mut s, &mut opt);
+                handle_message(msg, &mut s, &mut opt, &mut repaint_signal);
             },
         }
     }
@@ -80,7 +96,7 @@ fn run_forever(mut s: MessageSender, mut r: MessageReceiver) -> Result<(), Error
     Ok(())
 }
 
-fn start_watch_thread(w: PathBuf, s: MessageSender) {
+fn start_watch_thread(w: PathBuf, s: MessageSender, repaint_signal: Arc<dyn RepaintSignal>) {
     s.send(Message::WatchedChanged).unwrap();
 
     thread::spawn(move || {
@@ -92,6 +108,7 @@ fn start_watch_thread(w: PathBuf, s: MessageSender) {
         Watcher::try_from(watch_opt)
             .unwrap()
             .watch(&mut || {
+                repaint_signal.request_repaint();
                 s.send(Message::WatchedChanged).unwrap();
             })
             .unwrap();

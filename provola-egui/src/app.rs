@@ -42,7 +42,7 @@ impl epi::App for ProvolaGuiApp {
     fn setup(
         &mut self,
         _ctx: &egui::CtxRef,
-        _frame: &mut epi::Frame<'_>,
+        frame: &mut epi::Frame<'_>,
         _storage: Option<&dyn epi::Storage>,
     ) {
         // Load previous app state (if any).
@@ -53,7 +53,14 @@ impl epi::App for ProvolaGuiApp {
             // self.config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default()
         }
 
-        self.s.send(Message::Setup(self.config.clone())).unwrap();
+        let repaint_signal = frame.repaint_signal();
+
+        let setup = super::Setup {
+            opt: self.config.clone(),
+            repaint_signal,
+        };
+
+        self.s.send(Message::Setup(setup)).unwrap();
     }
 
     /// Called by the frame work to save state before shutdown.
