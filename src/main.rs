@@ -54,12 +54,14 @@ impl Opt {
             .or_else(|| source.and_then(|x| Language::from_source(x)))
     }
 
-    fn infer_options(&mut self) {
+    fn infer_options(mut self) -> Self {
         self.lang = self.lang_or_guess();
 
         if let Some(test_runner) = &self.test_runner {
             self.watch = Some(test_runner.clone());
         }
+
+        self
     }
 
     fn reporter(&self) -> Result<Box<dyn Reporter>, Error> {
@@ -131,8 +133,7 @@ fn run_gui(_opt: Opt) {
 fn main() {
     env_logger::init();
 
-    let mut opt = Opt::parse();
-    opt.infer_options();
+    let opt = Opt::parse().infer_options();
 
     if let Some(shell_compl) = opt.shell_compl {
         let mut app = Opt::into_app();
