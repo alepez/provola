@@ -4,10 +4,8 @@ pub use app::Config as GuiOpt;
 use app::ProvolaGuiApp;
 use crossbeam_channel::{bounded, select, Receiver, Sender};
 use eframe::epi::RepaintSignal;
-use provola_core::{
-    Action, Error, Language, Source, TestDataIn, TestDataOut, WatchOptions, Watcher,
-};
-use provola_testrunners::{make_test_runner, TestRunnerInfo, TestRunnerType};
+use provola_core::{Action, Error, Source, TestDataIn, TestDataOut, WatchOptions, Watcher};
+use provola_testrunners::{make_test_runner, TestRunnerInfo};
 use std::{path::PathBuf, sync::Arc, thread, time::Duration};
 
 struct Setup {
@@ -42,8 +40,7 @@ fn start_working_thread(s: MessageSender, r: MessageReceiver) {
     log::debug!("start_working_thread");
     thread::spawn(move || {
         log::debug!("start_working_thread, spawned");
-        // TODO Handle error
-        run_forever(s, r).unwrap();
+        run_forever(s, r);
     });
 }
 
@@ -51,7 +48,7 @@ fn handle_message(
     msg: Result<Message, crossbeam_channel::RecvError>,
     s: &mut MessageSender,
     opt: &mut Option<GuiOpt>,
-    repaint_signal: &mut Option<Arc< dyn RepaintSignal>>,
+    repaint_signal: &mut Option<Arc<dyn RepaintSignal>>,
 ) {
     match msg {
         Ok(Message::Setup(setup)) => {
@@ -79,7 +76,7 @@ fn handle_message(
     }
 }
 
-fn run_forever(mut s: MessageSender, mut r: MessageReceiver) -> Result<(), Error> {
+fn run_forever(mut s: MessageSender, r: MessageReceiver) {
     log::debug!("run_forever");
 
     let mut opt = Option::<GuiOpt>::default();
@@ -92,8 +89,6 @@ fn run_forever(mut s: MessageSender, mut r: MessageReceiver) -> Result<(), Error
             },
         }
     }
-
-    Ok(())
 }
 
 fn start_watch_thread(w: PathBuf, s: MessageSender, repaint_signal: Arc<dyn RepaintSignal>) {
