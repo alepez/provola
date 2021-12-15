@@ -4,15 +4,13 @@ use gtk::prelude::*;
 use gtk::{ApplicationWindow, Label};
 use provola_core::Error;
 use provola_core::*;
-use provola_reporters::{ReporterType, DEFAULT_REPORTER_STR};
 use provola_testrunners::make_test_runner;
 use provola_testrunners::{TestRunnerInfo, TestRunnerType};
-use std::path::Path;
 use std::path::PathBuf;
 use std::thread;
 use std::time::Duration;
 
-const APPLICATION_ID: &'static str = "dev.alepez.provola";
+const APPLICATION_ID: &str = "dev.alepez.provola";
 
 #[derive(Clone)]
 pub struct GuiOpt {
@@ -23,7 +21,6 @@ pub struct GuiOpt {
     pub source: Option<PathBuf>,
     pub test_runner: Option<PathBuf>,
     pub test_runner_type: Option<TestRunnerType>,
-    pub reporter: ReporterType,
 }
 
 pub fn run(opt: GuiOpt) -> Result<(), Error> {
@@ -64,14 +61,15 @@ fn spawn_local_handler(label: gtk::Label, mut receiver: mpsc::Receiver<String>) 
 }
 
 /// Spawn separate thread to handle communication.
-fn start_communication_thread(mut sender: mpsc::Sender<String>, opt: GuiOpt) {
+fn start_communication_thread(sender: mpsc::Sender<String>, opt: GuiOpt) {
     // Note that blocking I/O with threads can be prevented
     // by using asynchronous code, which is often a better
     // choice. For the sake of this example, we showcase the
     // way to use a thread when there is no other option.
 
     thread::spawn(move || {
-        run_forever(opt, sender);
+        // TODO Handle error
+        run_forever(opt, sender).unwrap();
     });
 }
 
@@ -141,25 +139,5 @@ impl TryFrom<&GuiOpt> for Action {
         }
 
         Ok(Action::Nothing)
-    }
-}
-
-impl GuiOpt {
-    fn lang_or_guess(&self) -> Option<Language> {
-        let source = self.source.as_ref();
-        self.lang
-            .or_else(|| source.and_then(|x| Language::from_source(x)))
-    }
-
-    fn infer_options(&mut self) {
-        self.lang = self.lang_or_guess();
-
-        if let Some(test_runner) = &self.test_runner {
-            self.watch = Some(test_runner.clone());
-        }
-    }
-
-    fn reporter(&self) -> Result<Box<dyn Reporter>, Error> {
-        provola_reporters::make_reporter(self.reporter)
     }
 }

@@ -106,7 +106,6 @@ impl TryFrom<Opt> for provola_gtk::GuiOpt {
             source: opt.source,
             test_runner: opt.test_runner,
             test_runner_type: opt.test_runner_type,
-            reporter: opt.reporter,
         })
     }
 }
