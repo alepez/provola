@@ -36,12 +36,9 @@ struct Server {
 }
 
 pub fn run(opt: GuiOpt) -> Result<(), Error> {
-    // Create a channel between working thread and main event loop:
+    // Server and GUI are communicating throug channels
     let (action_s, action_r) = bounded(1000);
     let (feedback_s, feedback_r) = bounded(1000);
-
-    let app = ProvolaGuiApp::new(opt, action_s, feedback_r);
-    let native_options = eframe::NativeOptions::default();
 
     let mut server = Server {
         opt: None,
@@ -54,6 +51,10 @@ pub fn run(opt: GuiOpt) -> Result<(), Error> {
         log::debug!("start_working_thread, spawned");
         server.run();
     });
+
+    // Create the GUI application
+    let app = ProvolaGuiApp::new(opt, action_s, feedback_r);
+    let native_options = eframe::NativeOptions::default();
 
     eframe::run_native(Box::new(app), native_options)
 }
