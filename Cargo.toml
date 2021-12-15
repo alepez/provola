@@ -32,9 +32,15 @@ version = "0.1.7"
 path = "provola-gtk"
 optional = true
 
+[dependencies.provola-egui]
+version = "0.1.7"
+path = "provola-egui"
+optional = true
+
 [features]
-default = []
+default = [ "egui" ]
 gtk = [ "provola-gtk" ]
+egui = [ "provola-egui" ]
 
 [workspace]
 
@@ -46,4 +52,5 @@ members = [
   "provola-testrunners",
   "provola-terminalreporter",
   "provola-gtk",
+  "provola-egui",
 ]
