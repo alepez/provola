@@ -93,19 +93,39 @@ impl TryFrom<&Opt> for Action {
     }
 }
 
+#[cfg(feature = "gtk")]
+impl TryFrom<Opt> for provola_gtk::GuiOpt {
+    type Error = Error;
+
+    fn try_from(opt: Opt) -> Result<Self, Error> {
+        Ok(Self {
+            watch: opt.watch,
+            input: opt.input,
+            output: opt.output,
+            lang: opt.lang,
+            source: opt.source,
+            test_runner: opt.test_runner,
+            test_runner_type: opt.test_runner_type,
+            reporter: opt.reporter,
+        })
+    }
+}
+
 fn print_completions<G: Generator>(gen: G, app: &mut App) {
     generate(gen, app, app.get_name().to_string(), &mut std::io::stdout());
 }
 
 #[cfg(feature = "gtk")]
-fn run_gui(_opt: &Opt) {
-    if let Err(e) = provola_gtk::run() {
+fn run_gui(opt: Opt) {
+    // TODO Error handling
+    let opt = provola_gtk::GuiOpt::try_from(opt).unwrap();
+    if let Err(e) = provola_gtk::run(opt) {
         log::error!("{}", e);
     }
 }
 
 #[cfg(not(feature = "gtk"))]
-fn run_gui(_opt: &Opt) {
+fn run_gui(_opt: Opt) {
     log::error!("GUI not avaiable");
 }
 
@@ -122,7 +142,7 @@ fn main() {
     }
 
     if opt.gui {
-        return run_gui(&opt);
+        return run_gui(opt);
     }
 
     if let Err(e) = cli::run(&opt) {

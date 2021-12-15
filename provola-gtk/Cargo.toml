@@ -15,5 +15,13 @@ log = "0.4"
 version = "0.1.7"
 path = "../provola-core"
 
+[dependencies.provola-testrunners]
+version = "0.1.7"
+path = "../provola-testrunners"
+
+[dependencies.provola-reporters]
+version = "0.1.7"
+path = "../provola-reporters"
+
 [dependencies.gtk]
 version = "0.14.3"

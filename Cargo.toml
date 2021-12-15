@@ -33,7 +33,7 @@ path = "provola-gtk"
 optional = true
 
 [features]
-default = []
+default = [ "gtk" ]
 gtk = [ "provola-gtk" ]
 
 [workspace]
