@@ -13,15 +13,20 @@ struct Setup {
     repaint_signal: Arc<dyn RepaintSignal>,
 }
 
-enum Message {
+enum ActionMessage {
     Setup(Setup),
-    Result(provola_core::TestResult),
     RunAll,
+}
+
+enum FeedbackMessage {
+    Result(provola_core::TestResult),
     WatchedChanged,
 }
 
-type MessageSender = Sender<Message>;
-type MessageReceiver = Receiver<Message>;
+type ActionSender = Sender<ActionMessage>;
+type ActionReceiver = Receiver<ActionMessage>;
+type FeedbackSender = Sender<FeedbackMessage>;
+type FeedbackReceiver = Receiver<FeedbackMessage>;
 
 pub fn run(opt: GuiOpt) -> Result<(), Error> {
     // Create a channel between working thread and main event loop:
@@ -36,7 +41,7 @@ pub fn run(opt: GuiOpt) -> Result<(), Error> {
     eframe::run_native(Box::new(app), native_options);
 }
 
-fn start_working_thread(s: MessageSender, r: MessageReceiver) {
+fn start_working_thread(s: FeedbackSender, r: ActionReceiver) {
     log::debug!("start_working_thread");
     thread::spawn(move || {
         log::debug!("start_working_thread, spawned");
@@ -45,13 +50,13 @@ fn start_working_thread(s: MessageSender, r: MessageReceiver) {
 }
 
 fn handle_message(
-    msg: Result<Message, crossbeam_channel::RecvError>,
-    s: &mut MessageSender,
+    msg: Result<ActionMessage, crossbeam_channel::RecvError>,
+    s: &mut FeedbackSender,
     opt: &mut Option<GuiOpt>,
     repaint_signal: &mut Option<Arc<dyn RepaintSignal>>,
 ) {
     match msg {
-        Ok(Message::Setup(setup)) => {
+        Ok(ActionMessage::Setup(setup)) => {
             let new_opt = setup.opt;
             let new_repaint_signal = setup.repaint_signal;
 
@@ -64,7 +69,7 @@ fn handle_message(
             *opt = Some(new_opt);
             *repaint_signal = Some(new_repaint_signal);
         }
-        Ok(Message::RunAll) => {
+        Ok(ActionMessage::RunAll) => {
             log::debug!("Receive Message::RunAll");
             // TODO Give a feedback if run_once return an error
             run_once(&opt, s.clone()).ok();
@@ -76,7 +81,7 @@ fn handle_message(
     }
 }
 
-fn run_forever(mut s: MessageSender, r: MessageReceiver) {
+fn run_forever(mut s: FeedbackSender, r: ActionReceiver) {
     log::debug!("run_forever");
 
     let mut opt = Option::<GuiOpt>::default();
@@ -91,8 +96,8 @@ fn run_forever(mut s: MessageSender, r: MessageReceiver) {
     }
 }
 
-fn start_watch_thread(w: PathBuf, s: MessageSender, repaint_signal: Arc<dyn RepaintSignal>) {
-    s.send(Message::WatchedChanged).unwrap();
+fn start_watch_thread(w: PathBuf, s: FeedbackSender, repaint_signal: Arc<dyn RepaintSignal>) {
+    s.send(FeedbackMessage::WatchedChanged).unwrap();
 
     thread::spawn(move || {
         let watch_opt = WatchOptions {
@@ -104,20 +109,20 @@ fn start_watch_thread(w: PathBuf, s: MessageSender, repaint_signal: Arc<dyn Repa
             .unwrap()
             .watch(&mut || {
                 repaint_signal.request_repaint();
-                s.send(Message::WatchedChanged).unwrap();
+                s.send(FeedbackMessage::WatchedChanged).unwrap();
             })
             .unwrap();
     });
 }
 
-fn run_once(opt: &Option<GuiOpt>, s: MessageSender) -> Result<(), Error> {
+fn run_once(opt: &Option<GuiOpt>, s: FeedbackSender) -> Result<(), Error> {
     let opt = opt.as_ref().ok_or(Error::NoResult)?;
 
     let action = Action::try_from(opt)?;
     let result = action.run()?;
 
     log::info!("Result is ready, sending");
-    s.send(Message::Result(result)).unwrap();
+    s.send(FeedbackMessage::Result(result)).unwrap();
 
     Ok(())
 }

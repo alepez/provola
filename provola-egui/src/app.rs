@@ -1,4 +1,4 @@
-use super::{Message, MessageReceiver, MessageSender};
+use super::{ActionMessage, ActionSender, FeedbackMessage, FeedbackReceiver};
 use crossbeam_channel::select;
 use eframe::{egui, epi};
 use merge::Merge;
@@ -30,8 +30,8 @@ pub struct State {
 pub struct ProvolaGuiApp {
     config: Config,
     state: State,
-    s: MessageSender,
-    r: MessageReceiver,
+    s: ActionSender,
+    r: FeedbackReceiver,
 }
 
 impl epi::App for ProvolaGuiApp {
@@ -63,7 +63,7 @@ impl epi::App for ProvolaGuiApp {
             repaint_signal,
         };
 
-        self.s.send(Message::Setup(setup)).unwrap();
+        self.s.send(ActionMessage::Setup(setup)).unwrap();
     }
 
     /// Called by the frame work to save state before shutdown.
@@ -79,14 +79,14 @@ impl epi::App for ProvolaGuiApp {
         select! {
             recv(self.r) -> msg => {
                 match msg {
-                    Ok(Message::Result(new_result)) => {
+                    Ok(FeedbackMessage::Result(new_result)) => {
                         log::info!("Test result is ready");
                         state.last_result = Some(new_result);
                     }
-                    Ok(Message::WatchedChanged) => {
+                    Ok(FeedbackMessage::WatchedChanged) => {
                         log::info!("Watched file has changed");
                         state.last_result = None;
-                        self.s.send(Message::RunAll).unwrap();
+                        self.s.send(ActionMessage::RunAll).unwrap();
                     }
                     _ => {}
                 }
@@ -126,7 +126,7 @@ impl epi::App for ProvolaGuiApp {
             if ui.button("Run all").clicked() {
                 log::debug!("Send Message::RunAll");
                 state.last_result = None;
-                self.s.send(Message::RunAll).unwrap();
+                self.s.send(ActionMessage::RunAll).unwrap();
             }
         });
 
@@ -138,7 +138,7 @@ impl epi::App for ProvolaGuiApp {
 }
 
 impl ProvolaGuiApp {
-    pub(crate) fn new(config: Config, s: MessageSender, r: MessageReceiver) -> Self {
+    pub(crate) fn new(config: Config, s: ActionSender, r: FeedbackReceiver) -> Self {
         let state = State::default();
         Self {
             config,
