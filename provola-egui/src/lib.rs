@@ -7,12 +7,13 @@ use provola_core::{
     Action, Error, Language, Source, TestDataIn, TestDataOut, WatchOptions, Watcher,
 };
 use provola_testrunners::{make_test_runner, TestRunnerInfo, TestRunnerType};
-use std::thread;
+use std::{path::PathBuf, thread, time::Duration};
 
 enum Message {
     Setup(GuiOpt),
     Result(provola_core::TestResult),
     RunAll,
+    WatchedChanged,
 }
 
 type MessageSender = Sender<Message>;
@@ -23,7 +24,7 @@ pub fn run(opt: GuiOpt) -> Result<(), Error> {
     let (action_s, action_r) = bounded(1000);
     let (feedback_s, feedback_r) = bounded(1000);
 
-    start_working_thread(feedback_s, action_r);
+    start_working_thread(feedback_s.clone(), action_r.clone());
 
     let app = ProvolaGuiApp::new(opt, action_s, feedback_r);
     let native_options = eframe::NativeOptions::default();
@@ -40,6 +41,29 @@ fn start_working_thread(s: MessageSender, r: MessageReceiver) {
     });
 }
 
+fn handle_message(
+    msg: Result<Message, crossbeam_channel::RecvError>,
+    s: &mut MessageSender,
+    opt: &mut Option<GuiOpt>,
+) {
+    match msg {
+        Ok(Message::Setup(new_opt)) => {
+            log::info!("Setup!");
+            if let Some(file_to_watch) = &new_opt.watch {
+                // FIXME Make this thread stoppable (when file_to_watch changes)
+                start_watch_thread(file_to_watch.clone(), s.clone());
+            }
+            *opt = Some(new_opt);
+        }
+        Ok(Message::RunAll) => {
+            log::debug!("Receive Message::RunAll");
+            // TODO Give a feedback if run_once return an error
+            run_once(&opt, s.clone()).ok();
+        }
+        _ => {}
+    }
+}
+
 fn run_forever(mut s: MessageSender, mut r: MessageReceiver) -> Result<(), Error> {
     log::debug!("run_forever");
 
@@ -48,38 +72,30 @@ fn run_forever(mut s: MessageSender, mut r: MessageReceiver) -> Result<(), Error
     loop {
         select! {
             recv(r) -> msg => {
-                match msg {
-                    Ok(Message::Setup(new_opt)) => {
-                        log::info!("Setup!");
-                        opt = Some(new_opt);
-                    }
-                    Ok(Message::RunAll) => {
-                        log::debug!("Receive Message::RunAll");
-                        // TODO Give a feedback if run_once return an error
-                        run_once(&opt, s.clone()).ok();
-                    }
-                    _ => {
-                    }
-                }
+                handle_message(msg, &mut s, &mut opt);
             },
         }
     }
 
-    // // TODO Handle error
-    // run_once(&opt, &mut s).unwrap();
-
-    // let watch_opt = WatchOptions {
-    //     // TODO Handle error
-    //     file: opt.watch.as_ref().unwrap().into(),
-    //     debounce_time: Duration::from_secs(1),
-    // };
-
-    // Watcher::try_from(watch_opt)?.watch(&mut || {
-    //     // TODO Handle error
-    //     run_once(&opt, &mut s).unwrap();
-    // })?;
-
     Ok(())
+}
+
+fn start_watch_thread(w: PathBuf, s: MessageSender) {
+    s.send(Message::WatchedChanged).unwrap();
+
+    thread::spawn(move || {
+        let watch_opt = WatchOptions {
+            file: w,
+            debounce_time: Duration::from_secs(1),
+        };
+
+        Watcher::try_from(watch_opt)
+            .unwrap()
+            .watch(&mut || {
+                s.send(Message::WatchedChanged).unwrap();
+            })
+            .unwrap();
+    });
 }
 
 fn run_once(opt: &Option<GuiOpt>, s: MessageSender) -> Result<(), Error> {

@@ -70,8 +70,13 @@ impl epi::App for ProvolaGuiApp {
             recv(self.r) -> msg => {
                 match msg {
                     Ok(Message::Result(new_result)) => {
-                        log::info!("Result!");
+                        log::info!("Test result is ready");
                         state.last_result = Some(new_result);
+                    }
+                    Ok(Message::WatchedChanged) => {
+                        log::info!("Watched file has changed");
+                        state.last_result = None;
+                        self.s.send(Message::RunAll).unwrap();
                     }
                     _ => {}
                 }
