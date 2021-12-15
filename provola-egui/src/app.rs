@@ -3,23 +3,14 @@ use eframe::{egui, epi};
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
-pub struct ProvolaGuiApp {
-    // Example stuff:
-    label: String,
-
-    // this how you opt-out of serialization of a member
-    #[cfg_attr(feature = "persistence", serde(skip))]
-    value: f32,
+#[derive(Default)]
+struct Config {
+    // Persistent configuration
 }
 
-impl Default for ProvolaGuiApp {
-    fn default() -> Self {
-        Self {
-            // Example stuff:
-            label: "Hello World!".to_owned(),
-            value: 2.7,
-        }
-    }
+pub struct ProvolaGuiApp {
+    config: Config,
+    receiver: futures::channel::mpsc::Receiver<String>,
 }
 
 impl epi::App for ProvolaGuiApp {
@@ -38,20 +29,18 @@ impl epi::App for ProvolaGuiApp {
         // Note that you must enable the `persistence` feature for this to work.
         #[cfg(feature = "persistence")]
         if let Some(storage) = _storage {
-            *self = epi::get_value(storage, epi::APP_KEY).unwrap_or_default()
+            self.config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default()
         }
     }
 
     /// Called by the frame work to save state before shutdown.
     #[cfg(feature = "persistence")]
     fn save(&mut self, storage: &mut dyn epi::Storage) {
-        epi::set_value(storage, epi::APP_KEY, self);
+        epi::set_value(storage, epi::APP_KEY, &self.config);
     }
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::CtxRef, frame: &mut epi::Frame<'_>) {
-        let Self { label, value } = self;
-
         // Top panel contains the main menu
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
@@ -72,13 +61,22 @@ impl epi::App for ProvolaGuiApp {
         });
 
         // Side panel for global actions and feedbacks
-        egui::SidePanel::left("side_panel").show(ctx, |ui| {
+        egui::SidePanel::left("side_panel").show(ctx, |_ui| {
             // TODO
         });
 
         // Central panel for test results
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::CentralPanel::default().show(ctx, |_ui| {
             // TODO
         });
+    }
+}
+
+impl ProvolaGuiApp {
+    pub(crate) fn new(receiver: futures::channel::mpsc::Receiver<String>) -> Self {
+        Self {
+            config: Config::default(),
+            receiver,
+        }
     }
 }
