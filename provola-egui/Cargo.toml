@@ -12,6 +12,7 @@ futures = "0.3"
 log = "0.4"
 crossbeam-channel = "0.5"
 serde = { version = "1", features = ["derive"], optional = true }
+merge = "0.1.0"
 
 [dependencies.provola-core]
 version = "0.1.7"

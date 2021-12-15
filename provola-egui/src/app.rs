@@ -1,6 +1,7 @@
 use super::{Message, MessageReceiver, MessageSender};
 use crossbeam_channel::select;
 use eframe::{egui, epi};
+use merge::Merge;
 use provola_core::{Language, TestResult};
 use provola_testrunners::TestRunnerType;
 use std::path::PathBuf;
@@ -9,7 +10,7 @@ use std::time::Duration;
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone, Debug, Merge)]
 pub struct Config {
     // Persistent configuration
     pub watch: Option<PathBuf>,
@@ -49,8 +50,10 @@ impl epi::App for ProvolaGuiApp {
         // Note that you must enable the `persistence` feature for this to work.
         #[cfg(feature = "persistence")]
         if let Some(storage) = _storage {
-            // TODO merge storage with overrides (from self.config)
-            // self.config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default()
+            let stored_config: Config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default();
+            // If options have been passed as cli arguments, we override stored
+            // option with the new ones.
+            self.config.merge(stored_config);
         }
 
         let repaint_signal = frame.repaint_signal();
