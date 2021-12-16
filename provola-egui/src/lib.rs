@@ -48,7 +48,6 @@ pub fn run(opt: GuiOpt) -> Result<(), Error> {
     };
 
     thread::spawn(move || {
-        log::debug!("start_working_thread, spawned");
         server.run();
     });
 
@@ -60,13 +59,12 @@ pub fn run(opt: GuiOpt) -> Result<(), Error> {
 }
 
 impl Server {
-    fn handle_message(&mut self, msg: Result<ActionMessage, crossbeam_channel::RecvError>) {
+    fn handle_message(&mut self, msg: ActionMessage) {
         match msg {
-            Ok(ActionMessage::Setup(setup)) => {
+            ActionMessage::Setup(setup) => {
                 let new_opt = setup.opt;
                 let new_repaint_signal = setup.repaint_signal;
 
-                log::info!("Setup!");
                 if let Some(file_to_watch) = &new_opt.watch {
                     // FIXME Make this thread stoppable (when file_to_watch changes)
                     Server::start_watch_thread(
@@ -79,25 +77,24 @@ impl Server {
                 self.opt = Some(new_opt);
                 self.repaint_signal = Some(new_repaint_signal);
             }
-            Ok(ActionMessage::RunAll) => {
-                log::debug!("Receive Message::RunAll");
+            ActionMessage::RunAll => {
                 // TODO Give a feedback if run_once return an error
                 Server::run_once(&self.opt, self.feedback_s.clone()).ok();
                 if let Some(repaint_signal) = &self.repaint_signal {
                     repaint_signal.request_repaint();
                 }
             }
-            _ => {}
         }
     }
 
     fn run(&mut self) {
-        log::debug!("run_forever");
-
         loop {
             select! {
                 recv(self.action_r) -> msg => {
-                    self.handle_message(msg);
+                    match msg {
+                        Ok(msg) => self.handle_message(msg),
+                        Err(_) => return,
+                    }
                 },
             }
         }
@@ -128,7 +125,6 @@ impl Server {
         let action = Action::try_from(opt)?;
         let result = action.run()?;
 
-        log::info!("Result is ready, sending");
         s.send(FeedbackMessage::Result(result)).unwrap();
 
         Ok(())
