@@ -1,4 +1,5 @@
 mod app;
+mod central_panel;
 
 pub use app::Config as GuiOpt;
 use app::ProvolaGuiApp;

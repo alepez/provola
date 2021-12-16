@@ -1,4 +1,5 @@
 use super::{ActionMessage, ActionSender, FeedbackMessage, FeedbackReceiver};
+use crate::central_panel;
 use crossbeam_channel::select;
 use eframe::{egui, epi};
 use merge::Merge;
@@ -40,10 +41,11 @@ impl ProvolaGuiApp {
         // Note that you must enable the `persistence` feature for this to work.
         #[cfg(feature = "persistence")]
         if let Some(storage) = _storage {
-            let stored_config: Config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default();
+            // TODO Merge is not working well when both test_runner and source are selected
+            let _stored_config: Config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default();
             // If options have been passed as cli arguments, we override stored
             // option with the new ones.
-            self.config.merge(stored_config);
+            // self.config.merge(stored_config);
         }
     }
 
@@ -156,8 +158,8 @@ impl epi::App for ProvolaGuiApp {
         });
 
         // Central panel for test results
-        CentralPanel::default().show(ctx, |_ui| {
-            // TODO
+        CentralPanel::default().show(ctx, |ui| {
+            central_panel::show(ui, &self.state.last_result);
         });
     }
 }
