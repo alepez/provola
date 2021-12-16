@@ -80,18 +80,15 @@ impl Server {
     fn handle_message(&mut self, msg: ActionMessage) {
         match msg {
             ActionMessage::Setup(setup) => {
-                let new_opt = setup.opt;
-                let new_repaint_signal = setup.repaint_signal;
-
                 // This must be done before starting watch thread
-                self.feedback_s.repaint_signal = Some(new_repaint_signal);
+                self.feedback_s.repaint_signal = Some(setup.repaint_signal);
 
-                if let Some(file_to_watch) = &new_opt.watch {
+                if let Some(file_to_watch) = &setup.opt.watch {
                     // FIXME Make this thread stoppable (when file_to_watch changes)
                     self.start_watch_thread(file_to_watch.clone());
                 }
 
-                self.opt = Some(new_opt);
+                self.opt = Some(setup.opt);
             }
             ActionMessage::RunAll => {
                 // TODO Give a feedback if run_once return an error
