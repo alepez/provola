@@ -65,21 +65,19 @@ impl Server {
                 let new_opt = setup.opt;
                 let new_repaint_signal = setup.repaint_signal;
 
+                // This must be done before starting watch thread
+                self.repaint_signal = Some(new_repaint_signal);
+
                 if let Some(file_to_watch) = &new_opt.watch {
                     // FIXME Make this thread stoppable (when file_to_watch changes)
-                    Server::start_watch_thread(
-                        file_to_watch.clone(),
-                        self.feedback_s.clone(),
-                        new_repaint_signal.clone(),
-                    );
+                    self.start_watch_thread(file_to_watch.clone());
                 }
 
                 self.opt = Some(new_opt);
-                self.repaint_signal = Some(new_repaint_signal);
             }
             ActionMessage::RunAll => {
                 // TODO Give a feedback if run_once return an error
-                Server::run_once(&self.opt, self.feedback_s.clone()).ok();
+                self.run_once().ok();
                 if let Some(repaint_signal) = &self.repaint_signal {
                     repaint_signal.request_repaint();
                 }
@@ -100,8 +98,11 @@ impl Server {
         }
     }
 
-    fn start_watch_thread(w: PathBuf, s: FeedbackSender, repaint_signal: Arc<dyn RepaintSignal>) {
-        s.send(FeedbackMessage::WatchedChanged).unwrap();
+    fn start_watch_thread(&self, w: PathBuf) {
+        let feedback_s = self.feedback_s.clone();
+        let repaint_signal = self.repaint_signal.clone().unwrap();
+
+        feedback_s.send(FeedbackMessage::WatchedChanged).unwrap();
 
         thread::spawn(move || {
             let watch_opt = WatchOptions {
@@ -113,19 +114,21 @@ impl Server {
                 .unwrap()
                 .watch(&mut || {
                     repaint_signal.request_repaint();
-                    s.send(FeedbackMessage::WatchedChanged).unwrap();
+                    feedback_s.send(FeedbackMessage::WatchedChanged).unwrap();
                 })
                 .unwrap();
         });
     }
 
-    fn run_once(opt: &Option<GuiOpt>, s: FeedbackSender) -> Result<(), Error> {
-        let opt = opt.as_ref().ok_or(Error::NoResult)?;
+    fn run_once(&self) -> Result<(), Error> {
+        let opt = self.opt.as_ref().ok_or(Error::NoResult)?;
 
         let action = Action::try_from(opt)?;
         let result = action.run()?;
 
-        s.send(FeedbackMessage::Result(result)).unwrap();
+        self.feedback_s
+            .send(FeedbackMessage::Result(result))
+            .unwrap();
 
         Ok(())
     }
