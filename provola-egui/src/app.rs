@@ -56,11 +56,9 @@ impl ProvolaGuiApp {
 
         match msg {
             FeedbackMessage::Result(new_result) => {
-                log::info!("Test result is ready");
                 state.last_result = Some(new_result);
             }
             FeedbackMessage::WatchedChanged => {
-                log::info!("Watched file has changed");
                 self.action_run_all();
             }
         }
