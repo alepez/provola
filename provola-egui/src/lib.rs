@@ -121,6 +121,7 @@ impl Server {
                 debounce_time: Duration::from_secs(1),
             };
 
+            // TODO watch must be stopped when file_to_watch changes
             Watcher::try_from(watch_opt)
                 .unwrap()
                 .watch(&mut || {

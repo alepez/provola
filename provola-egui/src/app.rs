@@ -34,6 +34,52 @@ pub struct ProvolaGuiApp {
     r: FeedbackReceiver,
 }
 
+impl ProvolaGuiApp {
+    fn resume_config(&mut self, _storage: Option<&dyn epi::Storage>) {
+        // Load previous app state (if any).
+        // Note that you must enable the `persistence` feature for this to work.
+        #[cfg(feature = "persistence")]
+        if let Some(storage) = _storage {
+            let stored_config: Config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default();
+            // If options have been passed as cli arguments, we override stored
+            // option with the new ones.
+            self.config.merge(stored_config);
+        }
+    }
+
+    fn send(&mut self, msg: ActionMessage) {
+        self.s.send(msg).unwrap();
+    }
+
+    fn handle_message(&mut self, msg: FeedbackMessage) {
+        let state = &mut self.state;
+
+        match msg {
+            FeedbackMessage::Result(new_result) => {
+                log::info!("Test result is ready");
+                state.last_result = Some(new_result);
+            }
+            FeedbackMessage::WatchedChanged => {
+                log::info!("Watched file has changed");
+                state.last_result = None;
+                self.s.send(ActionMessage::RunAll).unwrap();
+            }
+        }
+    }
+
+    fn handle_messages(&mut self) {
+        select! {
+            recv(self.r) -> msg => {
+                match msg {
+                    Ok(msg) => self.handle_message(msg),
+                    Err(_) => return,
+                }
+            },
+            default(Duration::from_millis(1)) => {}
+        }
+    }
+}
+
 impl epi::App for ProvolaGuiApp {
     fn name(&self) -> &str {
         "Provola"
@@ -44,26 +90,16 @@ impl epi::App for ProvolaGuiApp {
         &mut self,
         _ctx: &egui::CtxRef,
         frame: &mut epi::Frame<'_>,
-        _storage: Option<&dyn epi::Storage>,
+        storage: Option<&dyn epi::Storage>,
     ) {
-        // Load previous app state (if any).
-        // Note that you must enable the `persistence` feature for this to work.
-        #[cfg(feature = "persistence")]
-        if let Some(storage) = _storage {
-            let stored_config: Config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default();
-            // If options have been passed as cli arguments, we override stored
-            // option with the new ones.
-            self.config.merge(stored_config);
-        }
-
-        let repaint_signal = frame.repaint_signal();
+        self.resume_config(storage);
 
         let setup = super::Setup {
             opt: self.config.clone(),
-            repaint_signal,
+            repaint_signal: frame.repaint_signal(),
         };
 
-        self.s.send(ActionMessage::Setup(setup)).unwrap();
+        self.send(ActionMessage::Setup(setup));
     }
 
     /// Called by the frame work to save state before shutdown.
@@ -74,25 +110,9 @@ impl epi::App for ProvolaGuiApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::CtxRef, frame: &mut epi::Frame<'_>) {
-        let state = &mut self.state;
+        self.handle_messages();
 
-        select! {
-            recv(self.r) -> msg => {
-                match msg {
-                    Ok(FeedbackMessage::Result(new_result)) => {
-                        log::info!("Test result is ready");
-                        state.last_result = Some(new_result);
-                    }
-                    Ok(FeedbackMessage::WatchedChanged) => {
-                        log::info!("Watched file has changed");
-                        state.last_result = None;
-                        self.s.send(ActionMessage::RunAll).unwrap();
-                    }
-                    _ => {}
-                }
-            },
-            default(Duration::from_millis(1)) => {}
-        }
+        let state = &mut self.state;
 
         // Top panel contains the main menu
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
