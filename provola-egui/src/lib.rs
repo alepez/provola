@@ -25,12 +25,28 @@ enum FeedbackMessage {
 
 type ActionSender = Sender<ActionMessage>;
 type ActionReceiver = Receiver<ActionMessage>;
-type FeedbackSender = Sender<FeedbackMessage>;
 type FeedbackReceiver = Receiver<FeedbackMessage>;
+
+// When the server send a feedback to the gui, the gui must awake.
+// To do that, we use repaint_signal to notify the gui whenever a
+// feedback is sent.
+#[derive(Clone)]
+struct FeedbackSender {
+    sender: Sender<FeedbackMessage>,
+    repaint_signal: Option<Arc<dyn RepaintSignal>>,
+}
+
+impl FeedbackSender {
+    fn send(&self, msg: FeedbackMessage) {
+        self.sender.send(msg).unwrap();
+        if let Some(repaint_signal) = &self.repaint_signal {
+            repaint_signal.request_repaint();
+        }
+    }
+}
 
 struct Server {
     opt: Option<GuiOpt>,
-    repaint_signal: Option<Arc<dyn RepaintSignal>>,
     action_r: ActionReceiver,
     feedback_s: FeedbackSender,
 }
@@ -42,9 +58,11 @@ pub fn run(opt: GuiOpt) -> Result<(), Error> {
 
     let mut server = Server {
         opt: None,
-        repaint_signal: None,
         action_r,
-        feedback_s,
+        feedback_s: FeedbackSender {
+            sender: feedback_s,
+            repaint_signal: None,
+        },
     };
 
     thread::spawn(move || {
@@ -66,7 +84,7 @@ impl Server {
                 let new_repaint_signal = setup.repaint_signal;
 
                 // This must be done before starting watch thread
-                self.repaint_signal = Some(new_repaint_signal);
+                self.feedback_s.repaint_signal = Some(new_repaint_signal);
 
                 if let Some(file_to_watch) = &new_opt.watch {
                     // FIXME Make this thread stoppable (when file_to_watch changes)
@@ -78,9 +96,6 @@ impl Server {
             ActionMessage::RunAll => {
                 // TODO Give a feedback if run_once return an error
                 self.run_once().ok();
-                if let Some(repaint_signal) = &self.repaint_signal {
-                    repaint_signal.request_repaint();
-                }
             }
         }
     }
@@ -100,9 +115,8 @@ impl Server {
 
     fn start_watch_thread(&self, w: PathBuf) {
         let feedback_s = self.feedback_s.clone();
-        let repaint_signal = self.repaint_signal.clone().unwrap();
 
-        feedback_s.send(FeedbackMessage::WatchedChanged).unwrap();
+        feedback_s.send(FeedbackMessage::WatchedChanged);
 
         thread::spawn(move || {
             let watch_opt = WatchOptions {
@@ -113,8 +127,7 @@ impl Server {
             Watcher::try_from(watch_opt)
                 .unwrap()
                 .watch(&mut || {
-                    repaint_signal.request_repaint();
-                    feedback_s.send(FeedbackMessage::WatchedChanged).unwrap();
+                    feedback_s.send(FeedbackMessage::WatchedChanged);
                 })
                 .unwrap();
         });
@@ -126,9 +139,7 @@ impl Server {
         let action = Action::try_from(opt)?;
         let result = action.run()?;
 
-        self.feedback_s
-            .send(FeedbackMessage::Result(result))
-            .unwrap();
+        self.feedback_s.send(FeedbackMessage::Result(result));
 
         Ok(())
     }
