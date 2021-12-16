@@ -1,4 +1,5 @@
 use super::{ActionMessage, ActionSender, FeedbackMessage, FeedbackReceiver};
+use crate::central_panel;
 use crossbeam_channel::select;
 use eframe::{egui, epi};
 use merge::Merge;
@@ -156,8 +157,8 @@ impl epi::App for ProvolaGuiApp {
         });
 
         // Central panel for test results
-        CentralPanel::default().show(ctx, |_ui| {
-            // TODO
+        CentralPanel::default().show(ctx, |ui| {
+            central_panel::show(ui, &self.state.last_result);
         });
     }
 }

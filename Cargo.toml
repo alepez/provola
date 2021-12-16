@@ -33,7 +33,7 @@ path = "provola-egui"
 optional = true
 
 [features]
-default = []
+default = ["egui"]
 egui = ["provola-egui"]
 
 [workspace]
