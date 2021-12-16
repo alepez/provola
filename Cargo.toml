@@ -27,14 +27,14 @@ path = "provola-testrunners"
 version = "0.1.7"
 path = "provola-reporters"
 
-[dependencies.provola-gtk]
+[dependencies.provola-egui]
 version = "0.1.7"
-path = "provola-gtk"
+path = "provola-egui"
 optional = true
 
 [features]
 default = []
-gtk = [ "provola-gtk" ]
+egui = ["provola-egui"]
 
 [workspace]
 
@@ -45,5 +45,5 @@ members = [
   "provola-catch2",
   "provola-testrunners",
   "provola-terminalreporter",
-  "provola-gtk",
+  "provola-egui",
 ]

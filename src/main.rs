@@ -95,8 +95,8 @@ impl TryFrom<&Opt> for Action {
     }
 }
 
-#[cfg(feature = "gtk")]
-impl TryFrom<Opt> for provola_gtk::GuiOpt {
+#[cfg(feature = "egui")]
+impl TryFrom<Opt> for provola_egui::GuiOpt {
     type Error = Error;
 
     fn try_from(opt: Opt) -> Result<Self, Error> {
@@ -116,16 +116,16 @@ fn print_completions<G: Generator>(gen: G, app: &mut App) {
     generate(gen, app, app.get_name().to_string(), &mut std::io::stdout());
 }
 
-#[cfg(feature = "gtk")]
+#[cfg(feature = "egui")]
 fn run_gui(opt: Opt) {
     // TODO Error handling
-    let opt = provola_gtk::GuiOpt::try_from(opt).unwrap();
-    if let Err(e) = provola_gtk::run(opt) {
+    let opt = provola_egui::GuiOpt::try_from(opt).unwrap();
+    if let Err(e) = provola_egui::run(opt) {
         log::error!("{}", e);
     }
 }
 
-#[cfg(not(feature = "gtk"))]
+#[cfg(not(feature = "egui"))]
 fn run_gui(_opt: Opt) {
     log::error!("GUI not avaiable");
 }
@@ -149,3 +149,4 @@ fn main() {
         log::error!("{}", e);
     }
 }
+

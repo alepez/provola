@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use std::{fmt::Display, path::Path, str::FromStr};
 use strum_macros::EnumIter;
 
-#[derive(Debug, Copy, Clone, EnumIter, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, EnumIter, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub enum Language {
     Ada,
     Bash,
