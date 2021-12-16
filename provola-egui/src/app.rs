@@ -61,8 +61,7 @@ impl ProvolaGuiApp {
             }
             FeedbackMessage::WatchedChanged => {
                 log::info!("Watched file has changed");
-                state.last_result = None;
-                self.s.send(ActionMessage::RunAll).unwrap();
+                self.action_run_all();
             }
         }
     }
@@ -77,6 +76,22 @@ impl ProvolaGuiApp {
             },
             default(Duration::from_millis(1)) => {}
         }
+    }
+
+    fn action_run_all(&mut self) {
+        self.state.last_result = None;
+        self.send(ActionMessage::RunAll);
+    }
+
+    fn action_setup(&mut self, frame: &mut epi::Frame<'_>) {
+        // This message is needed to setup the working thread, so it knows
+        // how app is configured and how to request a UI repaint.
+        let setup = super::Setup {
+            opt: self.config.clone(),
+            repaint_signal: frame.repaint_signal(),
+        };
+
+        self.send(ActionMessage::Setup(setup));
     }
 }
 
@@ -93,13 +108,7 @@ impl epi::App for ProvolaGuiApp {
         storage: Option<&dyn epi::Storage>,
     ) {
         self.resume_config(storage);
-
-        let setup = super::Setup {
-            opt: self.config.clone(),
-            repaint_signal: frame.repaint_signal(),
-        };
-
-        self.send(ActionMessage::Setup(setup));
+        self.action_setup(frame);
     }
 
     /// Called by the frame work to save state before shutdown.
@@ -113,8 +122,6 @@ impl epi::App for ProvolaGuiApp {
         use egui::*;
 
         self.handle_messages();
-
-        let state = &mut self.state;
 
         // Top panel contains the main menu
         TopBottomPanel::top("top_panel").show(ctx, |ui| {
@@ -137,7 +144,7 @@ impl epi::App for ProvolaGuiApp {
 
         // Side panel for global actions and feedbacks
         SidePanel::left("side_panel").show(ctx, |ui| {
-            let result_str = match state.last_result {
+            let result_str = match self.state.last_result {
                 None => "-",
                 Some(TestResult::Pass(_)) => "PASS",
                 Some(TestResult::Fail(_)) => "FAIL",
@@ -146,9 +153,7 @@ impl epi::App for ProvolaGuiApp {
             ui.strong(result_str);
 
             if ui.button("Run all").clicked() {
-                log::debug!("Send Message::RunAll");
-                state.last_result = None;
-                self.s.send(ActionMessage::RunAll).unwrap();
+                self.action_run_all();
             }
         });
 
