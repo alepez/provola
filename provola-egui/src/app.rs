@@ -41,10 +41,11 @@ impl ProvolaGuiApp {
         // Note that you must enable the `persistence` feature for this to work.
         #[cfg(feature = "persistence")]
         if let Some(storage) = _storage {
-            let stored_config: Config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default();
+            // TODO Merge is not working well when both test_runner and source are selected
+            let _stored_config: Config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default();
             // If options have been passed as cli arguments, we override stored
             // option with the new ones.
-            self.config.merge(stored_config);
+            // self.config.merge(stored_config);
         }
     }
 
