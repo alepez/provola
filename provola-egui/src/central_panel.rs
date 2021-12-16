@@ -1,5 +1,5 @@
-use eframe::egui::Ui;
-use provola_core::{Reason, Report, TestResult};
+use eframe::egui::*;
+use provola_core::{Failure, Reason, Report, TestCase, TestResult, TestSuite};
 
 pub fn show(ui: &mut Ui, test_result: &Option<TestResult>) {
     if let Some(test_result) = test_result {
@@ -10,7 +10,7 @@ pub fn show(ui: &mut Ui, test_result: &Option<TestResult>) {
 }
 
 fn show_no_result(ui: &mut Ui) {
-    // TODO
+    ui.label("No results");
 }
 
 fn show_result(ui: &mut Ui, test_result: &TestResult) {
@@ -21,10 +21,12 @@ fn show_result(ui: &mut Ui, test_result: &TestResult) {
 }
 
 fn show_result_pass(ui: &mut Ui, reason: &Reason) {
+    // TODO summary
     show_reason(ui, reason);
 }
 
 fn show_result_fail(ui: &mut Ui, reason: &Reason) {
+    // TODO summary
     show_reason(ui, reason);
 }
 
@@ -37,24 +39,58 @@ fn show_reason(ui: &mut Ui, reason: &Reason) {
     }
 }
 
-fn show_reason_unknown(ui: &mut Ui) {}
+fn show_reason_unknown(_ui: &mut Ui) {
+    // TODO
+}
 
-fn show_reason_generic(ui: &mut Ui, msg: &str) {}
+fn show_reason_generic(_ui: &mut Ui, _msg: &str) {
+    // TODO
+}
 
-fn show_reason_not_expected(ui: &mut Ui, actual: &str, expected: &str) {}
+fn show_reason_not_expected(_ui: &mut Ui, _actual: &str, _expected: &str) {
+    // TODO
+}
 
 fn show_reason_report(ui: &mut Ui, report: &Report) {
-    if let Some(name) = &report.name {
-        // writeln!(f, "{}", name.bold())?;
+    if let Some(_name) = &report.name {
+        // log::debug!("report: {}", &name);
     }
 
     for testsuite in &report.testsuites {
-        // writeln!(f, "  {}", testsuite.name.bold())?;
-
-        for testcase in &testsuite.testcases {
-            let ok = testcase.failures.is_empty();
-            let symbol = if ok { "✔" } else { "✖" };
-            // writeln!(f, "    {} {}", symbol, testcase.name)?;
-        }
+        show_testsuite(ui, testsuite);
     }
+}
+
+fn show_testsuite(ui: &mut Ui, testsuite: &TestSuite) {
+    // TODO failures should not be an Option here
+    let ok = testsuite.failures.unwrap_or(0) == 0;
+    let symbol = if ok { "✔" } else { "✖" };
+    let name = format!("{} {}", symbol, testsuite.name);
+
+    CollapsingHeader::new(&name)
+        .default_open(true)
+        .show(ui, |ui| {
+            for testcase in &testsuite.testcases {
+                show_testcase(ui, testcase);
+            }
+        });
+}
+
+fn show_testcase(ui: &mut Ui, testcase: &TestCase) {
+    let ok = testcase.failures.is_empty();
+    let symbol = if ok { "✔" } else { "✖" };
+    let name = format!("{} {}", symbol, testcase.name);
+
+    CollapsingHeader::new(&name)
+        .default_open(true)
+        .show(ui, |ui| {
+            for failure in &testcase.failures {
+                show_failure(ui, failure);
+            }
+        });
+}
+
+fn show_failure(ui: &mut Ui, failure: &Failure) {
+    let msg = &failure.message;
+    ui.label(msg);
 }
