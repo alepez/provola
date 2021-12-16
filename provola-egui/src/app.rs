@@ -110,22 +110,24 @@ impl epi::App for ProvolaGuiApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::CtxRef, frame: &mut epi::Frame<'_>) {
+        use egui::*;
+
         self.handle_messages();
 
         let state = &mut self.state;
 
         // Top panel contains the main menu
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            egui::menu::bar(ui, |ui| {
-                egui::menu::menu(ui, "File", |ui| {
+        TopBottomPanel::top("top_panel").show(ctx, |ui| {
+            menu::bar(ui, |ui| {
+                menu::menu(ui, "File", |ui| {
                     if ui.button("Quit").clicked() {
                         frame.quit();
                     }
                 });
-                egui::menu::menu(ui, "Help", |ui| {
-                    egui::warn_if_debug_build(ui);
+                menu::menu(ui, "Help", |ui| {
+                    warn_if_debug_build(ui);
                     ui.add(
-                        egui::Hyperlink::new("https://github.com/alepez/provola")
+                        Hyperlink::new("https://github.com/alepez/provola")
                             .text("About this project")
                             .small(),
                     )
@@ -134,7 +136,7 @@ impl epi::App for ProvolaGuiApp {
         });
 
         // Side panel for global actions and feedbacks
-        egui::SidePanel::left("side_panel").show(ctx, |ui| {
+        SidePanel::left("side_panel").show(ctx, |ui| {
             let result_str = match state.last_result {
                 None => "-",
                 Some(TestResult::Pass(_)) => "PASS",
@@ -151,7 +153,7 @@ impl epi::App for ProvolaGuiApp {
         });
 
         // Central panel for test results
-        egui::CentralPanel::default().show(ctx, |_ui| {
+        CentralPanel::default().show(ctx, |_ui| {
             // TODO
         });
     }
