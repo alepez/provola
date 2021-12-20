@@ -51,8 +51,8 @@ pub struct TestRunner {
     executable: Executable,
 }
 
-impl TestRunner {
-    pub fn from_executable(executable: Executable) -> Self {
+impl From<Executable> for TestRunner {
+    fn from(executable: Executable) -> Self {
         Self { executable }
     }
 }
