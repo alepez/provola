@@ -51,13 +51,16 @@ pub struct TestRunner {
     executable: Executable,
 }
 
-impl provola_core::test_runners::TestRunner for TestRunner {
-    fn from_executable(
+impl TestRunner {
+    /// Creates a TestRunner from an executable
+    pub fn from_executable(
         executable: Executable,
     ) -> Box<(dyn provola_core::test_runners::TestRunner)> {
         Box::new(TestRunner { executable })
     }
+}
 
+impl provola_core::test_runners::TestRunner for TestRunner {
     fn run(&self) -> Result<provola_core::TestResult, provola_core::Error> {
         let report = run_exec(&self.executable)?;
         let result = report.into();
