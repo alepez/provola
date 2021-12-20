@@ -15,7 +15,7 @@ fn add_arguments(mut argv: Vec<String>, report_path: &str) -> Vec<String> {
     argv
 }
 
-fn run_exec_with_argv(argv: Vec<String>) -> Result<(), Error> {
+fn run_exec_with_argv(argv: Vec<String>) -> Result<String, Error> {
     let mut p = Popen::create(
         &argv,
         PopenConfig {
@@ -26,7 +26,7 @@ fn run_exec_with_argv(argv: Vec<String>) -> Result<(), Error> {
         },
     )?;
 
-    let (_out, _err) = p.communicate(None)?;
+    let (out, _err) = p.communicate(None)?;
 
     // TODO Timeout from configuration
     let timeout = Duration::from_secs(3600);
@@ -38,7 +38,50 @@ fn run_exec_with_argv(argv: Vec<String>) -> Result<(), Error> {
         p.terminate()?;
     }
 
-    Ok(())
+    Ok(out.unwrap_or_default())
+}
+
+fn extract_test_suite_name(s: &str) -> String {
+    s.chars().take_while(|&x| x != '.').collect()
+}
+
+fn extract_test_case_name(s: &str) -> String {
+    s.chars().skip(2).collect()
+}
+
+fn parse_available_tests(s: &str) -> Result<AvailableTests, Error> {
+    let lines = s.lines().skip(1);
+
+    let mut test_suite: Option<String> = None;
+    let mut tests = AvailableTests::default();
+
+    for line in lines {
+        // At least 2 chars, one for the name, one for dot or space
+        // "X." is the shortest test suite name
+        // "  X" is the shortest test case name
+        match line.chars().nth(0) {
+            Some(' ') => {
+                if let Some(test_suite) = &test_suite {
+                    tests.push(test_suite.clone(), extract_test_case_name(line));
+                }
+            }
+            Some(_) => {
+                test_suite = Some(extract_test_suite_name(line));
+            }
+            None => {
+                // invalid
+            }
+        }
+    }
+
+    Ok(tests)
+}
+
+fn generate_available_tests(executable: &Executable) -> Result<AvailableTests, Error> {
+    let report_path = "googletest_report.json";
+    let argv = add_arguments(executable.into(), report_path);
+    let out = run_exec_with_argv(argv)?;
+    parse_available_tests(&out)
 }
 
 fn generate_report(executable: &Executable) -> Result<Report, Error> {
@@ -71,7 +114,7 @@ impl provola_core::test_runners::TestRunner for TestRunner {
     }
 
     fn list(&self) -> Result<AvailableTests, Error> {
-        todo!()
+        generate_available_tests(&self.executable)
     }
 }
 
@@ -99,5 +142,28 @@ mod tests {
         let tr = TestRunner::from(exec);
         let tr: Box<dyn provola_core::test_runners::TestRunner> = Box::new(tr);
         assert!(tr.run().is_ok());
+    }
+
+    // Ignored because example must be built first
+    #[ignore]
+    #[test]
+    fn generate_available_tests_from_valid_executable() {
+        let path = PathBuf::from("./examples/data/build/example");
+        let exec = Executable::from(path);
+        let list = generate_available_tests(&exec).unwrap();
+        assert_eq!(list.len(), 4);
+    }
+
+    #[test]
+    fn parse_gtest_list_tests_output() {
+        let s = r#"Running main() from provola-googletest/examples/data/googletest/googletest/src/gtest_main.cc
+Foo.
+  Foo1
+  Foo2
+Bar.
+  Bar1
+  Bar2"#;
+        let list = parse_available_tests(s).unwrap();
+        insta::assert_debug_snapshot!(&list);
     }
 }

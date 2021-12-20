@@ -1,0 +1,41 @@
+---
+source: provola-googletest/src/lib.rs
+expression: "&list"
+
+---
+AvailableTests(
+    [
+        FullyQualifiedTestCase {
+            test_suite: TestSuite(
+                "Foo",
+            ),
+            test_case: TestCase(
+                "Foo1",
+            ),
+        },
+        FullyQualifiedTestCase {
+            test_suite: TestSuite(
+                "Foo",
+            ),
+            test_case: TestCase(
+                "Foo2",
+            ),
+        },
+        FullyQualifiedTestCase {
+            test_suite: TestSuite(
+                "Bar",
+            ),
+            test_case: TestCase(
+                "Bar1",
+            ),
+        },
+        FullyQualifiedTestCase {
+            test_suite: TestSuite(
+                "Bar",
+            ),
+            test_case: TestCase(
+                "Bar2",
+            ),
+        },
+    ],
+)
