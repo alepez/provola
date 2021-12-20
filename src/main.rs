@@ -42,6 +42,8 @@ struct Opt {
     /// Select test runner type
     #[clap(short = 'T')]
     test_runner_type: Option<TestRunnerType>,
+    #[clap(long)]
+    list: bool,
     // Select reporter type
     #[clap(short = 'R', default_value = &DEFAULT_REPORTER_STR)]
     reporter: ReporterType,
@@ -149,4 +151,3 @@ fn main() {
         log::error!("{}", e);
     }
 }
-
