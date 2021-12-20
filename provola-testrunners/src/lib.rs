@@ -6,11 +6,13 @@ pub fn make_test_runner(info: TestRunnerInfo) -> Result<Box<dyn TestRunner>, Err
     let test_runner_type = info.trt;
     match test_runner_type {
         #[cfg(feature = "googletest")]
-        TestRunnerType::GoogleTest => {
-            Ok(provola_googletest::TestRunner::from_executable(info.exec))
-        }
+        TestRunnerType::GoogleTest => Ok(Box::new(
+            provola_googletest::TestRunner::from_executable(info.exec),
+        )),
         #[cfg(feature = "catch2")]
-        TestRunnerType::Catch2 => Ok(provola_catch2::TestRunner::from_executable(info.exec)),
+        TestRunnerType::Catch2 => Ok(Box::new(provola_catch2::TestRunner::from_executable(
+            info.exec,
+        ))),
     }
 }
 

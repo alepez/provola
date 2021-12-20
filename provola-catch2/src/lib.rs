@@ -52,10 +52,8 @@ pub struct TestRunner {
 }
 
 impl TestRunner {
-    pub fn from_executable(
-        executable: Executable,
-    ) -> Box<(dyn provola_core::test_runners::TestRunner)> {
-        Box::new(TestRunner { executable })
+    pub fn from_executable(executable: Executable) -> Self {
+        Self { executable }
     }
 }
 
