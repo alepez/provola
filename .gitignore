@@ -16,3 +16,4 @@ tmp*
 provola-catch2/examples/data/catch2
 provola-googletest/examples/data/googletest
 
+/provola-googletest/googletest_report.json
