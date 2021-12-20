@@ -6,7 +6,7 @@ pub trait TestRunner {
         Err(Error::TestRunnerFeatureNotAvailable(TestRunnerFeature::Run))
     }
 
-    fn list(&self) -> Result<TestList, Error> {
+    fn list(&self) -> Result<AvailableTests, Error> {
         Err(Error::TestRunnerFeatureNotAvailable(
             TestRunnerFeature::List,
         ))
@@ -28,4 +28,4 @@ struct FullyQualifiedTestCase {
     test_case: TestCase,
 }
 
-pub struct TestList(Vec<FullyQualifiedTestCase>);
+pub struct AvailableTests(Vec<FullyQualifiedTestCase>);
