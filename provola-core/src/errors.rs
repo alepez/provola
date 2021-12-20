@@ -1,3 +1,5 @@
+use crate::test_runners::TestRunnerFeature;
+
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("no test result available")]
@@ -28,4 +30,6 @@ pub enum Error {
     ReporterError(#[from] crate::reporter::Error),
     #[error("report unavailable")]
     ReportUnavailable,
+    #[error("feature not available: {0}")]
+    TestRunnerFeatureNotAvailable(TestRunnerFeature),
 }
