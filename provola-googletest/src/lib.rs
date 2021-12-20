@@ -15,10 +15,7 @@ fn add_arguments(mut argv: Vec<String>, report_path: &str) -> Vec<String> {
     argv
 }
 
-fn run_exec(executable: &Executable) -> Result<Report, Error> {
-    let report_path = "googletest_report.json";
-    let argv = add_arguments(executable.into(), report_path);
-
+fn run_exec_with_argv(argv: Vec<String>) -> Result<(), Error> {
     let mut p = Popen::create(
         &argv,
         PopenConfig {
@@ -41,6 +38,14 @@ fn run_exec(executable: &Executable) -> Result<Report, Error> {
         p.terminate()?;
     }
 
+    Ok(())
+}
+
+fn generate_report(executable: &Executable) -> Result<Report, Error> {
+    let report_path = "googletest_report.json";
+    let argv = add_arguments(executable.into(), report_path);
+    run_exec_with_argv(argv)?;
+
     let file = File::open(report_path).unwrap();
     let reader = BufReader::new(file);
     let gtest_rep: report::UnitTest = serde_json::from_reader(reader).unwrap();
@@ -60,7 +65,7 @@ impl From<Executable> for TestRunner {
 
 impl provola_core::test_runners::TestRunner for TestRunner {
     fn run(&self) -> Result<provola_core::TestResult, provola_core::Error> {
-        let report = run_exec(&self.executable)?;
+        let report = generate_report(&self.executable)?;
         let result = report.into();
         Ok(result)
     }
@@ -82,7 +87,7 @@ mod tests {
     fn run_valid_executable() {
         let path = PathBuf::from("./examples/data/build/example");
         let exec = Executable::from(path);
-        assert!(run_exec(&exec).is_ok());
+        assert!(generate_report(&exec).is_ok());
     }
 
     // Ignored because example must be built first
