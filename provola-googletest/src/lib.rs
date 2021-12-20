@@ -1,3 +1,4 @@
+use provola_core::test_runners::AvailableTests;
 use provola_core::{Error, Executable, Report};
 use std::fs::File;
 use std::io::BufReader;
@@ -62,6 +63,10 @@ impl provola_core::test_runners::TestRunner for TestRunner {
         let report = run_exec(&self.executable)?;
         let result = report.into();
         Ok(result)
+    }
+
+    fn list(&self) -> Result<AvailableTests, Error> {
+        todo!()
     }
 }
 
