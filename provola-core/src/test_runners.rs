@@ -26,9 +26,15 @@ struct TestSuite(String);
 struct TestCase(String);
 
 #[derive(Debug)]
-struct FullyQualifiedTestCase {
+pub struct FullyQualifiedTestCase {
     test_suite: TestSuite,
     test_case: TestCase,
+}
+
+impl std::fmt::Display for FullyQualifiedTestCase {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}", self.test_suite.0, self.test_case.0)
+    }
 }
 
 #[derive(Default, Debug)]
@@ -46,5 +52,9 @@ impl AvailableTests {
 
     pub fn len(&self) -> usize {
         self.0.len()
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<FullyQualifiedTestCase> {
+        self.0.iter()
     }
 }

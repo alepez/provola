@@ -35,8 +35,25 @@ fn run_once(opt: &Opt) -> Result<(), Error> {
     Ok(())
 }
 
+fn list_tests(opt: &Opt) -> Result<(), Error> {
+    let action = Action::try_from(opt)?;
+
+    let list = match action {
+        Action::TestRunner(tr) => tr.list()?,
+        _ => todo!(),
+    };
+
+    for test in list.iter() {
+        println!("{}", test);
+    }
+
+    Ok(())
+}
+
 pub(crate) fn run(opt: &Opt) -> Result<(), Error> {
-    if let Some(watch_files) = &opt.watch {
+    if opt.list {
+        list_tests(opt)
+    } else if let Some(watch_files) = &opt.watch {
         run_forever(opt, watch_files)
     } else {
         run_once(opt)

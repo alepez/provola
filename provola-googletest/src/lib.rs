@@ -9,7 +9,13 @@ use subprocess::Redirection;
 
 mod report;
 
-fn add_arguments(mut argv: Vec<String>, report_path: &str) -> Vec<String> {
+fn add_list_argv(mut argv: Vec<String>) -> Vec<String> {
+    argv.push("--gtest_list_tests".to_string());
+    argv.push("--gtest_color=no".to_string());
+    argv
+}
+
+fn add_run_argv(mut argv: Vec<String>, report_path: &str) -> Vec<String> {
     argv.push(format!("--gtest_output=json:{}", report_path));
     argv.push("--gtest_color=no".to_string());
     argv
@@ -78,15 +84,14 @@ fn parse_available_tests(s: &str) -> Result<AvailableTests, Error> {
 }
 
 fn generate_available_tests(executable: &Executable) -> Result<AvailableTests, Error> {
-    let report_path = "googletest_report.json";
-    let argv = add_arguments(executable.into(), report_path);
+    let argv = add_list_argv(executable.into());
     let out = run_exec_with_argv(argv)?;
     parse_available_tests(&out)
 }
 
 fn generate_report(executable: &Executable) -> Result<Report, Error> {
     let report_path = "googletest_report.json";
-    let argv = add_arguments(executable.into(), report_path);
+    let argv = add_run_argv(executable.into(), report_path);
     run_exec_with_argv(argv)?;
 
     let file = File::open(report_path).unwrap();
