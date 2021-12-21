@@ -2,7 +2,7 @@
 
 > ~~Test it!~~ → ~~Provalo!~~ → Provola!
 
-![Provola Logo](doc/provola-icon.png)
+![Provola Logo](/.doc/provola-icon.png)
 
 `provola` is your best ~~cheese~~ friend when you need to test code quickly.
 
