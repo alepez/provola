@@ -38,8 +38,8 @@ fn run_exec(executable: &Executable) -> Result<Report, Error> {
     }
 
     if let Some(out) = out {
-        // FIXME unwrap
-        let rep: report::Report = serde_xml_rs::from_str(&out).unwrap();
+        let rep: report::Report =
+            serde_xml_rs::from_str(&out).map_err(|e| Error::ReportParseError(Box::new(e)))?;
         let core_rep = Report::from(rep);
         Ok(core_rep)
     } else {

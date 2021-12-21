@@ -32,4 +32,6 @@ pub enum Error {
     ReportUnavailable,
     #[error("feature not available: {0}")]
     TestRunnerFeatureNotAvailable(TestRunnerFeature),
+    #[error("cannot parse report: {0}")]
+    ReportParseError(Box<dyn std::error::Error>),
 }
