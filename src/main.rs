@@ -6,6 +6,7 @@ use provola_testrunners::make_test_runner;
 use provola_testrunners::{TestRunnerInfo, TestRunnerType};
 use std::convert::TryFrom;
 use std::path::PathBuf;
+use provola_core::test_runners::{TestRunnerOpt, Only};
 
 mod cli;
 
@@ -92,8 +93,18 @@ impl TryFrom<&Opt> for Action {
         if let (Some(exec), Some(trt)) = (&opt.test_runner, opt.test_runner_type) {
             let exec = exec.clone().into();
             let info = TestRunnerInfo { exec, trt };
+
+            let opt = match opt.only {
+                None => TestRunnerOpt {
+                    only: Only::All
+                },
+                Some(id) => TestRunnerOpt {
+                    only: Only::SingleById(id)
+                }
+            };
+            // FIXME
             let test_runner = make_test_runner(info);
-            let a = Action::TestRunner(test_runner?);
+            let a = Action::TestRunner(test_runner?, opt);
             return Ok(a);
         }
 
