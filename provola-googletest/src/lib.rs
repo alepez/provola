@@ -65,7 +65,7 @@ fn parse_available_tests(s: &str) -> Result<AvailableTests, Error> {
         // At least 2 chars, one for the name, one for dot or space
         // "X." is the shortest test suite name
         // "  X" is the shortest test case name
-        match line.chars().nth(0) {
+        match line.chars().next() {
             Some(' ') => {
                 if let Some(test_suite) = &test_suite {
                     tests.push(test_suite.clone(), extract_test_case_name(line));
