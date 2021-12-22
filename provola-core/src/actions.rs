@@ -73,7 +73,7 @@ impl Action {
             }
 
             // FIXME pass options to run()
-            Action::TestRunner(runner, _opt) => runner.run(),
+            Action::TestRunner(runner, opt) => runner.run(opt),
         }
     }
 }

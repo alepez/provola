@@ -3,6 +3,7 @@ use std::time::Duration;
 use subprocess::Popen;
 use subprocess::PopenConfig;
 use subprocess::Redirection;
+use provola_core::test_runners::TestRunnerOpt;
 
 mod report;
 
@@ -58,7 +59,7 @@ impl From<Executable> for TestRunner {
 }
 
 impl provola_core::test_runners::TestRunner for TestRunner {
-    fn run(&self) -> Result<provola_core::TestResult, provola_core::Error> {
+    fn run(&self, _opt: &TestRunnerOpt) -> Result<provola_core::TestResult, provola_core::Error> {
         let report = run_exec(&self.executable)?;
         let result = report.into();
         Ok(result)

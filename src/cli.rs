@@ -38,9 +38,8 @@ fn run_once(opt: &Opt) -> Result<(), Error> {
 fn list_tests(opt: &Opt) -> Result<(), Error> {
     let action = Action::try_from(opt)?;
 
-    // FIXME pass options to list()
     let list = match action {
-        Action::TestRunner(tr, _opt) => tr.list()?,
+        Action::TestRunner(tr, opt) => tr.list(&opt)?,
         _ => todo!(),
     };
 
