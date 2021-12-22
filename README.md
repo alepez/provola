@@ -63,7 +63,11 @@ Where:
 - `-T` is the test runner type (e.g.: GoogleTest, Catch2, ...)
 - `-t` is the executable to run
 
-You can also find an example of GoogleTest runner inside `provola-googletest/examples/data/`
+You don't need to specify what files to watch, because in this case `provola` is
+automatically watching changes in the test runner (not the sources!).
+
+You can also find an example of GoogleTest runner inside
+`provola-googletest/examples/data/`
 
 This is a (work in progress) list of supported frameworks:
 
