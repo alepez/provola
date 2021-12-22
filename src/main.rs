@@ -42,11 +42,15 @@ struct Opt {
     /// Select test runner type
     #[clap(short = 'T')]
     test_runner_type: Option<TestRunnerType>,
+    /// List available tests
     #[clap(long)]
     list: bool,
     // Select reporter type
-    #[clap(short = 'R', default_value = &DEFAULT_REPORTER_STR)]
+    #[clap(short = 'R', default_value = & DEFAULT_REPORTER_STR)]
     reporter: ReporterType,
+    /// Specify which test number to run. See --list for available tests
+    #[clap(long)]
+    only: Option<usize>,
 }
 
 impl Opt {
@@ -76,7 +80,7 @@ impl TryFrom<&Opt> for Action {
 
     fn try_from(opt: &Opt) -> Result<Self, Error> {
         if let (Some(lang), Some(source), Some(input), Some(output)) =
-            (opt.lang, &opt.source, &opt.input, &opt.output)
+        (opt.lang, &opt.source, &opt.input, &opt.output)
         {
             let source = Source::new(source.clone());
             let input = TestDataIn::new(input.clone());
