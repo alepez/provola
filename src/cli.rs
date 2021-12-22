@@ -44,7 +44,7 @@ fn list_tests(opt: &Opt) -> Result<(), Error> {
     };
 
     for test in list.iter() {
-        println!("{}", test);
+        println!("{} {}", test.id, test);
     }
 
     Ok(())
