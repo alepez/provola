@@ -26,6 +26,13 @@ echo -n dcba > out.txt
 provola -i in.txt -o out.txt -s reverse.hs -w .
 ```
 
+Where:
+
+- `-i` is the input file
+- `-o` is the expected output file
+- `-s` is the source code
+- `-w` is the file or directory to watch for changes
+
 ### Supported languages
 
 | Language   | Build       | Run      |
