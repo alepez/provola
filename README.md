@@ -58,6 +58,13 @@ provola -T GoogleTest -t path/to/gtest/executable
 
 ![GoogleTest example](/.doc/googletest-screenshot.png)
 
+Where:
+
+- `-T` is the test runner type (e.g.: GoogleTest, Catch2, ...)
+- `-t` is the executable to run
+
+You can also find an example of GoogleTest runner inside `provola-googletest/examples/data/`
+
 This is a (work in progress) list of supported frameworks:
 
 | Framework   | Language |
