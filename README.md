@@ -58,6 +58,22 @@ This is a (work in progress) list of supported frameworks:
 | Google Test | C++      |
 | Catch2      | C++      |
 
+## Install
+
+If you have a rust toolchain, just clone this project and from the root
+directory:
+
+```shell
+cargo install --path .
+```
+
+If you want to use the GUI, you need to enable the egui feature:
+
+```shell
+cargo install --features=egui --path .
+```
+
+
 ## Shell auto completion
 
 `provola` provides shell autocompletion for even faster usage.
