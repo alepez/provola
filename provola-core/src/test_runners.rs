@@ -117,6 +117,22 @@ impl AvailableTests {
     }
 }
 
+#[derive(Default)]
+pub struct TestRunnerOpt{
+    pub only: Only,
+}
+
+pub enum Only{
+    SingleById(usize),
+    All
+}
+
+impl Default for Only{
+    fn default() -> Self {
+        Only::All
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

@@ -1,4 +1,4 @@
-use crate::test_runners::TestRunner;
+use crate::test_runners::{TestRunner, TestRunnerOpt};
 use crate::{Error, Executable, Language, TestResult};
 use std::{convert::TryFrom, io::Read, path::PathBuf};
 
@@ -59,7 +59,7 @@ impl TryFrom<&TestDataOut> for String {
 pub enum Action {
     Nothing,
     BuildTestInputOutput(Language, Source, TestDataIn, TestDataOut),
-    TestRunner(Box<dyn TestRunner>),
+    TestRunner(Box<dyn TestRunner>, TestRunnerOpt),
 }
 
 impl Action {
@@ -71,7 +71,9 @@ impl Action {
                 let executable = executable.as_ref().ok_or(Error::NoExecutable)?;
                 crate::test::data::test(executable, input, output)
             }
-            Action::TestRunner(runner) => runner.run(),
+
+            // FIXME pass options to run()
+            Action::TestRunner(runner, _opt) => runner.run(),
         }
     }
 }
