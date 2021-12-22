@@ -1,4 +1,4 @@
-use provola_core::test_runners::AvailableTests;
+use provola_core::test_runners::{AvailableTests, TestRunnerOpt};
 use provola_core::{Error, Executable, Report};
 use std::fs::File;
 use std::io::BufReader;
@@ -112,13 +112,13 @@ impl From<Executable> for TestRunner {
 }
 
 impl provola_core::test_runners::TestRunner for TestRunner {
-    fn run(&self) -> Result<provola_core::TestResult, provola_core::Error> {
+    fn run(&self, opt: &TestRunnerOpt) -> Result<provola_core::TestResult, provola_core::Error> {
         let report = generate_report(&self.executable)?;
         let result = report.into();
         Ok(result)
     }
 
-    fn list(&self) -> Result<AvailableTests, Error> {
+    fn list(&self, _opt: &TestRunnerOpt) -> Result<AvailableTests, Error> {
         generate_available_tests(&self.executable)
     }
 }

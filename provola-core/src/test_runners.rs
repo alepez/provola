@@ -5,11 +5,11 @@ use std::iter::Enumerate;
 use strum_macros::Display;
 
 pub trait TestRunner {
-    fn run(&self) -> Result<TestResult, Error> {
+    fn run(&self, _opt: &TestRunnerOpt) -> Result<TestResult, Error> {
         Err(Error::TestRunnerFeatureNotAvailable(TestRunnerFeature::Run))
     }
 
-    fn list(&self) -> Result<AvailableTests, Error> {
+    fn list(&self, _opt: &TestRunnerOpt) -> Result<AvailableTests, Error> {
         Err(Error::TestRunnerFeatureNotAvailable(
             TestRunnerFeature::List,
         ))
