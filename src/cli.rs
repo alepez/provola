@@ -43,8 +43,21 @@ fn list_tests(opt: &Opt) -> Result<(), Error> {
         _ => todo!(),
     };
 
-    for test in list.iter() {
-        println!("{} {}", test.id, test);
+    for (index, test) in list.enumerate() {
+        let width = match list.len() {
+            x if x < 10 => 1,
+            x if x < 100 => 2,
+            x if x < 1000 => 3,
+            _ => 4,
+        };
+
+        println!(
+            "{:width$} {id} {test}",
+            index = index,
+            width = width,
+            id = test.id,
+            test = test
+        );
     }
 
     Ok(())

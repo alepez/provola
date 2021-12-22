@@ -1,6 +1,7 @@
 use crate::{Error, TestResult};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
+use std::iter::Enumerate;
 use strum_macros::Display;
 
 pub trait TestRunner {
@@ -110,6 +111,10 @@ impl AvailableTests {
     pub fn iter(&self) -> std::slice::Iter<FullyQualifiedTestCase> {
         self.0.iter()
     }
+
+    pub fn enumerate(&self) -> Enumerate<std::slice::Iter<'_, FullyQualifiedTestCase, >> {
+        self.0.iter().enumerate()
+    }
 }
 
 #[cfg(test)]
@@ -127,6 +132,14 @@ mod test {
 
     #[test]
     fn push_test_suite_test_case() {
+        let mut available_tests = AvailableTests::default();
+        assert!(available_tests.is_empty());
+        available_tests.push("foo", "bar");
+        assert_eq!(available_tests.len(), 1);
+    }
+
+    #[test]
+    fn enumerate_available_tests() {
         let mut available_tests = AvailableTests::default();
         assert!(available_tests.is_empty());
         available_tests.push("foo", "bar");
