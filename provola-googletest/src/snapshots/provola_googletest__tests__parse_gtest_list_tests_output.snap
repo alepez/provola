@@ -12,6 +12,9 @@ AvailableTests(
             test_case: TestCase(
                 "Foo1",
             ),
+            id: FullyQualifiedTestCaseId(
+                8963711218677400845,
+            ),
         },
         FullyQualifiedTestCase {
             test_suite: TestSuite(
@@ -19,6 +22,9 @@ AvailableTests(
             ),
             test_case: TestCase(
                 "Foo2",
+            ),
+            id: FullyQualifiedTestCaseId(
+                8172373706971880047,
             ),
         },
         FullyQualifiedTestCase {
@@ -28,6 +34,9 @@ AvailableTests(
             test_case: TestCase(
                 "Bar1",
             ),
+            id: FullyQualifiedTestCaseId(
+                1049647244553836656,
+            ),
         },
         FullyQualifiedTestCase {
             test_suite: TestSuite(
@@ -35,6 +44,9 @@ AvailableTests(
             ),
             test_case: TestCase(
                 "Bar2",
+            ),
+            id: FullyQualifiedTestCaseId(
+                2609436735268993511,
             ),
         },
     ],
