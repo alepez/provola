@@ -112,7 +112,8 @@ impl From<Executable> for TestRunner {
 }
 
 impl provola_core::test_runners::TestRunner for TestRunner {
-    fn run(&self, opt: &TestRunnerOpt) -> Result<provola_core::TestResult, provola_core::Error> {
+    fn run(&self, _opt: &TestRunnerOpt) -> Result<provola_core::TestResult, provola_core::Error> {
+        // TODO use opt.only
         let report = generate_report(&self.executable)?;
         let result = report.into();
         Ok(result)
