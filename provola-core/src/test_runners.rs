@@ -1,8 +1,8 @@
 use crate::{Error, TestResult};
+use serde::{Deserialize, Serialize};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::iter::Enumerate;
-use serde::{Deserialize, Serialize};
 use strum_macros::Display;
 
 pub trait TestRunner {
@@ -113,23 +113,23 @@ impl AvailableTests {
         self.0.iter()
     }
 
-    pub fn enumerate(&self) -> Enumerate<std::slice::Iter<'_, FullyQualifiedTestCase, >> {
+    pub fn enumerate(&self) -> Enumerate<std::slice::Iter<'_, FullyQualifiedTestCase>> {
         self.0.iter().enumerate()
     }
 }
 
 #[derive(Default, Clone, Debug, Deserialize, Serialize)]
-pub struct TestRunnerOpt{
+pub struct TestRunnerOpt {
     pub only: Only,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub enum Only{
+pub enum Only {
     SingleById(usize),
-    All
+    All,
 }
 
-impl Default for Only{
+impl Default for Only {
     fn default() -> Self {
         Only::All
     }
