@@ -147,7 +147,8 @@ mod tests {
         let exec = Executable::from(path);
         let tr = TestRunner::from(exec);
         let tr: Box<dyn provola_core::test_runners::TestRunner> = Box::new(tr);
-        assert!(tr.run().is_ok());
+        let tr_opt = TestRunnerOpt::default();
+        assert!(tr.run(&tr_opt).is_ok());
     }
 
     // Ignored because example must be built first
