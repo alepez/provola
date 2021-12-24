@@ -5,6 +5,7 @@ pub use app::Config as GuiOpt;
 use app::ProvolaGuiApp;
 use crossbeam_channel::{bounded, select, Receiver, Sender};
 use eframe::epi::RepaintSignal;
+// use provola_core::test_runners::{Only, TestRunnerOpt};
 use provola_core::{Action, Error, Source, TestDataIn, TestDataOut, WatchOptions, Watcher};
 use provola_testrunners::{make_test_runner, TestRunnerInfo};
 use std::{path::PathBuf, sync::Arc, thread, time::Duration};
@@ -162,7 +163,7 @@ impl TryFrom<&GuiOpt> for Action {
             let exec = exec.clone().into();
             let info = TestRunnerInfo { exec, trt };
             let test_runner = make_test_runner(info);
-            let a = Action::TestRunner(test_runner?);
+            let a = Action::TestRunner(test_runner?, opt.test_runner_opt.clone());
             return Ok(a);
         }
 

@@ -76,12 +76,23 @@ impl Opt {
     }
 }
 
+impl From<&Opt> for TestRunnerOpt {
+    fn from(opt: &Opt) -> Self {
+        match opt.only {
+            None => TestRunnerOpt { only: Only::All },
+            Some(id) => TestRunnerOpt {
+                only: Only::SingleById(id),
+            },
+        }
+    }
+}
+
 impl TryFrom<&Opt> for Action {
     type Error = Error;
 
     fn try_from(opt: &Opt) -> Result<Self, Error> {
         if let (Some(lang), Some(source), Some(input), Some(output)) =
-        (opt.lang, &opt.source, &opt.input, &opt.output)
+            (opt.lang, &opt.source, &opt.input, &opt.output)
         {
             let source = Source::new(source.clone());
             let input = TestDataIn::new(input.clone());
@@ -93,18 +104,8 @@ impl TryFrom<&Opt> for Action {
         if let (Some(exec), Some(trt)) = (&opt.test_runner, opt.test_runner_type) {
             let exec = exec.clone().into();
             let info = TestRunnerInfo { exec, trt };
-
-            let opt = match opt.only {
-                None => TestRunnerOpt {
-                    only: Only::All
-                },
-                Some(id) => TestRunnerOpt {
-                    only: Only::SingleById(id)
-                }
-            };
-            // FIXME
             let test_runner = make_test_runner(info);
-            let a = Action::TestRunner(test_runner?, opt);
+            let a = Action::TestRunner(test_runner?, opt.into());
             return Ok(a);
         }
 
@@ -117,6 +118,7 @@ impl TryFrom<Opt> for provola_egui::GuiOpt {
     type Error = Error;
 
     fn try_from(opt: Opt) -> Result<Self, Error> {
+        let test_runner_opt = (&opt).into();
         Ok(Self {
             watch: opt.watch,
             input: opt.input,
@@ -125,6 +127,7 @@ impl TryFrom<Opt> for provola_egui::GuiOpt {
             source: opt.source,
             test_runner: opt.test_runner,
             test_runner_type: opt.test_runner_type,
+            test_runner_opt,
         })
     }
 }
