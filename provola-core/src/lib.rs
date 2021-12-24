@@ -25,5 +25,5 @@ pub use reporter::Error as ReporterError;
 pub use reporter::Reporter;
 pub use result::Reason;
 pub use result::TestResult;
-pub use watch::WatchOptions;
 pub use watch::ProvolaWatcher as Watcher;
+pub use watch::WatchOptions;

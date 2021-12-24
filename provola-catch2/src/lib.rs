@@ -1,9 +1,9 @@
+use provola_core::test_runners::TestRunnerOpt;
 use provola_core::{Error, Executable, Report};
 use std::time::Duration;
 use subprocess::Popen;
 use subprocess::PopenConfig;
 use subprocess::Redirection;
-use provola_core::test_runners::TestRunnerOpt;
 
 mod report;
 

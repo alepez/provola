@@ -1,12 +1,12 @@
 use clap::{App, IntoApp, Parser};
 use clap_generate::{generate, Generator, Shell};
+use provola_core::test_runners::{Only, TestRunnerOpt};
 use provola_core::*;
 use provola_reporters::{ReporterType, DEFAULT_REPORTER_STR};
 use provola_testrunners::make_test_runner;
 use provola_testrunners::{TestRunnerInfo, TestRunnerType};
 use std::convert::TryFrom;
 use std::path::PathBuf;
-use provola_core::test_runners::{TestRunnerOpt, Only};
 
 mod cli;
 

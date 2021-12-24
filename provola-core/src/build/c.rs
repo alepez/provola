@@ -1,9 +1,9 @@
 use std::path::Path;
 use std::process::Command;
 
-use crate::Executable;
 use crate::actions::Source;
 use crate::errors::Error;
+use crate::Executable;
 
 fn gen_command(exec: &Path, source: &Source) -> Command {
     let mut cmd = Command::new("gcc");
