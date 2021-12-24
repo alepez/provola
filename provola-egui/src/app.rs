@@ -2,7 +2,7 @@ use super::{ActionMessage, ActionSender, FeedbackMessage, FeedbackReceiver};
 use crate::central_panel;
 use crossbeam_channel::select;
 use eframe::{egui, epi};
-use merge::Merge;
+use provola_core::test_runners::TestRunnerOpt;
 use provola_core::{Language, TestResult};
 use provola_testrunners::TestRunnerType;
 use std::path::PathBuf;
@@ -11,7 +11,7 @@ use std::time::Duration;
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
-#[derive(Default, Clone, Debug, Merge)]
+#[derive(Default, Clone, Debug)]
 pub struct Config {
     // Persistent configuration
     pub watch: Option<PathBuf>,
@@ -21,6 +21,7 @@ pub struct Config {
     pub source: Option<PathBuf>,
     pub test_runner: Option<PathBuf>,
     pub test_runner_type: Option<TestRunnerType>,
+    pub test_runner_opt: TestRunnerOpt,
 }
 
 #[derive(Default)]

@@ -2,6 +2,7 @@ use crate::{Error, TestResult};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::iter::Enumerate;
+use serde::{Deserialize, Serialize};
 use strum_macros::Display;
 
 pub trait TestRunner {
@@ -117,11 +118,12 @@ impl AvailableTests {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone, Debug, Deserialize, Serialize)]
 pub struct TestRunnerOpt{
     pub only: Only,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum Only{
     SingleById(usize),
     All
