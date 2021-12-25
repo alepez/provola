@@ -24,15 +24,15 @@ pub enum TestRunnerFeature {
 }
 
 #[derive(Debug, Hash)]
-pub struct TestSuite(String);
+pub struct TestSuite(pub String);
 
 #[derive(Debug, Hash)]
-pub struct TestCase(String);
+pub struct TestCase(pub String);
 
 #[derive(Debug)]
 pub struct FullyQualifiedTestCase {
-    test_suite: TestSuite,
-    test_case: TestCase,
+    pub test_suite: TestSuite,
+    pub test_case: TestCase,
     pub id: FullyQualifiedTestCaseId,
 }
 
@@ -116,6 +116,10 @@ impl AvailableTests {
     pub fn enumerate(&self) -> Enumerate<std::slice::Iter<'_, FullyQualifiedTestCase>> {
         self.0.iter().enumerate()
     }
+
+    pub fn get(&self, index: usize) -> Option<&FullyQualifiedTestCase> {
+        self.0.get(index)
+    }
 }
 
 #[derive(Default, Clone, Debug, Deserialize, Serialize)]
@@ -125,7 +129,7 @@ pub struct TestRunnerOpt {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum Only {
-    SingleById(usize),
+    SingleByIndex(usize),
     All,
 }
 

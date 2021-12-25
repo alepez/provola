@@ -81,7 +81,7 @@ impl From<&Opt> for TestRunnerOpt {
         match opt.only {
             None => TestRunnerOpt { only: Only::All },
             Some(id) => TestRunnerOpt {
-                only: Only::SingleById(id),
+                only: Only::SingleByIndex(id),
             },
         }
     }

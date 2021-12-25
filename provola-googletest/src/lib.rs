@@ -1,4 +1,4 @@
-use provola_core::test_runners::{AvailableTests, TestRunnerOpt};
+use provola_core::test_runners::{AvailableTests, Only, TestRunnerOpt};
 use provola_core::{Error, Executable, Report};
 use std::fs::File;
 use std::io::BufReader;
@@ -89,9 +89,16 @@ fn generate_available_tests(executable: &Executable) -> Result<AvailableTests, E
     parse_available_tests(&out)
 }
 
-fn generate_report(executable: &Executable) -> Result<Report, Error> {
+fn generate_report(executable: &Executable, test_filter: &TestFilter) -> Result<Report, Error> {
     let report_path = "googletest_report.json";
-    let argv = add_run_argv(executable.into(), report_path);
+    let executable = executable.into();
+
+    let mut argv = add_run_argv(executable, report_path);
+
+    if let Some(test_filter_s) = &test_filter.0 {
+        argv.push(format!("--gtest_filter={}", test_filter_s));
+    }
+
     run_exec_with_argv(argv)?;
 
     let file = File::open(report_path).unwrap();
@@ -103,18 +110,49 @@ fn generate_report(executable: &Executable) -> Result<Report, Error> {
 
 pub struct TestRunner {
     executable: Executable,
+    available_tests: AvailableTests,
+}
+
+struct TestFilter(Option<String>);
+
+impl Default for TestFilter {
+    fn default() -> Self {
+        TestFilter(None)
+    }
+}
+
+fn make_test_filter(opt: &TestRunnerOpt, tests: &AvailableTests) -> Result<TestFilter, Error> {
+    let fqtn = match opt.only {
+        Only::SingleByIndex(index) => tests.get(index),
+        Only::All => None,
+    };
+
+    let s = fqtn.map(|x| format!("{}.{}", x.test_suite.0, x.test_case.0));
+
+    Ok(TestFilter(s))
+}
+
+impl TestRunner {
+    fn generate_report(&self, opt: &TestRunnerOpt) -> Result<Report, Error> {
+        let test_filter = make_test_filter(opt, &self.available_tests);
+        generate_report(&self.executable, &test_filter?)
+    }
 }
 
 impl From<Executable> for TestRunner {
     fn from(executable: Executable) -> Self {
-        TestRunner { executable }
+        // TODO Fix unwrap
+        let available_tests = generate_available_tests(&executable).unwrap();
+        TestRunner {
+            executable,
+            available_tests,
+        }
     }
 }
 
 impl provola_core::test_runners::TestRunner for TestRunner {
-    fn run(&self, _opt: &TestRunnerOpt) -> Result<provola_core::TestResult, provola_core::Error> {
-        // TODO use opt.only
-        let report = generate_report(&self.executable)?;
+    fn run(&self, opt: &TestRunnerOpt) -> Result<provola_core::TestResult, provola_core::Error> {
+        let report = self.generate_report(&opt)?;
         let result = report.into();
         Ok(result)
     }
@@ -140,7 +178,8 @@ mod tests {
     #[test]
     fn run_valid_executable() {
         let exec = make_exec();
-        assert!(generate_report(&exec).is_ok());
+        let test_filter = TestFilter::default();
+        assert!(generate_report(&exec, &test_filter).is_ok());
     }
 
     // Ignored because example must be built first
