@@ -130,12 +130,16 @@ mod tests {
 
     use super::*;
 
+    fn make_exec() -> Executable {
+        let path = PathBuf::from("./examples/data/build/example");
+        Executable::from(path)
+    }
+
     // Ignored because example must be built first
     #[ignore]
     #[test]
     fn run_valid_executable() {
-        let path = PathBuf::from("./examples/data/build/example");
-        let exec = Executable::from(path);
+        let exec = make_exec();
         assert!(generate_report(&exec).is_ok());
     }
 
@@ -143,8 +147,7 @@ mod tests {
     #[ignore]
     #[test]
     fn from_valid_executable() {
-        let path = PathBuf::from("./examples/data/build/example");
-        let exec = Executable::from(path);
+        let exec = make_exec();
         let tr = TestRunner::from(exec);
         let tr: Box<dyn provola_core::test_runners::TestRunner> = Box::new(tr);
         let tr_opt = TestRunnerOpt::default();
@@ -155,8 +158,7 @@ mod tests {
     #[ignore]
     #[test]
     fn generate_available_tests_from_valid_executable() {
-        let path = PathBuf::from("./examples/data/build/example");
-        let exec = Executable::from(path);
+        let exec = make_exec();
         let list = generate_available_tests(&exec).unwrap();
         assert_eq!(list.len(), 4);
     }
