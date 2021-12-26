@@ -167,6 +167,6 @@ impl TryFrom<&GuiOpt> for Action {
             return Ok(a);
         }
 
-        Ok(Action::Nothing)
+        Err(Error::NothingToDo)
     }
 }

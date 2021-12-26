@@ -57,7 +57,6 @@ impl TryFrom<&TestDataOut> for String {
 }
 
 pub enum Action {
-    Nothing,
     BuildTestInputOutput(Language, Source, TestDataIn, TestDataOut),
     TestRunner(Box<dyn TestRunner>, TestRunnerOpt),
 }
@@ -65,7 +64,6 @@ pub enum Action {
 impl Action {
     pub fn run(&self) -> Result<TestResult, Error> {
         match self {
-            Action::Nothing => Err(Error::NoResult),
             Action::BuildTestInputOutput(lang, source, input, output) => {
                 let executable = Some(Executable::try_from((*lang, source))?);
                 let executable = executable.as_ref().ok_or(Error::NoExecutable)?;
