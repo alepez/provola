@@ -9,15 +9,15 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
-pub enum GuiAction {
+pub enum ActionConfig {
     BuildTestInputOutput(Language, Source, TestDataIn, TestDataOut),
     TestRunner(TestRunnerInfo, TestRunnerOpt),
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Default, Clone, Debug)]
-pub struct GuiOpt {
+pub struct GuiConfig {
     pub watch: Option<PathBuf>,
-    pub action: Option<GuiAction>,
+    pub action: Option<ActionConfig>,
 }
 
 #[derive(Default)]
@@ -26,19 +26,29 @@ pub struct State {
 }
 
 pub struct ProvolaGuiApp {
-    config: GuiOpt,
+    config: GuiConfig,
     state: State,
     s: ActionSender,
     r: FeedbackReceiver,
 }
 
+fn merge(config: &mut GuiConfig, stored_config: GuiConfig) {
+    if config.watch.is_none() {
+        config.watch = stored_config.watch;
+    }
+    if config.action.is_none() {
+        config.action = stored_config.action;
+    }
+}
+
 impl ProvolaGuiApp {
     /// Try to resume previous app state
     fn resume_config(&mut self, storage: Option<&dyn epi::Storage>) {
-        let stored_config: Option<GuiOpt> = storage.and_then(|s| epi::get_value(s, epi::APP_KEY));
+        let stored_config: Option<GuiConfig> =
+            storage.and_then(|s| epi::get_value(s, epi::APP_KEY));
 
         if let Some(stored_config) = stored_config {
-            self.config = stored_config;
+            merge(&mut self.config, stored_config);
         }
     }
 
@@ -80,7 +90,7 @@ impl ProvolaGuiApp {
         // This message is needed to setup the working thread, so it knows
         // how app is configured and how to request a UI repaint.
         let setup = super::Setup {
-            opt: self.config.clone(),
+            config: self.config.clone(),
             repaint_signal: frame.repaint_signal(),
         };
 
@@ -157,7 +167,7 @@ impl epi::App for ProvolaGuiApp {
 }
 
 impl ProvolaGuiApp {
-    pub(crate) fn new(config: GuiOpt, s: ActionSender, r: FeedbackReceiver) -> Self {
+    pub(crate) fn new(config: GuiConfig, s: ActionSender, r: FeedbackReceiver) -> Self {
         let state = State::default();
         Self {
             config,

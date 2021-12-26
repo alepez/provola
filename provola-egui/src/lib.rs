@@ -1,9 +1,8 @@
 mod app;
 mod central_panel;
 
-pub use app::GuiAction;
-pub use app::GuiOpt;
 use app::ProvolaGuiApp;
+pub use app::{ActionConfig, GuiConfig};
 use crossbeam_channel::{bounded, select, Receiver, Sender};
 use eframe::epi::RepaintSignal;
 // use provola_core::test_runners::{Only, TestRunnerOpt};
@@ -12,7 +11,7 @@ use provola_testrunners::make_test_runner;
 use std::{path::PathBuf, sync::Arc, thread, time::Duration};
 
 struct Setup {
-    opt: GuiOpt,
+    config: GuiConfig,
     repaint_signal: Arc<dyn RepaintSignal>,
 }
 
@@ -49,12 +48,12 @@ impl FeedbackSender {
 }
 
 struct Server {
-    opt: Option<GuiOpt>,
+    opt: Option<GuiConfig>,
     action_r: ActionReceiver,
     feedback_s: FeedbackSender,
 }
 
-pub fn run(opt: GuiOpt) -> Result<(), Error> {
+pub fn run(opt: GuiConfig) -> Result<(), Error> {
     // Server and GUI are communicating throug channels
     let (action_s, action_r) = bounded(1000);
     let (feedback_s, feedback_r) = bounded(1000);
@@ -86,12 +85,12 @@ impl Server {
                 // This must be done before starting watch thread
                 self.feedback_s.repaint_signal = Some(setup.repaint_signal);
 
-                if let Some(file_to_watch) = &setup.opt.watch {
+                if let Some(file_to_watch) = &setup.config.watch {
                     // FIXME Make this thread stoppable (when file_to_watch changes)
                     self.start_watch_thread(file_to_watch.clone());
                 }
 
-                self.opt = Some(setup.opt);
+                self.opt = Some(setup.config);
             }
             ActionMessage::RunAll => {
                 // TODO Give a feedback if run_once return an error
@@ -146,13 +145,13 @@ impl Server {
     }
 }
 
-impl TryFrom<&GuiOpt> for Action {
+impl TryFrom<&GuiConfig> for Action {
     type Error = Error;
 
-    fn try_from(opt: &GuiOpt) -> Result<Self, Error> {
+    fn try_from(opt: &GuiConfig) -> Result<Self, Error> {
         if let Some(action) = &opt.action {
             let action = match action {
-                app::GuiAction::BuildTestInputOutput(lang, source, input, output) => {
+                app::ActionConfig::BuildTestInputOutput(lang, source, input, output) => {
                     Action::BuildTestInputOutput(
                         *lang,
                         source.clone(),
@@ -160,7 +159,7 @@ impl TryFrom<&GuiOpt> for Action {
                         output.clone(),
                     )
                 }
-                app::GuiAction::TestRunner(info, opt) => {
+                app::ActionConfig::TestRunner(info, opt) => {
                     let test_runner = make_test_runner(info.clone());
                     Action::TestRunner(test_runner?, opt.clone())
                 }

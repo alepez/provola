@@ -87,6 +87,33 @@ impl From<&Opt> for TestRunnerOpt {
     }
 }
 
+#[cfg(feature = "egui")]
+impl TryFrom<&Opt> for provola_egui::ActionConfig {
+    type Error = Error;
+
+    fn try_from(opt: &Opt) -> Result<Self, Error> {
+        if let (Some(lang), Some(source), Some(input), Some(output)) =
+            (opt.lang, &opt.source, &opt.input, &opt.output)
+        {
+            let source = Source::new(source.clone());
+            let input = TestDataIn::new(input.clone());
+            let output = TestDataOut::new(output.clone());
+            let a = Self::BuildTestInputOutput(lang, source, input, output);
+            return Ok(a);
+        }
+
+        if let (Some(exec), Some(trt)) = (&opt.test_runner, opt.test_runner_type) {
+            let exec = exec.clone().into();
+            let info = TestRunnerInfo { exec, trt };
+            let a = Self::TestRunner(info, opt.into());
+            return Ok(a);
+        }
+
+        Err(Error::NothingToDo)
+    }
+}
+
+// TODO Create from ActionConfig
 impl TryFrom<&Opt> for Action {
     type Error = Error;
 
@@ -114,23 +141,14 @@ impl TryFrom<&Opt> for Action {
 }
 
 #[cfg(feature = "egui")]
-impl TryFrom<Opt> for provola_egui::GuiAction {
-    type Error = Error;
-
-    fn try_from(opt: Opt) -> Result<Self, Error> {
-        todo!()
-    }
-}
-
-#[cfg(feature = "egui")]
-impl TryFrom<Opt> for provola_egui::GuiOpt {
+impl TryFrom<Opt> for provola_egui::GuiConfig {
     type Error = Error;
 
     fn try_from(opt: Opt) -> Result<Self, Error> {
         let watch = opt.watch.clone();
         Ok(Self {
             watch,
-            action: opt.try_into().ok(),
+            action: (&opt).try_into().ok(),
         })
     }
 }
@@ -140,12 +158,13 @@ fn print_completions<G: Generator>(gen: G, app: &mut App) {
 }
 
 #[cfg(feature = "egui")]
-fn run_gui(opt: Opt) {
-    // TODO Error handling
-    let opt = provola_egui::GuiOpt::try_from(opt).unwrap();
+fn run_gui(opt: Opt) -> Result<(), Error> {
+    let opt = provola_egui::GuiConfig::try_from(opt)?;
     if let Err(e) = provola_egui::run(opt) {
         log::error!("{}", e);
     }
+
+    Ok(())
 }
 
 #[cfg(not(feature = "egui"))]
@@ -165,7 +184,7 @@ fn main() {
     }
 
     if opt.gui {
-        return run_gui(opt);
+        return run_gui(opt).unwrap();
     }
 
     if let Err(e) = cli::run(&opt) {

@@ -1705,6 +1705,7 @@ dependencies = [
  "provola-egui",
  "provola-reporters",
  "provola-testrunners",
+ "serde",
 ]
 
 [[package]]
