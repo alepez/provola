@@ -46,7 +46,7 @@ struct Opt {
     /// List available tests
     #[clap(long)]
     list: bool,
-    // Select reporter type
+    /// Select reporter type
     #[clap(short = 'R', default_value = & DEFAULT_REPORTER_STR)]
     reporter: ReporterType,
     /// Specify which test number to run. See --list for available tests
