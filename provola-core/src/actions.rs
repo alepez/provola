@@ -72,7 +72,6 @@ impl Action {
                 crate::test::data::test(executable, input, output)
             }
 
-            // FIXME pass options to run()
             Action::TestRunner(runner, opt) => runner.run(opt),
         }
     }
