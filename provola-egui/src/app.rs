@@ -3,23 +3,21 @@ use crate::central_panel;
 use crossbeam_channel::select;
 use eframe::{egui, epi};
 use provola_core::test_runners::TestRunnerOpt;
-use provola_core::{Language, TestResult};
-use provola_testrunners::TestRunnerType;
+use provola_core::{Language, Source, TestDataIn, TestDataOut, TestResult};
+use provola_testrunners::TestRunnerInfo;
 use std::path::PathBuf;
 use std::time::Duration;
 
-/// We derive Deserialize/Serialize so we can persist app state on shutdown.
+#[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+pub enum GuiAction {
+    BuildTestInputOutput(Language, Source, TestDataIn, TestDataOut),
+    TestRunner(TestRunnerInfo, TestRunnerOpt),
+}
+
 #[derive(serde::Deserialize, serde::Serialize, Default, Clone, Debug)]
-pub struct Config {
-    // Persistent configuration
+pub struct GuiOpt {
     pub watch: Option<PathBuf>,
-    pub input: Option<PathBuf>,
-    pub output: Option<PathBuf>,
-    pub lang: Option<Language>,
-    pub source: Option<PathBuf>,
-    pub test_runner: Option<PathBuf>,
-    pub test_runner_type: Option<TestRunnerType>,
-    pub test_runner_opt: TestRunnerOpt,
+    pub action: Option<GuiAction>,
 }
 
 #[derive(Default)]
@@ -28,7 +26,7 @@ pub struct State {
 }
 
 pub struct ProvolaGuiApp {
-    config: Config,
+    config: GuiOpt,
     state: State,
     s: ActionSender,
     r: FeedbackReceiver,
@@ -37,7 +35,7 @@ pub struct ProvolaGuiApp {
 impl ProvolaGuiApp {
     /// Try to resume previous app state
     fn resume_config(&mut self, storage: Option<&dyn epi::Storage>) {
-        let stored_config: Option<Config> = storage.and_then(|s| epi::get_value(s, epi::APP_KEY));
+        let stored_config: Option<GuiOpt> = storage.and_then(|s| epi::get_value(s, epi::APP_KEY));
 
         if let Some(stored_config) = stored_config {
             self.config = stored_config;
@@ -159,7 +157,7 @@ impl epi::App for ProvolaGuiApp {
 }
 
 impl ProvolaGuiApp {
-    pub(crate) fn new(config: Config, s: ActionSender, r: FeedbackReceiver) -> Self {
+    pub(crate) fn new(config: GuiOpt, s: ActionSender, r: FeedbackReceiver) -> Self {
         let state = State::default();
         Self {
             config,

@@ -1,13 +1,14 @@
 mod app;
 mod central_panel;
 
-pub use app::Config as GuiOpt;
+pub use app::GuiAction;
+pub use app::GuiOpt;
 use app::ProvolaGuiApp;
 use crossbeam_channel::{bounded, select, Receiver, Sender};
 use eframe::epi::RepaintSignal;
 // use provola_core::test_runners::{Only, TestRunnerOpt};
-use provola_core::{Action, Error, Source, TestDataIn, TestDataOut, WatchOptions, Watcher};
-use provola_testrunners::{make_test_runner, TestRunnerInfo};
+use provola_core::{Action, Error, WatchOptions, Watcher};
+use provola_testrunners::make_test_runner;
 use std::{path::PathBuf, sync::Arc, thread, time::Duration};
 
 struct Setup {
@@ -149,24 +150,24 @@ impl TryFrom<&GuiOpt> for Action {
     type Error = Error;
 
     fn try_from(opt: &GuiOpt) -> Result<Self, Error> {
-        if let (Some(lang), Some(source), Some(input), Some(output)) =
-            (opt.lang, &opt.source, &opt.input, &opt.output)
-        {
-            let source = Source::new(source.clone());
-            let input = TestDataIn::new(input.clone());
-            let output = TestDataOut::new(output.clone());
-            let a = Action::BuildTestInputOutput(lang, source, input, output);
-            return Ok(a);
+        if let Some(action) = &opt.action {
+            let action = match action {
+                app::GuiAction::BuildTestInputOutput(lang, source, input, output) => {
+                    Action::BuildTestInputOutput(
+                        *lang,
+                        source.clone(),
+                        input.clone(),
+                        output.clone(),
+                    )
+                }
+                app::GuiAction::TestRunner(info, opt) => {
+                    let test_runner = make_test_runner(info.clone());
+                    Action::TestRunner(test_runner?, opt.clone())
+                }
+            };
+            Ok(action)
+        } else {
+            Err(Error::NothingToDo)
         }
-
-        if let (Some(exec), Some(trt)) = (&opt.test_runner, opt.test_runner_type) {
-            let exec = exec.clone().into();
-            let info = TestRunnerInfo { exec, trt };
-            let test_runner = make_test_runner(info);
-            let a = Action::TestRunner(test_runner?, opt.test_runner_opt.clone());
-            return Ok(a);
-        }
-
-        Err(Error::NothingToDo)
     }
 }

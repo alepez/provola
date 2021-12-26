@@ -2,7 +2,7 @@ use crate::test_runners::{TestRunner, TestRunnerOpt};
 use crate::{Error, Executable, Language, TestResult};
 use std::{convert::TryFrom, io::Read, path::PathBuf};
 
-#[derive(Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub struct Source(pub PathBuf);
 
 impl Source {
@@ -11,7 +11,7 @@ impl Source {
     }
 }
 
-#[derive(Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub struct TestDataIn(PathBuf);
 
 impl TestDataIn {
@@ -28,7 +28,7 @@ impl TryFrom<&TestDataIn> for std::fs::File {
     }
 }
 
-#[derive(Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub struct TestDataOut(PathBuf);
 
 impl TestDataOut {

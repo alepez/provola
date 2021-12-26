@@ -27,7 +27,7 @@ pub enum TestRunnerType {
     Catch2,
 }
 
-#[derive(Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 pub struct TestRunnerInfo {
     pub exec: Executable,
     pub trt: TestRunnerType,

@@ -114,20 +114,23 @@ impl TryFrom<&Opt> for Action {
 }
 
 #[cfg(feature = "egui")]
+impl TryFrom<Opt> for provola_egui::GuiAction {
+    type Error = Error;
+
+    fn try_from(opt: Opt) -> Result<Self, Error> {
+        todo!()
+    }
+}
+
+#[cfg(feature = "egui")]
 impl TryFrom<Opt> for provola_egui::GuiOpt {
     type Error = Error;
 
     fn try_from(opt: Opt) -> Result<Self, Error> {
-        let test_runner_opt = (&opt).into();
+        let watch = opt.watch.clone();
         Ok(Self {
-            watch: opt.watch,
-            input: opt.input,
-            output: opt.output,
-            lang: opt.lang,
-            source: opt.source,
-            test_runner: opt.test_runner,
-            test_runner_type: opt.test_runner_type,
-            test_runner_opt,
+            watch,
+            action: opt.try_into().ok(),
         })
     }
 }
