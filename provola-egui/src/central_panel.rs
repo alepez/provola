@@ -61,11 +61,14 @@ fn show_reason_report(ui: &mut Ui, report: &Report) {
     }
 }
 
-fn show_testsuite(ui: &mut Ui, testsuite: &TestSuite) {
-    // TODO failures should not be an Option here
-    let ok = testsuite.failures.unwrap_or(0) == 0;
+fn symbol_and_name(ok: bool, name: &str) -> String {
     let symbol = if ok { "✔" } else { "✖" };
-    let name = format!("{} {}", symbol, testsuite.name);
+    format!("{} {}", symbol, name)
+}
+
+fn show_testsuite(ui: &mut Ui, testsuite: &TestSuite) {
+    let ok = testsuite.failures.unwrap_or(0) == 0;
+    let name = symbol_and_name(ok, &testsuite.name);
 
     CollapsingHeader::new(&name)
         .default_open(true)
@@ -78,8 +81,7 @@ fn show_testsuite(ui: &mut Ui, testsuite: &TestSuite) {
 
 fn show_testcase(ui: &mut Ui, testcase: &TestCase) {
     let ok = testcase.failures.is_empty();
-    let symbol = if ok { "✔" } else { "✖" };
-    let name = format!("{} {}", symbol, testcase.name);
+    let name = symbol_and_name(ok, &testcase.name);
 
     CollapsingHeader::new(&name)
         .default_open(true)
