@@ -25,6 +25,9 @@ struct Opt {
     /// Watch files or directories for changes
     #[clap(short, long, parse(from_os_str))]
     watch: Option<PathBuf>,
+    /// Prevent automatic watch
+    #[clap(long, conflicts_with("watch"))]
+    no_watch: bool,
     /// Input file to be used for data test
     #[clap(short, long, parse(from_os_str))]
     input: Option<PathBuf>,
@@ -65,7 +68,9 @@ impl Opt {
         self.lang = self.lang_or_guess();
 
         if let Some(test_runner) = &self.test_runner {
-            self.watch = Some(test_runner.clone());
+            if !self.no_watch {
+                self.watch = Some(test_runner.clone());
+            }
         }
 
         self
