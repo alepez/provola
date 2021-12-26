@@ -9,9 +9,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
-#[cfg_attr(feature = "persistence", derive(serde::Deserialize, serde::Serialize))]
-#[cfg_attr(feature = "persistence", serde(default))] // if we add new fields, give them default values when deserializing old state
-#[derive(Default, Clone, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Default, Clone, Debug)]
 pub struct Config {
     // Persistent configuration
     pub watch: Option<PathBuf>,
@@ -40,7 +38,6 @@ impl ProvolaGuiApp {
     fn resume_config(&mut self, _storage: Option<&dyn epi::Storage>) {
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
-        #[cfg(feature = "persistence")]
         if let Some(storage) = _storage {
             // TODO Merge is not working well when both test_runner and source are selected
             let _stored_config: Config = epi::get_value(storage, epi::APP_KEY).unwrap_or_default();
@@ -113,7 +110,6 @@ impl epi::App for ProvolaGuiApp {
     }
 
     /// Called by the frame work to save state before shutdown.
-    #[cfg(feature = "persistence")]
     fn save(&mut self, storage: &mut dyn epi::Storage) {
         epi::set_value(storage, epi::APP_KEY, &self.config);
     }
