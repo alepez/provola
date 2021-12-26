@@ -26,34 +26,34 @@ struct Opt {
     #[clap(short, long, parse(from_os_str))]
     watch: Option<PathBuf>,
     /// Prevent automatic watch
-    #[clap(long, conflicts_with("watch"))]
+    #[clap(long, conflicts_with = "watch")]
     no_watch: bool,
     /// Input file to be used for data test
-    #[clap(short, long, parse(from_os_str))]
+    #[clap(short, long, parse(from_os_str), conflicts_with = "test-runner")]
     input: Option<PathBuf>,
     /// Expected output to be used for data test
-    #[clap(short, long, parse(from_os_str))]
+    #[clap(short, long, parse(from_os_str), conflicts_with = "test-runner")]
     output: Option<PathBuf>,
     /// Language of the source code. If not provided, it is automatically detected
-    #[clap(short, long)]
+    #[clap(short, long, conflicts_with = "test-runner")]
     lang: Option<Language>,
     /// Source code file
-    #[clap(short, long)]
+    #[clap(short, long, conflicts_with = "test-runner")]
     source: Option<PathBuf>,
     /// Execute a test runner
-    #[clap(short = 't')]
+    #[clap(short = 't', requires_all = &["test-runner-type"])]
     test_runner: Option<PathBuf>,
     /// Select test runner type
-    #[clap(short = 'T')]
+    #[clap(short = 'T', requires_all = &["test-runner"])]
     test_runner_type: Option<TestRunnerType>,
     /// List available tests
-    #[clap(long)]
+    #[clap(long, requires_all = &["test-runner"])]
     list: bool,
     /// Select reporter type
     #[clap(short = 'R', default_value = & DEFAULT_REPORTER_STR)]
     reporter: ReporterType,
     /// Specify which test number to run. See --list for available tests
-    #[clap(long)]
+    #[clap(long, requires_all = &["test-runner"])]
     only: Option<usize>,
 }
 
