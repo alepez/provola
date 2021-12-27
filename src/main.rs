@@ -173,8 +173,8 @@ fn run_gui(opt: Opt) -> Result<(), Error> {
 }
 
 #[cfg(not(feature = "egui"))]
-fn run_gui(_opt: Opt) {
-    log::error!("GUI not avaiable");
+fn run_gui(_opt: Opt) -> Result<(), Error> {
+    Err(Error::GuiNotAvailable)
 }
 
 fn main() {

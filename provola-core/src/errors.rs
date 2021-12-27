@@ -34,4 +34,6 @@ pub enum Error {
     TestRunnerFeatureNotAvailable(TestRunnerFeature),
     #[error("cannot parse report: {0}")]
     ReportParseError(Box<dyn std::error::Error>),
+    #[error("gui is not available")]
+    GuiNotAvailable,
 }
