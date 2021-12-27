@@ -238,12 +238,11 @@ jobs:
         #       cp 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/manual/provola.1 "$ARCHIVE_DIR"
         # README and LICENSE
         cp "README.md" "LICENSE-MIT" "LICENSE-APACHE" "$ARCHIVE_DIR"
-        # TODO Generate autocompletion with `provola --shell-compl ${shell}`
-        #       # Autocompletion files
-        #       cp 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/completions/provola.bash "$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.bash"
-        #       cp 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/completions/provola.fish "$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.fish"
-        #       cp 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/completions/_provola.ps1 "$ARCHIVE_DIR/autocomplete/_${{ env.PROJECT_NAME }}.ps1"
-        #       cp 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/completions/provola.zsh "$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.zsh"
+        # Generate autocompletion with `provola --shell-compl ${shell}`
+        "./target/x86_64-unknown-linux-gnu/release/${BIN_NAME}" --shell-compl bash > "$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.bash"
+        "./target/x86_64-unknown-linux-gnu/release/${BIN_NAME}" --shell-compl fish > "$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.fish"
+        "./target/x86_64-unknown-linux-gnu/release/${BIN_NAME}" --shell-compl powershell > "$ARCHIVE_DIR/autocomplete/_${{ env.PROJECT_NAME }}.ps1"
+        "./target/x86_64-unknown-linux-gnu/release/${BIN_NAME}" --shell-compl zsh > "$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.zsh"
         # base compressed package
         pushd "${PKG_STAGING}/" >/dev/null
         case ${{ matrix.job.target }} in
@@ -282,11 +281,10 @@ jobs:
         #       # Man page
         #       install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/manual/provola.1 "${DPKG_DIR}/usr/share/man/man1/${{ env.PROJECT_NAME }}.1"
         #       gzip -n --best "${DPKG_DIR}/usr/share/man/man1/${{ env.PROJECT_NAME }}.1"
-        # TODO Autocompletion
-        #       # Autocompletion files
-        #       install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/completions/provola.bash "${DPKG_DIR}/usr/share/bash-completion/completions/${{ env.PROJECT_NAME }}"
-        #       install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/completions/provola.fish "${DPKG_DIR}/usr/share/fish/vendor_completions.d/${{ env.PROJECT_NAME }}.fish"
-        #       install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/completions/provola.zsh "${DPKG_DIR}/usr/share/zsh/vendor-completions/_${{ env.PROJECT_NAME }}"
+        # Autocompletion files
+        install -Dm644 '$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.bash' "${DPKG_DIR}/usr/share/bash-completion/completions/${{ env.PROJECT_NAME }}"
+        install -Dm644 '$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.fish' "${DPKG_DIR}/usr/share/fish/vendor_completions.d/${{ env.PROJECT_NAME }}.fish"
+        install -Dm644 '$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.zsh' "${DPKG_DIR}/usr/share/zsh/vendor-completions/_${{ env.PROJECT_NAME }}"
         # README and LICENSE
         install -Dm644 "README.md" "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/README.md"
         install -Dm644 "LICENSE-MIT" "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/LICENSE-MIT"
