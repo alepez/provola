@@ -7,7 +7,7 @@ description = "A tool for quick development/test cycle in any language"
 homepage = "https://github.com/alepez/provola"
 repository = "https://github.com/alepez/provola"
 readme = "../README.md"
-license = "Apache-2.0"
+license = "MIT/Apache-2.0"
 
 [dependencies]
 colored = "2.0.0"

@@ -5,7 +5,7 @@ edition = "2021"
 description = "provola extension for catch2"
 homepage = "https://github.com/alepez/provola"
 repository = "https://github.com/alepez/provola"
-license = "Apache-2.0"
+license = "MIT/Apache-2.0"
 
 [dependencies]
 chrono = "0.4"
