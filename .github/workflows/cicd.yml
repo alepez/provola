@@ -283,9 +283,9 @@ jobs:
         #       install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/manual/provola.1 "${DPKG_DIR}/usr/share/man/man1/${{ env.PROJECT_NAME }}.1"
         #       gzip -n --best "${DPKG_DIR}/usr/share/man/man1/${{ env.PROJECT_NAME }}.1"
         # Autocompletion files
-        install -Dm644 "$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.bash" "${DPKG_DIR}/usr/share/bash-completion/completions/${{ env.PROJECT_NAME }}"
-        install -Dm644 "$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.fish" "${DPKG_DIR}/usr/share/fish/vendor_completions.d/${{ env.PROJECT_NAME }}.fish"
-        install -Dm644 "$ARCHIVE_DIR/autocomplete/${{ env.PROJECT_NAME }}.zsh" "${DPKG_DIR}/usr/share/zsh/vendor-completions/_${{ env.PROJECT_NAME }}"
+        install -Dm644 "${{ steps.package.outputs.ARCHIVE_DIR }}/autocomplete/${{ env.PROJECT_NAME }}.bash" "${DPKG_DIR}/usr/share/bash-completion/completions/${{ env.PROJECT_NAME }}"
+        install -Dm644 "${{ steps.package.outputs.ARCHIVE_DIR }}/autocomplete/${{ env.PROJECT_NAME }}.fish" "${DPKG_DIR}/usr/share/fish/vendor_completions.d/${{ env.PROJECT_NAME }}.fish"
+        install -Dm644 "${{ steps.package.outputs.ARCHIVE_DIR }}/autocomplete/${{ env.PROJECT_NAME }}.zsh" "${DPKG_DIR}/usr/share/zsh/vendor-completions/_${{ env.PROJECT_NAME }}"
         # README and LICENSE
         install -Dm644 "README.md" "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/README.md"
         install -Dm644 "LICENSE-MIT" "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/LICENSE-MIT"
