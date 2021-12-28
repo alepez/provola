@@ -134,6 +134,8 @@ impl epi::App for ProvolaGuiApp {
 
         self.handle_messages();
 
+        let mut new_config = self.config.clone();
+
         // Top panel contains the main menu
         TopBottomPanel::top("top_panel").show(ctx, |ui| {
             menu::bar(ui, |ui| {
@@ -166,12 +168,19 @@ impl epi::App for ProvolaGuiApp {
             if ui.button("Run all").clicked() {
                 self.action_run_all();
             }
+
+            ui.checkbox(&mut new_config.watch, "Watch");
         });
 
         // Central panel for test results
         CentralPanel::default().show(ctx, |ui| {
             central_panel::show(ui, &self.state.last_result);
         });
+
+        if new_config != self.config {
+            log::info!("Configuration changed!");
+            self.config = new_config;
+        }
     }
 }
 
