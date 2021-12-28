@@ -4,7 +4,7 @@ mod central_panel;
 pub use crate::app::{ActionConfig, GuiConfig, ProvolaGuiApp};
 use crossbeam_channel::{bounded, select, Receiver, Sender};
 use eframe::epi::RepaintSignal;
-use provola_core::{Action, Error, WatchOptions, Watcher};
+use provola_core::{Action, AvailableTests, Error, TestResult, WatchOptions, Watcher};
 use provola_testrunners::make_test_runner;
 use std::{path::PathBuf, sync::Arc, thread, time::Duration};
 
@@ -19,7 +19,8 @@ enum ActionMessage {
 }
 
 enum FeedbackMessage {
-    Result(provola_core::TestResult),
+    AvailableTests(AvailableTests),
+    Result(TestResult),
     WatchedChanged,
 }
 

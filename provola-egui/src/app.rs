@@ -3,7 +3,7 @@ use crate::central_panel;
 use crossbeam_channel::select;
 use eframe::{egui, epi};
 use provola_core::test_runners::TestRunnerOpt;
-use provola_core::{Language, Source, TestDataIn, TestDataOut, TestResult};
+use provola_core::{AvailableTests, Language, Source, TestDataIn, TestDataOut, TestResult};
 use provola_testrunners::TestRunnerInfo;
 use std::path::PathBuf;
 use std::time::Duration;
@@ -23,6 +23,7 @@ pub struct GuiConfig {
 #[derive(Default)]
 pub struct State {
     last_result: Option<TestResult>,
+    available_tests: Option<AvailableTests>,
 }
 
 pub struct ProvolaGuiApp {
@@ -64,6 +65,9 @@ impl ProvolaGuiApp {
         let state = &mut self.state;
 
         match msg {
+            FeedbackMessage::AvailableTests(tests) => {
+                state.available_tests = Some(tests);
+            }
             FeedbackMessage::Result(new_result) => {
                 state.last_result = Some(new_result);
             }
