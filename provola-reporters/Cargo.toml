@@ -1,6 +1,6 @@
 [package]
 name = "provola-reporters"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
 edition = "2021"
 description = "A tool for quick development/test cycle in any language"
@@ -15,11 +15,11 @@ strum = "0.23"
 strum_macros = "0.23"
 
 [dependencies.provola-core]
-version = "0.1.7"
+version = "0.1.8"
 path = "../provola-core"
 
 [dependencies.provola-terminalreporter]
-version = "0.1.7"
+version = "0.1.8"
 path = "../provola-terminalreporter"
 optional = true
 

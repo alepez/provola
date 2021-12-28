@@ -1,6 +1,6 @@
 [package]
 name = "provola-core"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
 edition = "2021"
 description = "A tool for quick development/test cycle in any language"
