@@ -32,6 +32,8 @@ pub struct ProvolaGuiApp {
     r: FeedbackReceiver,
 }
 
+/// Merges current configuration with stored configuration, giving priority to
+/// current configuration.
 fn merge(config: &mut GuiConfig, stored_config: GuiConfig) {
     if config.watch.is_none() {
         config.watch = stored_config.watch;
@@ -44,9 +46,11 @@ fn merge(config: &mut GuiConfig, stored_config: GuiConfig) {
 impl ProvolaGuiApp {
     /// Try to resume previous app state
     fn resume_config(&mut self, storage: Option<&dyn epi::Storage>) {
+        // Get stored configuration
         let stored_config: Option<GuiConfig> =
             storage.and_then(|s| epi::get_value(s, epi::APP_KEY));
 
+        // Merge current configuration with stored configuration
         if let Some(stored_config) = stored_config {
             merge(&mut self.config, stored_config);
         }
