@@ -105,6 +105,17 @@ jobs:
     - name: Checkout source code
       uses: actions/checkout@v2
 
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ matrix.target }}-${{ matrix.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
     - name: Install prerequisites
       shell: bash
       run: |
