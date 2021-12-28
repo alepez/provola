@@ -19,4 +19,4 @@ main() {
   for_all_crates update_version $version
 }
 
-main 0.1.8
+main $1
