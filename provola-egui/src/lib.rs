@@ -1,11 +1,9 @@
 mod app;
 mod central_panel;
 
-use app::ProvolaGuiApp;
-pub use app::{ActionConfig, GuiConfig};
+pub use crate::app::{ActionConfig, GuiConfig, ProvolaGuiApp};
 use crossbeam_channel::{bounded, select, Receiver, Sender};
 use eframe::epi::RepaintSignal;
-// use provola_core::test_runners::{Only, TestRunnerOpt};
 use provola_core::{Action, Error, WatchOptions, Watcher};
 use provola_testrunners::make_test_runner;
 use std::{path::PathBuf, sync::Arc, thread, time::Duration};
@@ -149,24 +147,18 @@ impl TryFrom<&GuiConfig> for Action {
     type Error = Error;
 
     fn try_from(opt: &GuiConfig) -> Result<Self, Error> {
-        if let Some(action) = &opt.action {
-            let action = match action {
-                app::ActionConfig::BuildTestInputOutput(lang, source, input, output) => {
-                    Action::BuildTestInputOutput(
-                        *lang,
-                        source.clone(),
-                        input.clone(),
-                        output.clone(),
-                    )
-                }
-                app::ActionConfig::TestRunner(info, opt) => {
-                    let test_runner = make_test_runner(info.clone());
-                    Action::TestRunner(test_runner?, opt.clone())
-                }
-            };
-            Ok(action)
-        } else {
-            Err(Error::NothingToDo)
-        }
+        let action_cfg = opt.action.as_ref().ok_or(Error::NothingToDo)?;
+
+        let action = match action_cfg {
+            ActionConfig::BuildTestInputOutput(lang, source, input, output) => {
+                Action::BuildTestInputOutput(*lang, source.clone(), input.clone(), output.clone())
+            }
+            ActionConfig::TestRunner(info, opt) => {
+                let test_runner = make_test_runner(info.clone());
+                Action::TestRunner(test_runner?, opt.clone())
+            }
+        };
+
+        Ok(action)
     }
 }
