@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source "${THIS_DIR}/_common"
+
+update_version() {
+  local dir=$1
+  local version=$2
+  (
+    cd $dir
+    toml set Cargo.toml package.version $2 > _tmp_Cargo.toml
+    mv _tmp_Cargo.toml Cargo.toml
+  )
+}
+
+main() {
+  local version=$1
+  for_all_crates update_version $version
+}
+
+main 0.1.8

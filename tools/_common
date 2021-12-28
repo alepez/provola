@@ -1,0 +1,19 @@
+crates=(
+  ./provola-reporters
+  ./provola-egui
+  ./provola-testrunners
+  ./provola-terminalreporter
+  ./provola-catch2
+  ./provola-googletest
+  ./provola-core
+  ./
+)
+
+for_all_crates() {
+  local fun=$1
+  shift
+  for i in ${!crates[@]}; do
+    $fun ${crates[$i]} $@
+  done
+}
+
