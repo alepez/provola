@@ -122,12 +122,12 @@ impl AvailableTests {
     }
 }
 
-#[derive(Default, Clone, Debug, Deserialize, Serialize)]
+#[derive(Default, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct TestRunnerOpt {
     pub only: Only,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum Only {
     SingleByIndex(usize),
     All,

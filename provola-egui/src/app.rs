@@ -8,15 +8,16 @@ use provola_testrunners::TestRunnerInfo;
 use std::path::PathBuf;
 use std::time::Duration;
 
-#[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Clone, Debug, PartialEq, Eq)]
 pub enum ActionConfig {
     BuildTestInputOutput(Language, Source, TestDataIn, TestDataOut),
     TestRunner(TestRunnerInfo, TestRunnerOpt),
 }
 
-#[derive(serde::Deserialize, serde::Serialize, Default, Clone, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Default, Clone, Debug, PartialEq, Eq)]
 pub struct GuiConfig {
-    pub watch: Option<PathBuf>,
+    pub watch_path: Option<PathBuf>,
+    pub watch: bool,
     pub action: Option<ActionConfig>,
 }
 
@@ -36,8 +37,8 @@ pub struct ProvolaGuiApp {
 /// Merges current configuration with stored configuration, giving priority to
 /// current configuration.
 fn merge(config: &mut GuiConfig, stored_config: GuiConfig) {
-    if config.watch.is_none() {
-        config.watch = stored_config.watch;
+    if config.watch_path.is_none() {
+        config.watch_path = stored_config.watch_path;
     }
     if config.action.is_none() {
         config.action = stored_config.action;

@@ -3,7 +3,7 @@ use std::{convert::TryFrom, path::Path};
 
 use crate::{build::gen_executable, Language, Source};
 
-#[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Clone, Debug, PartialEq, Eq)]
 pub enum Executable {
     Simple(PathBuf),
     Multiple(Vec<String>),

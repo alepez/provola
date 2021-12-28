@@ -84,9 +84,9 @@ impl Server {
                 // This must be done before starting watch thread
                 self.feedback_s.repaint_signal = Some(setup.repaint_signal);
 
-                if let Some(file_to_watch) = &setup.config.watch {
-                    // FIXME Make this thread stoppable (when file_to_watch changes)
-                    self.start_watch_thread(file_to_watch.clone());
+                if let Some(watch_path) = &setup.config.watch_path {
+                    // FIXME Make this thread stoppable (when watch_path changes)
+                    self.start_watch_thread(watch_path.clone());
                 }
 
                 self.opt = Some(setup.config);

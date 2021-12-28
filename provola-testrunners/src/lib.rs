@@ -19,7 +19,7 @@ pub fn make_test_runner(info: TestRunnerInfo) -> Result<Box<dyn TestRunner>, Err
     }
 }
 
-#[derive(Debug, EnumString, Clone, Copy, Display, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, EnumString, Clone, Copy, Display, serde::Deserialize, serde::Serialize, PartialEq, Eq)]
 pub enum TestRunnerType {
     #[cfg(feature = "googletest")]
     GoogleTest,
@@ -27,7 +27,7 @@ pub enum TestRunnerType {
     Catch2,
 }
 
-#[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Clone, Debug, PartialEq, Eq)]
 pub struct TestRunnerInfo {
     pub exec: Executable,
     pub trt: TestRunnerType,

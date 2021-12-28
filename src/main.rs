@@ -150,8 +150,10 @@ impl TryFrom<Opt> for provola_egui::GuiConfig {
     type Error = Error;
 
     fn try_from(opt: Opt) -> Result<Self, Error> {
-        let watch = opt.watch.clone();
+        let watch_path = opt.watch.clone();
+        let watch = !opt.no_watch;
         Ok(Self {
+            watch_path,
             watch,
             action: (&opt).try_into().ok(),
         })
