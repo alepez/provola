@@ -62,13 +62,20 @@ fn show_reason_report(ui: &mut Ui, report: &CoreReport) {
     }
 }
 
-fn symbol_and_name(ok: bool, name: &str) -> String {
-    let symbol = if ok { "✔" } else { "✖" };
-    format!("{} {}", symbol, name)
+fn symbol(ok: Option<bool>) -> &'static str {
+    match ok {
+        Some(true) => "✔",
+        Some(false) => "✖",
+        None => "?",
+    }
+}
+
+fn symbol_and_name(ok: Option<bool>, name: &str) -> String {
+    format!("{} {}", symbol(ok), name)
 }
 
 fn show_testsuite(ui: &mut Ui, testsuite: &CoreTestSuite) {
-    let ok = testsuite.failures.unwrap_or(0) == 0;
+    let ok = testsuite.failures.map(|x| x == 0);
     let name = symbol_and_name(ok, &testsuite.name);
 
     CollapsingHeader::new(&name)
@@ -81,7 +88,12 @@ fn show_testsuite(ui: &mut Ui, testsuite: &CoreTestSuite) {
 }
 
 fn show_testcase(ui: &mut Ui, testcase: &CoreTestCase) {
-    let ok = testcase.failures.is_empty();
+    let ok = if testcase.status.is_none() {
+        None
+    } else {
+        Some(testcase.failures.is_empty())
+    };
+
     let name = symbol_and_name(ok, &testcase.name);
 
     CollapsingHeader::new(&name)
