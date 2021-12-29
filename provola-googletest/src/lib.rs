@@ -38,7 +38,7 @@ fn run_exec_with_argv(argv: Vec<String>) -> Result<String, Error> {
     let timeout = Duration::from_secs(3600);
 
     if let Some(_exit_status) = p.wait_timeout(timeout)? {
-        log::debug!("Test done");
+        log::trace!("done");
     } else {
         log::warn!("Terminate subprocess");
         p.terminate()?;
