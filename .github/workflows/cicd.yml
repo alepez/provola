@@ -29,6 +29,16 @@ jobs:
         default: true
         profile: minimal
         components: rustfmt
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: cargo-${{ hashFiles('**/Cargo.lock') }}
     - uses: actions/checkout@v2
     - run: cargo fmt --all -- --check
 
@@ -50,6 +60,16 @@ jobs:
         default: true
         profile: minimal # minimal component installation (ie, no documentation)
         components: clippy
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: cargo-${{ hashFiles('**/Cargo.lock') }}
     - name: Run clippy (on minimum supported rust version to prevent warnings we can't fix)
       uses: actions-rs/cargo@v1
       with:
