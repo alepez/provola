@@ -95,25 +95,23 @@ impl Server {
 
                 self.opt = Some(setup.config);
 
-                self.get_available_tests()
-                    .map_err(|e| self.send_error_feedback(e))
-                    .ok();
+                self.handle_result(self.get_available_tests());
             }
             ActionMessage::RunAll => {
-                self.run_once()
-                    .map_err(|e| self.send_error_feedback(e))
-                    .ok();
+                self.handle_result(self.run_once());
             }
             ActionMessage::UpdateConfig(new_config) => {
                 log::debug!("Configuration changed");
                 self.opt = Some(new_config);
             }
             ActionMessage::ReqAvailableTests => {
-                self.get_available_tests()
-                    .map_err(|e| self.send_error_feedback(e))
-                    .ok();
+                self.handle_result(self.get_available_tests());
             }
         }
+    }
+
+    fn handle_result<T>(&self, res: Result<T, Error>) {
+        res.map_err(|e| self.send_error_feedback(e)).ok();
     }
 
     fn send_error_feedback(&self, err: impl ToString) {
