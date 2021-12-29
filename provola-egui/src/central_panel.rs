@@ -1,5 +1,7 @@
 use eframe::egui::*;
-use provola_core::{CoreFailure, CoreReport, CoreTestCase, CoreTestSuite, Reason, TestResult};
+use provola_core::{
+    report::CoreStatus, CoreFailure, CoreReport, CoreTestCase, CoreTestSuite, Reason, TestResult,
+};
 
 pub fn show(ui: &mut Ui, test_result: Option<&TestResult>) {
     if let Some(test_result) = test_result {
@@ -62,21 +64,21 @@ fn show_reason_report(ui: &mut Ui, report: &CoreReport) {
     }
 }
 
-fn symbol(ok: Option<bool>) -> &'static str {
-    match ok {
-        Some(true) => "✔",
-        Some(false) => "✖",
-        None => "?",
+fn symbol(status: CoreStatus) -> &'static str {
+    match status {
+        CoreStatus::Pass => "✔",
+        CoreStatus::Fail => "✖",
+        _ => "?",
     }
 }
 
-fn symbol_and_name(ok: Option<bool>, name: &str) -> String {
+fn symbol_and_name(ok: CoreStatus, name: &str) -> String {
     format!("{} {}", symbol(ok), name)
 }
 
 fn show_testsuite(ui: &mut Ui, testsuite: &CoreTestSuite) {
     let ok = testsuite.failures.map(|x| x == 0);
-    let name = symbol_and_name(ok, &testsuite.name);
+    let name = symbol_and_name(ok.into(), &testsuite.name);
 
     CollapsingHeader::new(&name)
         .default_open(true)
@@ -88,13 +90,9 @@ fn show_testsuite(ui: &mut Ui, testsuite: &CoreTestSuite) {
 }
 
 fn show_testcase(ui: &mut Ui, testcase: &CoreTestCase) {
-    let ok = if testcase.status.is_none() {
-        None
-    } else {
-        Some(testcase.failures.is_empty())
-    };
+    let status = testcase.status;
 
-    let name = symbol_and_name(ok, &testcase.name);
+    let name = symbol_and_name(status, &testcase.name);
 
     CollapsingHeader::new(&name)
         .default_open(true)

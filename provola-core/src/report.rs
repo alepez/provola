@@ -4,13 +4,37 @@ pub type Timestamp = chrono::DateTime<chrono::Utc>;
 pub type Duration = std::time::Duration;
 pub type Count = usize;
 pub type Name = String;
-pub type Status = String;
 pub type Hostname = String;
 pub type Id = String;
 pub type Package = String;
 pub type ClassName = String;
 pub type FailureType = String;
 pub type Message = String;
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+pub enum CoreStatus {
+    Unknown,
+    Pass,
+    Fail,
+    Ignored,
+    Skipped,
+}
+
+impl Default for CoreStatus {
+    fn default() -> Self {
+        CoreStatus::Unknown
+    }
+}
+
+impl From<Option<bool>> for CoreStatus {
+    fn from(ok: Option<bool>) -> Self {
+        match ok {
+            None => CoreStatus::Unknown,
+            Some(true) => CoreStatus::Pass,
+            Some(false) => CoreStatus::Fail,
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct CoreReport {
@@ -60,7 +84,7 @@ pub struct CoreTestCase {
     pub classname: Option<ClassName>,
     /// The label of the rule
     pub name: Name,
-    pub status: Option<Status>,
+    pub status: CoreStatus,
     /// The time that was required to process all the applications of this rule
     pub time: Option<Duration>,
     pub failures: Vec<CoreFailure>,

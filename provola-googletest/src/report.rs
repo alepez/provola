@@ -1,3 +1,4 @@
+use provola_core::report::CoreStatus;
 use provola_core::CoreFailure;
 use provola_core::CoreReport;
 use provola_core::CoreTestCase;
@@ -107,8 +108,14 @@ impl From<TestCase> for CoreTestSuite {
 impl From<TestInfo> for CoreTestCase {
     fn from(x: TestInfo) -> Self {
         let status = match x.status {
-            Status::Run => Some(String::from("Run")),
-            Status::NotRun => None,
+            Status::Run => {
+                if x.failures.is_empty() {
+                    CoreStatus::Pass
+                } else {
+                    CoreStatus::Fail
+                }
+            }
+            Status::NotRun => CoreStatus::Unknown,
         };
 
         CoreTestCase {

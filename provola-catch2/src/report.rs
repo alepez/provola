@@ -1,3 +1,4 @@
+use provola_core::report::CoreStatus;
 use provola_core::CoreFailure;
 use provola_core::CoreReport;
 use provola_core::CoreTestCase;
@@ -83,10 +84,15 @@ impl From<TestSuite> for CoreTestSuite {
 
 impl From<TestCase> for CoreTestCase {
     fn from(x: TestCase) -> Self {
+        let status = match x.status.as_str() {
+            "" => CoreStatus::Pass,
+            _ => CoreStatus::Unknown,
+        };
+
         CoreTestCase {
             name: x.name,
             classname: Some(x.classname),
-            status: Some(x.status),
+            status,
             time: parse_duration(&x.time),
             failures: x.failures.into_iter().map(|x| x.into()).collect(),
         }
