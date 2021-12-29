@@ -3,6 +3,8 @@ use std::collections::BTreeMap;
 use std::hash::{Hash, Hasher};
 use std::iter::Enumerate;
 
+use crate::{CoreReport, CoreTestCase, CoreTestSuite};
+
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct TestSuite(pub String);
 
@@ -111,6 +113,33 @@ impl AvailableTests {
         &self,
     ) -> std::collections::btree_map::Iter<TestSuite, Vec<FullyQualifiedTestCase>> {
         self.map.iter()
+    }
+}
+
+impl From<&AvailableTests> for CoreReport {
+    fn from(available_tests: &AvailableTests) -> Self {
+        let mut report = CoreReport::default();
+
+        for (test_suite, test_cases) in available_tests.test_suites() {
+            let name = test_suite.0.clone();
+
+            let mut test_suite = CoreTestSuite {
+                name,
+                ..Default::default()
+            };
+
+            for fqtc in test_cases.iter() {
+                let name = fqtc.test_case.0.clone();
+
+                let test_case = CoreTestCase {
+                    name,
+                    ..Default::default()
+                };
+
+                test_suite.testcases.push(test_case);
+            }
+        }
+        report
     }
 }
 
