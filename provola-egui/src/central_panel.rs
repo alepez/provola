@@ -1,19 +1,31 @@
 use eframe::egui::*;
-use provola_core::{Failure, Reason, Report, TestCase, TestResult, TestSuite};
+use provola_core::{
+    test_runners::FullyQualifiedTestCase, AvailableTests, Failure, Reason, Report, TestCase,
+    TestResult, TestSuite,
+};
 
-pub fn show(ui: &mut Ui, test_result: &Option<TestResult>) {
+pub fn show(
+    ui: &mut Ui,
+    test_result: &Option<TestResult>,
+    available_tests: &Option<AvailableTests>,
+) {
     if let Some(test_result) = test_result {
-        show_result(ui, test_result);
+        show_result(ui, test_result, available_tests);
     } else {
-        show_no_result(ui);
+        show_no_result(ui, available_tests);
     }
 }
 
-fn show_no_result(ui: &mut Ui) {
-    ui.label("No results");
+fn show_no_result(ui: &mut Ui, available_tests: &Option<AvailableTests>) {
+    if let Some(available_tests) = available_tests {
+        show_available_tests(ui, available_tests);
+    } else {
+        ui.label("No results");
+    }
 }
 
-fn show_result(ui: &mut Ui, test_result: &TestResult) {
+// TODO Merge test_result/available_tests to show even ignored/disabled tests
+fn show_result(ui: &mut Ui, test_result: &TestResult, _available_tests: &Option<AvailableTests>) {
     match test_result {
         TestResult::Pass(result) => show_result_pass(ui, result),
         TestResult::Fail(result) => show_result_fail(ui, result),
@@ -95,4 +107,34 @@ fn show_testcase(ui: &mut Ui, testcase: &TestCase) {
 fn show_failure(ui: &mut Ui, failure: &Failure) {
     let msg = &failure.message;
     ui.label(msg);
+}
+
+fn show_available_tests(ui: &mut Ui, available_tests: &AvailableTests) {
+    for test_suite in available_tests.test_suites() {
+        show_available_test_suite(ui, test_suite);
+    }
+}
+
+fn show_available_test_suite(
+    ui: &mut Ui,
+    t: (
+        &provola_core::test_runners::TestSuite,
+        &std::vec::Vec<FullyQualifiedTestCase>,
+    ),
+) {
+    let (test_suite, test_cases) = t;
+    let name = &test_suite.0;
+    CollapsingHeader::new(name)
+        .default_open(true)
+        .show(ui, |ui| {
+            for testcase in test_cases.iter() {
+                show_available_test_case(ui, testcase);
+            }
+        });
+}
+
+fn show_available_test_case(ui: &mut Ui, testcase: &FullyQualifiedTestCase) {
+    let name = &testcase.test_case.0;
+    ui.label(name);
+    // TODO Checkbox for selecting test
 }

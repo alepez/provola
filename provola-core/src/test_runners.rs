@@ -127,6 +127,10 @@ impl AvailableTests {
     pub fn get(&self, index: usize) -> Option<&FullyQualifiedTestCase> {
         self.list.get(index)
     }
+
+    pub fn test_suites(&self) -> std::collections::btree_map::Iter<TestSuite, Vec<FullyQualifiedTestCase>> {
+        self.map.iter()
+    }
 }
 
 #[derive(Default, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]

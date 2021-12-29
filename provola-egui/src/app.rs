@@ -191,7 +191,7 @@ impl epi::App for ProvolaGuiApp {
 
         // Central panel for test results
         CentralPanel::default().show(ctx, |ui| {
-            central_panel::show(ui, &self.state.last_result);
+            central_panel::show(ui, &self.state.last_result, &self.state.available_tests);
         });
 
         if new_config != self.config {

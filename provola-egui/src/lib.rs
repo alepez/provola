@@ -94,6 +94,9 @@ impl Server {
                 }
 
                 self.opt = Some(setup.config);
+
+                // TODO Give a feedback if get_available_tests return an error
+                self.get_available_tests().ok();
             }
             ActionMessage::RunAll => {
                 // TODO Give a feedback if run_once return an error
@@ -104,6 +107,7 @@ impl Server {
                 self.opt = Some(new_config);
             }
             ActionMessage::ReqAvailableTests => {
+                // TODO Give a feedback if get_available_tests return an error
                 if let Err(err) = self.get_available_tests() {
                     log::error!("{}", err);
                 }
@@ -172,7 +176,8 @@ impl Server {
                 self.feedback_s.send(FeedbackMessage::AvailableTests(list));
             }
             Err(err) => {
-                self.feedback_s.send(FeedbackMessage::Error(err.to_string()));
+                self.feedback_s
+                    .send(FeedbackMessage::Error(err.to_string()));
             }
         };
 
