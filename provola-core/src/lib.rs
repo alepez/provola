@@ -17,7 +17,7 @@ pub use actions::TestDataOut;
 pub use errors::Error;
 pub use exec::Executable;
 pub use lang::Language;
-pub use report::Failure;
+pub use report::CoreFailure;
 pub use report::Report;
 pub use report::TestCase;
 pub use report::TestSuite;

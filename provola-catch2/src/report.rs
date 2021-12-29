@@ -1,4 +1,4 @@
-use provola_core::Failure as CoreFailure;
+use provola_core::CoreFailure as CoreFailure;
 use provola_core::Report as CoreReport;
 use provola_core::TestCase as CoreTestCase;
 use provola_core::TestSuite as CoreTestSuite;

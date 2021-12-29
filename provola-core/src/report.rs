@@ -63,11 +63,11 @@ pub struct TestCase {
     pub status: Option<Status>,
     /// The time that was required to process all the applications of this rule
     pub time: Option<Duration>,
-    pub failures: Vec<Failure>,
+    pub failures: Vec<CoreFailure>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
-pub struct Failure {
+pub struct CoreFailure {
     pub ttype: FailureType,
     pub message: Message,
 }

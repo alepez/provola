@@ -1,6 +1,6 @@
 use eframe::egui::*;
 use provola_core::test::xunit::FullyQualifiedTestCase;
-use provola_core::{AvailableTests, Failure, Reason, Report, TestCase, TestResult, TestSuite};
+use provola_core::{AvailableTests, CoreFailure, Reason, Report, TestCase, TestResult, TestSuite};
 
 pub fn show(
     ui: &mut Ui,
@@ -102,7 +102,7 @@ fn show_testcase(ui: &mut Ui, testcase: &TestCase) {
         });
 }
 
-fn show_failure(ui: &mut Ui, failure: &Failure) {
+fn show_failure(ui: &mut Ui, failure: &CoreFailure) {
     let msg = &failure.message;
     ui.label(msg);
 }
