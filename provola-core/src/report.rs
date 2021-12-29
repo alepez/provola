@@ -42,7 +42,7 @@ pub struct TestSuite {
     pub name: Name,
     pub package: Option<Package>,
     pub skipped: Option<Count>,
-    pub testcases: Vec<TestCase>,
+    pub testcases: Vec<CoreTestCase>,
     /// The number of rules in the provider that were applied
     pub tests: Count,
     /// The time that was required to process the rules in the provider
@@ -51,7 +51,7 @@ pub struct TestSuite {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
-pub struct TestCase {
+pub struct CoreTestCase {
     // TODO error
     // TODO assertions
     // TODO skipped
