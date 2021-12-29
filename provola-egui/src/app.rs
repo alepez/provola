@@ -3,7 +3,9 @@ use crate::central_panel;
 use crossbeam_channel::select;
 use eframe::{egui, epi};
 use provola_core::test_runners::TestRunnerOpt;
-use provola_core::{AvailableTests, Language, Source, TestDataIn, TestDataOut, TestResult};
+use provola_core::{
+    AvailableTests, CoreReport, Language, Source, TestDataIn, TestDataOut, TestResult,
+};
 use provola_testrunners::TestRunnerInfo;
 use std::path::PathBuf;
 use std::time::Duration;
@@ -191,7 +193,15 @@ impl epi::App for ProvolaGuiApp {
 
         // Central panel for test results
         CentralPanel::default().show(ctx, |ui| {
-            central_panel::show(ui, &self.state.last_result, &self.state.available_tests);
+            if let Some(test_result) = &self.state.last_result {
+                central_panel::show(ui, Some(test_result));
+            } else if let Some(available_tests) = &self.state.available_tests {
+                let report = CoreReport::from(available_tests);
+                let test_result = TestResult::from(report);
+                central_panel::show(ui, Some(&test_result));
+            } else {
+                central_panel::show(ui, None);
+            }
         });
 
         if new_config != self.config {

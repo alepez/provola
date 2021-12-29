@@ -1,5 +1,5 @@
 use provola_core::test_runners::TestRunnerOpt;
-use provola_core::{Error, Executable, CoreReport};
+use provola_core::{CoreReport, Error, Executable};
 use std::time::Duration;
 use subprocess::Popen;
 use subprocess::PopenConfig;

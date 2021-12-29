@@ -138,7 +138,10 @@ impl From<&AvailableTests> for CoreReport {
 
                 test_suite.testcases.push(test_case);
             }
+
+            report.testsuites.push(test_suite);
         }
+
         report
     }
 }
