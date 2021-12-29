@@ -91,34 +91,36 @@ impl std::fmt::Display for FullyQualifiedTestCaseId {
 }
 
 #[derive(Default, Debug)]
-pub struct AvailableTests(Vec<FullyQualifiedTestCase>);
+pub struct AvailableTests {
+    list: Vec<FullyQualifiedTestCase>,
+}
 
 impl AvailableTests {
     pub fn push(&mut self, test_suite: impl Into<String>, test_case: impl Into<String>) {
-        self.0
+        self.list
             .push(FullyQualifiedTestCase::from_test_suite_test_case(
                 test_suite, test_case,
             ));
     }
 
     pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
+        self.list.is_empty()
     }
 
     pub fn len(&self) -> usize {
-        self.0.len()
+        self.list.len()
     }
 
     pub fn iter(&self) -> std::slice::Iter<FullyQualifiedTestCase> {
-        self.0.iter()
+        self.list.iter()
     }
 
     pub fn enumerate(&self) -> Enumerate<std::slice::Iter<'_, FullyQualifiedTestCase>> {
-        self.0.iter().enumerate()
+        self.list.iter().enumerate()
     }
 
     pub fn get(&self, index: usize) -> Option<&FullyQualifiedTestCase> {
-        self.0.get(index)
+        self.list.get(index)
     }
 }
 
