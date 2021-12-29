@@ -73,7 +73,11 @@ impl ProvolaGuiApp {
                 state.last_result = Some(new_result);
             }
             FeedbackMessage::WatchedChanged => {
-                self.action_run_all();
+                // Avoid running all tests when watch is false.
+                // This is needed because watching thread may still be active.
+                if self.config.watch {
+                    self.action_run_all();
+                }
             }
         }
     }

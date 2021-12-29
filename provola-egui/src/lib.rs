@@ -86,6 +86,7 @@ impl Server {
 
                 if let Some(watch_path) = &setup.config.watch_path {
                     // FIXME Make this thread stoppable (when watch_path changes)
+                    // FIXME Start this thread even if watch_path is currently None
                     self.start_watch_thread(watch_path.clone());
                 }
 
@@ -126,6 +127,7 @@ impl Server {
             Watcher::try_from(watch_opt)
                 .unwrap()
                 .watch(&mut || {
+                    log::debug!("Watched change detected");
                     feedback_s.send(FeedbackMessage::WatchedChanged);
                 })
                 .unwrap();
