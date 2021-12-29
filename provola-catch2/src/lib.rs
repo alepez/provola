@@ -1,5 +1,5 @@
 use provola_core::test_runners::TestRunnerOpt;
-use provola_core::{Error, Executable, Report};
+use provola_core::{Error, Executable, CoreReport};
 use std::time::Duration;
 use subprocess::Popen;
 use subprocess::PopenConfig;
@@ -13,7 +13,7 @@ fn add_arguments(mut argv: Vec<String>) -> Vec<String> {
     argv
 }
 
-fn run_exec(executable: &Executable) -> Result<Report, Error> {
+fn run_exec(executable: &Executable) -> Result<CoreReport, Error> {
     let argv = add_arguments(executable.into());
 
     let mut p = Popen::create(
@@ -41,7 +41,7 @@ fn run_exec(executable: &Executable) -> Result<Report, Error> {
     if let Some(out) = out {
         let rep: report::Report =
             serde_xml_rs::from_str(&out).map_err(|e| Error::ReportParseError(Box::new(e)))?;
-        let core_rep = Report::from(rep);
+        let core_rep = CoreReport::from(rep);
         Ok(core_rep)
     } else {
         Err(Error::ReportUnavailable)

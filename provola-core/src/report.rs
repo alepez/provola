@@ -13,7 +13,7 @@ pub type FailureType = String;
 pub type Message = String;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
-pub struct Report {
+pub struct CoreReport {
     pub disabled: Option<Count>,
     pub errors: Option<Count>,
     /// The total number of rule violations

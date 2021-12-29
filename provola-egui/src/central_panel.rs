@@ -1,6 +1,6 @@
 use eframe::egui::*;
 use provola_core::test::xunit::FullyQualifiedTestCase;
-use provola_core::{AvailableTests, CoreFailure, Reason, Report, CoreTestCase, TestResult, CoreTestSuite};
+use provola_core::{AvailableTests, CoreFailure, Reason, CoreReport, CoreTestCase, TestResult, CoreTestSuite};
 
 pub fn show(
     ui: &mut Ui,
@@ -61,7 +61,7 @@ fn show_reason_not_expected(_ui: &mut Ui, _actual: &str, _expected: &str) {
     // TODO
 }
 
-fn show_reason_report(ui: &mut Ui, report: &Report) {
+fn show_reason_report(ui: &mut Ui, report: &CoreReport) {
     if let Some(_name) = &report.name {
         // log::debug!("report: {}", &name);
     }

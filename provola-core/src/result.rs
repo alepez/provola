@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::Report;
+use crate::CoreReport;
 
 #[derive(Debug)]
 pub enum TestResult {
@@ -13,7 +13,7 @@ pub enum Reason {
     Unknown,
     Generic(String),
     NotExpected { actual: String, expected: String },
-    Report(Report),
+    Report(CoreReport),
 }
 
 impl From<String> for Reason {
@@ -29,13 +29,13 @@ impl Reason {
         Reason::NotExpected { actual, expected }
     }
 
-    fn from_report(report: Report) -> Self {
+    fn from_report(report: CoreReport) -> Self {
         Reason::Report(report)
     }
 }
 
-impl From<Report> for TestResult {
-    fn from(x: Report) -> Self {
+impl From<CoreReport> for TestResult {
+    fn from(x: CoreReport) -> Self {
         let failures = x.failures.unwrap_or(0);
         let reason = Reason::from_report(x);
         if failures == 0 {

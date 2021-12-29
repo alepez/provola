@@ -1,5 +1,5 @@
 use provola_core::test_runners::{Only, TestRunnerOpt};
-use provola_core::{AvailableTests, Error, Executable, Report};
+use provola_core::{AvailableTests, Error, Executable, CoreReport};
 use std::fs::File;
 use std::io::BufReader;
 use std::time::Duration;
@@ -89,7 +89,7 @@ fn generate_available_tests(executable: &Executable) -> Result<AvailableTests, E
     parse_available_tests(&out)
 }
 
-fn generate_report(executable: &Executable, test_filter: &TestFilter) -> Result<Report, Error> {
+fn generate_report(executable: &Executable, test_filter: &TestFilter) -> Result<CoreReport, Error> {
     let report_path = "googletest_report.json";
     let executable = executable.into();
 
@@ -104,7 +104,7 @@ fn generate_report(executable: &Executable, test_filter: &TestFilter) -> Result<
     let file = File::open(report_path).unwrap();
     let reader = BufReader::new(file);
     let gtest_rep: report::UnitTest = serde_json::from_reader(reader).unwrap();
-    let core_rep = Report::from(gtest_rep);
+    let core_rep = CoreReport::from(gtest_rep);
     Ok(core_rep)
 }
 
@@ -133,7 +133,7 @@ fn make_test_filter(opt: &TestRunnerOpt, tests: &AvailableTests) -> Result<TestF
 }
 
 impl TestRunner {
-    fn generate_report(&self, opt: &TestRunnerOpt) -> Result<Report, Error> {
+    fn generate_report(&self, opt: &TestRunnerOpt) -> Result<CoreReport, Error> {
         let test_filter = make_test_filter(opt, &self.available_tests);
         generate_report(&self.executable, &test_filter?)
     }

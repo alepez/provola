@@ -18,7 +18,7 @@ pub use errors::Error;
 pub use exec::Executable;
 pub use lang::Language;
 pub use report::CoreFailure;
-pub use report::Report;
+pub use report::CoreReport;
 pub use report::CoreTestCase;
 pub use report::CoreTestSuite;
 pub use reporter::Error as ReporterError;
