@@ -19,7 +19,9 @@ pub fn make_test_runner(info: TestRunnerInfo) -> Result<Box<dyn TestRunner>, Err
     }
 }
 
-#[derive(Debug, EnumString, Clone, Copy, Display, serde::Deserialize, serde::Serialize, PartialEq, Eq)]
+#[derive(
+    Debug, EnumString, Clone, Copy, Display, serde::Deserialize, serde::Serialize, PartialEq, Eq,
+)]
 pub enum TestRunnerType {
     #[cfg(feature = "googletest")]
     GoogleTest,

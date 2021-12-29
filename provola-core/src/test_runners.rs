@@ -128,7 +128,9 @@ impl AvailableTests {
         self.list.get(index)
     }
 
-    pub fn test_suites(&self) -> std::collections::btree_map::Iter<TestSuite, Vec<FullyQualifiedTestCase>> {
+    pub fn test_suites(
+        &self,
+    ) -> std::collections::btree_map::Iter<TestSuite, Vec<FullyQualifiedTestCase>> {
         self.map.iter()
     }
 }
