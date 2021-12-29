@@ -1,6 +1,7 @@
 use crate::{Error, TestResult};
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::DefaultHasher;
+use std::collections::BTreeMap;
 use std::hash::{Hash, Hasher};
 use std::iter::Enumerate;
 use strum_macros::Display;
@@ -23,13 +24,13 @@ pub enum TestRunnerFeature {
     List,
 }
 
-#[derive(Debug, Hash)]
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct TestSuite(pub String);
 
-#[derive(Debug, Hash)]
+#[derive(Debug, Hash, Clone)]
 pub struct TestCase(pub String);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FullyQualifiedTestCase {
     pub test_suite: TestSuite,
     pub test_case: TestCase,
@@ -81,7 +82,7 @@ impl std::fmt::Display for FullyQualifiedTestCase {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct FullyQualifiedTestCaseId(u64);
 
 impl std::fmt::Display for FullyQualifiedTestCaseId {
@@ -93,14 +94,18 @@ impl std::fmt::Display for FullyQualifiedTestCaseId {
 #[derive(Default, Debug)]
 pub struct AvailableTests {
     list: Vec<FullyQualifiedTestCase>,
+    map: BTreeMap<TestSuite, Vec<FullyQualifiedTestCase>>,
 }
 
 impl AvailableTests {
     pub fn push(&mut self, test_suite: impl Into<String>, test_case: impl Into<String>) {
-        self.list
-            .push(FullyQualifiedTestCase::from_test_suite_test_case(
-                test_suite, test_case,
-            ));
+        // TODO Optimization: prevent clone
+        let fqtc = FullyQualifiedTestCase::from_test_suite_test_case(test_suite, test_case);
+        self.list.push(fqtc.clone());
+        self.map
+            .entry(fqtc.test_suite.clone())
+            .or_insert(Vec::default())
+            .push(fqtc);
     }
 
     pub fn is_empty(&self) -> bool {
