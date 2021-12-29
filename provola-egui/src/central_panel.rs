@@ -1,8 +1,6 @@
 use eframe::egui::*;
-use provola_core::{
-    test_runners::FullyQualifiedTestCase, AvailableTests, Failure, Reason, Report, TestCase,
-    TestResult, TestSuite,
-};
+use provola_core::test::xunit::FullyQualifiedTestCase;
+use provola_core::{AvailableTests, Failure, Reason, Report, TestCase, TestResult, TestSuite};
 
 pub fn show(
     ui: &mut Ui,
@@ -118,7 +116,7 @@ fn show_available_tests(ui: &mut Ui, available_tests: &AvailableTests) {
 fn show_available_test_suite(
     ui: &mut Ui,
     t: (
-        &provola_core::test_runners::TestSuite,
+        &provola_core::test::xunit::TestSuite,
         &std::vec::Vec<FullyQualifiedTestCase>,
     ),
 ) {

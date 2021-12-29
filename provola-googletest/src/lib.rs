@@ -1,5 +1,5 @@
-use provola_core::test_runners::{AvailableTests, Only, TestRunnerOpt};
-use provola_core::{Error, Executable, Report};
+use provola_core::test_runners::{Only, TestRunnerOpt};
+use provola_core::{AvailableTests, Error, Executable, Report};
 use std::fs::File;
 use std::io::BufReader;
 use std::time::Duration;
