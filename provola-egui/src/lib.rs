@@ -95,24 +95,30 @@ impl Server {
 
                 self.opt = Some(setup.config);
 
-                // TODO Give a feedback if get_available_tests return an error
-                self.get_available_tests().ok();
+                self.get_available_tests()
+                    .map_err(|e| self.send_error_feedback(e))
+                    .ok();
             }
             ActionMessage::RunAll => {
-                // TODO Give a feedback if run_once return an error
-                self.run_once().ok();
+                self.run_once()
+                    .map_err(|e| self.send_error_feedback(e))
+                    .ok();
             }
             ActionMessage::UpdateConfig(new_config) => {
                 log::debug!("Configuration changed");
                 self.opt = Some(new_config);
             }
             ActionMessage::ReqAvailableTests => {
-                // TODO Give a feedback if get_available_tests return an error
-                if let Err(err) = self.get_available_tests() {
-                    log::error!("{}", err);
-                }
+                self.get_available_tests()
+                    .map_err(|e| self.send_error_feedback(e))
+                    .ok();
             }
         }
+    }
+
+    fn send_error_feedback(&self, err: impl ToString) {
+        self.feedback_s
+            .send(FeedbackMessage::Error(err.to_string()));
     }
 
     fn run(&mut self) {
@@ -169,17 +175,9 @@ impl Server {
         let list = match action {
             Action::TestRunner(tr, opt) => Ok(tr.list(&opt)?),
             _ => Err(Error::NothingToDo),
-        };
+        }?;
 
-        match list {
-            Ok(list) => {
-                self.feedback_s.send(FeedbackMessage::AvailableTests(list));
-            }
-            Err(err) => {
-                self.feedback_s
-                    .send(FeedbackMessage::Error(err.to_string()));
-            }
-        };
+        self.feedback_s.send(FeedbackMessage::AvailableTests(list));
 
         Ok(())
     }
