@@ -182,7 +182,7 @@ impl epi::App for ProvolaGuiApp {
         });
 
         if new_config != self.config {
-            log::info!("Configuration changed!");
+            self.send(ActionMessage::UpdateConfig(self.config.clone()));
             self.config = new_config;
         }
     }

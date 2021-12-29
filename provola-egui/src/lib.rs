@@ -16,6 +16,7 @@ struct Setup {
 enum ActionMessage {
     Setup(Setup),
     RunAll,
+    UpdateConfig(GuiConfig),
 }
 
 enum FeedbackMessage {
@@ -95,6 +96,10 @@ impl Server {
             ActionMessage::RunAll => {
                 // TODO Give a feedback if run_once return an error
                 self.run_once().ok();
+            }
+            ActionMessage::UpdateConfig(new_config) => {
+                log::debug!("Configuration changed");
+                self.opt = Some(new_config);
             }
         }
     }
