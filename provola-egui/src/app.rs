@@ -79,6 +79,9 @@ impl ProvolaGuiApp {
                     self.action_run_all();
                 }
             }
+            FeedbackMessage::Error(_error) => {
+                // TODO Show error
+            }
         }
     }
 
@@ -97,6 +100,12 @@ impl ProvolaGuiApp {
     fn action_run_all(&mut self) {
         self.state.last_result = None;
         self.send(ActionMessage::RunAll);
+    }
+
+    fn action_req_available_tests(&mut self) {
+        self.state.last_result = None;
+        self.state.available_tests = None;
+        self.send(ActionMessage::ReqAvailableTests);
     }
 
     fn action_setup(&mut self, frame: &mut epi::Frame<'_>) {
@@ -171,6 +180,10 @@ impl epi::App for ProvolaGuiApp {
 
             if ui.button("Run all").clicked() {
                 self.action_run_all();
+            }
+
+            if ui.button("Scan").clicked() {
+                self.action_req_available_tests();
             }
 
             ui.checkbox(&mut new_config.watch, "Watch");

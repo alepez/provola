@@ -17,12 +17,14 @@ enum ActionMessage {
     Setup(Setup),
     RunAll,
     UpdateConfig(GuiConfig),
+    ReqAvailableTests,
 }
 
 enum FeedbackMessage {
     AvailableTests(AvailableTests),
     Result(TestResult),
     WatchedChanged,
+    Error(String),
 }
 
 type ActionSender = Sender<ActionMessage>;
@@ -101,6 +103,11 @@ impl Server {
                 log::debug!("Configuration changed");
                 self.opt = Some(new_config);
             }
+            ActionMessage::ReqAvailableTests => {
+                if let Err(err) = self.get_available_tests() {
+                    log::error!("{}", err);
+                }
+            }
         }
     }
 
@@ -146,6 +153,28 @@ impl Server {
         let result = action.run()?;
 
         self.feedback_s.send(FeedbackMessage::Result(result));
+
+        Ok(())
+    }
+
+    fn get_available_tests(&self) -> Result<(), Error> {
+        let opt = self.opt.as_ref().ok_or(Error::NoResult)?;
+
+        let action = Action::try_from(opt)?;
+
+        let list = match action {
+            Action::TestRunner(tr, opt) => Ok(tr.list(&opt)?),
+            _ => Err(Error::NothingToDo),
+        };
+
+        match list {
+            Ok(list) => {
+                self.feedback_s.send(FeedbackMessage::AvailableTests(list));
+            }
+            Err(err) => {
+                self.feedback_s.send(FeedbackMessage::Error(err.to_string()));
+            }
+        };
 
         Ok(())
     }
