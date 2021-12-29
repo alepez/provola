@@ -106,9 +106,14 @@ impl From<TestCase> for CoreTestSuite {
 
 impl From<TestInfo> for CoreTestCase {
     fn from(x: TestInfo) -> Self {
+        let status = match x.status {
+            Status::Run => Some(String::from("Run")),
+            Status::NotRun => None,
+        };
+
         CoreTestCase {
             name: x.name,
-            status: None, // TODO Convert to string, but to which format? Some(x.status),
+            status,
             time: parse_duration(&x.time),
             failures: x.failures.into_iter().map(|x| x.into()).collect(),
             ..Default::default()
