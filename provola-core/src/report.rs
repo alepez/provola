@@ -22,14 +22,14 @@ pub struct Report {
     pub name: Option<Name>,
     /// The total number of rules that were applied
     pub tests: Option<Count>,
-    pub testsuites: Vec<TestSuite>,
+    pub testsuites: Vec<CoreTestSuite>,
     /// The time that was required to process all the rules
     pub time: Option<Duration>,
     pub timestamp: Option<Timestamp>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
-pub struct TestSuite {
+pub struct CoreTestSuite {
     // TODO properties
     // TODO system-err
     // TODO system-out

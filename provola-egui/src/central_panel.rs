@@ -1,6 +1,6 @@
 use eframe::egui::*;
 use provola_core::test::xunit::FullyQualifiedTestCase;
-use provola_core::{AvailableTests, CoreFailure, Reason, Report, CoreTestCase, TestResult, TestSuite};
+use provola_core::{AvailableTests, CoreFailure, Reason, Report, CoreTestCase, TestResult, CoreTestSuite};
 
 pub fn show(
     ui: &mut Ui,
@@ -76,7 +76,7 @@ fn symbol_and_name(ok: bool, name: &str) -> String {
     format!("{} {}", symbol, name)
 }
 
-fn show_testsuite(ui: &mut Ui, testsuite: &TestSuite) {
+fn show_testsuite(ui: &mut Ui, testsuite: &CoreTestSuite) {
     let ok = testsuite.failures.unwrap_or(0) == 0;
     let name = symbol_and_name(ok, &testsuite.name);
 

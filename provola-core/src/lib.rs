@@ -20,7 +20,7 @@ pub use lang::Language;
 pub use report::CoreFailure;
 pub use report::Report;
 pub use report::CoreTestCase;
-pub use report::TestSuite;
+pub use report::CoreTestSuite;
 pub use reporter::Error as ReporterError;
 pub use reporter::Reporter;
 pub use result::Reason;

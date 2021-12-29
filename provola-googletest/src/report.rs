@@ -1,7 +1,7 @@
 use provola_core::CoreFailure as CoreFailure;
 use provola_core::Report as CoreReport;
 use provola_core::CoreTestCase as CoreTestCase;
-use provola_core::TestSuite as CoreTestSuite;
+use provola_core::CoreTestSuite as CoreTestSuite;
 use serde::{Deserialize, Serialize};
 
 type Duration = String;
