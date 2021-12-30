@@ -125,7 +125,10 @@ fn show_testcase_with_failures(ui: &mut Ui, testcase: &CoreTestCase) {
 fn show_testcase_without_failures(ui: &mut Ui, testcase: &CoreTestCase) {
     let status = testcase.status;
     let name = symbol_and_name(status, &testcase.name);
-    ui.add(Label::new(name));
+
+    CollapsingHeader::new(name)
+        .default_open(false)
+        .show(ui, |_ui| {});
 }
 
 fn show_failure(ui: &mut Ui, failure: &CoreFailure) {
