@@ -162,15 +162,14 @@ impl epi::App for ProvolaGuiApp {
                     }
                 });
                 menu::menu_button(ui, "Help", |ui| {
-                    warn_if_debug_build(ui);
-                    ui.add(
-                        Hyperlink::from_label_and_url(
-                            RichText::new("About this project").small(),
-                            "https://github.com/alepez/provola",
-                        )
-                    )
+                    ui.add(Hyperlink::from_label_and_url(
+                        RichText::new("About this project"),
+                        "https://github.com/alepez/provola",
+                    ))
                 });
             });
+
+            warn_if_debug_build(ui);
         });
 
         // Side panel for global actions and feedbacks
