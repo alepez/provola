@@ -1,29 +1,14 @@
-use super::{ActionMessage, ActionSender, FeedbackMessage, FeedbackReceiver};
+use super::{ActionMessage, ActionSender, FeedbackMessage, FeedbackReceiver, GuiConfig};
 use crate::central_panel;
 use crossbeam_channel::select;
 use eframe::egui::Color32;
 use eframe::{egui, epi};
 use egui::*;
 use provola_core::test_runners::TestRunnerOpt;
-use provola_core::{
-    AvailableTests, CoreReport, Language, Source, TestDataIn, TestDataOut, TestResult,
-};
+use provola_core::*;
 use provola_testrunners::TestRunnerInfo;
 use std::path::PathBuf;
 use std::time::Duration;
-
-#[derive(serde::Deserialize, serde::Serialize, Clone, Debug, PartialEq, Eq)]
-pub enum ActionConfig {
-    BuildTestInputOutput(Language, Source, TestDataIn, TestDataOut),
-    TestRunner(TestRunnerInfo, TestRunnerOpt),
-}
-
-#[derive(serde::Deserialize, serde::Serialize, Default, Clone, Debug, PartialEq, Eq)]
-pub struct GuiConfig {
-    pub watch_path: Option<PathBuf>,
-    pub watch: bool,
-    pub action: Option<ActionConfig>,
-}
 
 #[derive(Default)]
 pub struct State {

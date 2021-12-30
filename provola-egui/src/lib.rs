@@ -2,12 +2,21 @@ mod app;
 mod central_panel;
 mod server;
 
-pub use crate::app::{ActionConfig, GuiConfig, ProvolaGuiApp};
+pub use crate::app::ProvolaGuiApp;
 use crate::server::Server;
+use crossbeam_channel::select;
 use crossbeam_channel::{bounded, Receiver, Sender};
+use eframe::egui::Color32;
 use eframe::epi::backend::RepaintSignal;
+use eframe::{egui, epi};
+use egui::*;
+use provola_core::test_runners::TestRunnerOpt;
+use provola_core::*;
 use provola_core::{Action, AvailableTests, Error, TestResult};
 use provola_testrunners::make_test_runner;
+use provola_testrunners::TestRunnerInfo;
+use std::path::PathBuf;
+use std::time::Duration;
 use std::{sync::Arc, thread};
 
 struct Setup {
@@ -74,6 +83,19 @@ pub fn run(opt: GuiConfig) -> Result<(), Error> {
     let native_options = eframe::NativeOptions::default();
 
     eframe::run_native(Box::new(app), native_options)
+}
+
+#[derive(serde::Deserialize, serde::Serialize, Clone, Debug, PartialEq, Eq)]
+pub enum ActionConfig {
+    BuildTestInputOutput(Language, Source, TestDataIn, TestDataOut),
+    TestRunner(TestRunnerInfo, TestRunnerOpt),
+}
+
+#[derive(serde::Deserialize, serde::Serialize, Default, Clone, Debug, PartialEq, Eq)]
+pub struct GuiConfig {
+    pub watch_path: Option<PathBuf>,
+    pub watch: bool,
+    pub action: Option<ActionConfig>,
 }
 
 impl TryFrom<&GuiConfig> for Action {

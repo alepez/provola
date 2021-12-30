@@ -1,4 +1,4 @@
-pub use crate::app::{ActionConfig, GuiConfig, ProvolaGuiApp};
+use crate::{ActionConfig, GuiConfig, ProvolaGuiApp};
 use crate::*;
 use crossbeam_channel::select;
 use provola_core::{Action, Error, WatchOptions, Watcher};
