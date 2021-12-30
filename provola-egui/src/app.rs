@@ -183,37 +183,30 @@ impl epi::App for ProvolaGuiApp {
 
         // Side panel for global actions and feedbacks
         SidePanel::left("side_panel").show(ctx, |ui| {
-            let result_str = match self.state.last_result {
-                None => "-",
-                Some(TestResult::Pass(_)) => "PASS",
-                Some(TestResult::Fail(_)) => "FAIL",
-            };
+            ui.with_layout(Layout::top_down_justified(Align::Min), |ui| {
+                let result_str = match self.state.last_result {
+                    None => "-",
+                    Some(TestResult::Pass(_)) => "PASS",
+                    Some(TestResult::Fail(_)) => "FAIL",
+                };
 
-            let result_color = from_result_to_color(&self.state.last_result);
+                let result_color = from_result_to_color(&self.state.last_result);
 
-            Grid::new("side_panel_grid")
-                .num_columns(1)
-                .spacing([40., 4.])
-                .striped(true)
-                .min_col_width(ui.available_width())
-                .show(ui, |ui| {
-                    let result_label = Label::new(RichText::new(result_str).color(result_color));
-                    ui.add(result_label);
-                    ui.end_row();
+                let result_text = RichText::new(result_str).color(result_color);
 
-                    if ui.button("Run all").clicked() {
-                        self.action_run_all();
-                    }
-                    ui.end_row();
+                let result_label = Label::new(result_text);
+                ui.add(result_label);
 
-                    if ui.button("Scan").clicked() {
-                        self.action_req_available_tests();
-                    }
-                    ui.end_row();
+                if ui.button("Run all").clicked() {
+                    self.action_run_all();
+                }
 
-                    ui.checkbox(&mut new_config.watch, "Watch");
-                    ui.end_row();
-                });
+                if ui.button("Scan").clicked() {
+                    self.action_req_available_tests();
+                }
+
+                ui.checkbox(&mut new_config.watch, "Watch");
+            });
         });
 
         // Central panel for test results
