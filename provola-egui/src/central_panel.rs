@@ -64,7 +64,7 @@ fn show_reason_report(ui: &mut Ui, report: &CoreReport) {
     }
 }
 
-fn symbol(status: CoreStatus) -> &'static str {
+fn from_status_to_symbol(status: CoreStatus) -> &'static str {
     match status {
         CoreStatus::Pass => "✔",
         CoreStatus::Fail => "✖",
@@ -72,15 +72,25 @@ fn symbol(status: CoreStatus) -> &'static str {
     }
 }
 
-fn symbol_and_name(ok: CoreStatus, name: &str) -> String {
-    format!("{} {}", symbol(ok), name)
+fn from_status_to_color(status: CoreStatus) -> Color32 {
+    match status {
+        CoreStatus::Pass => Color32::GREEN,
+        CoreStatus::Fail => Color32::RED,
+        _ => Color32::LIGHT_GRAY,
+    }
+}
+
+fn symbol_and_name(ok: CoreStatus, name: &str) -> RichText {
+    let text = format!("{} {}", from_status_to_symbol(ok), name);
+    let color = from_status_to_color(ok);
+    RichText::new(text).color(color)
 }
 
 fn show_testsuite(ui: &mut Ui, testsuite: &CoreTestSuite) {
     let ok = testsuite.failures.map(|x| x == 0);
     let name = symbol_and_name(ok.into(), &testsuite.name);
 
-    CollapsingHeader::new(&name)
+    CollapsingHeader::new(name)
         .default_open(true)
         .show(ui, |ui| {
             for testcase in &testsuite.testcases {
@@ -102,7 +112,8 @@ fn show_testcase(ui: &mut Ui, testcase: &CoreTestCase) {
 fn show_testcase_with_failures(ui: &mut Ui, testcase: &CoreTestCase) {
     let status = testcase.status;
     let name = symbol_and_name(status, &testcase.name);
-    CollapsingHeader::new(&name)
+
+    CollapsingHeader::new(name)
         .default_open(true)
         .show(ui, |ui| {
             for failure in &testcase.failures {
@@ -114,7 +125,7 @@ fn show_testcase_with_failures(ui: &mut Ui, testcase: &CoreTestCase) {
 fn show_testcase_without_failures(ui: &mut Ui, testcase: &CoreTestCase) {
     let status = testcase.status;
     let name = symbol_and_name(status, &testcase.name);
-    ui.add(Label::new(&name));
+    ui.add(Label::new(name));
 }
 
 fn show_failure(ui: &mut Ui, failure: &CoreFailure) {
