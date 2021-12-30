@@ -135,6 +135,7 @@ impl From<&AvailableTests> for CoreReport {
 
                 let test_case = CoreTestCase {
                     name,
+                    fqtc: Some(fqtc.id),
                     ..Default::default()
                 };
 
