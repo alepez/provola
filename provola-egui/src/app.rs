@@ -3,6 +3,7 @@ use crate::central_panel;
 use crossbeam_channel::select;
 use eframe::egui::Color32;
 use eframe::{egui, epi};
+use egui::*;
 use provola_core::test_runners::TestRunnerOpt;
 use provola_core::{
     AvailableTests, CoreReport, Language, Source, TestDataIn, TestDataOut, TestResult,
@@ -125,14 +126,6 @@ impl ProvolaGuiApp {
     }
 }
 
-fn from_result_to_color(result: &Option<TestResult>) -> Color32 {
-    match result {
-        None => Color32::LIGHT_GRAY,
-        Some(TestResult::Pass(_)) => Color32::GREEN,
-        Some(TestResult::Fail(_)) => Color32::RED,
-    }
-}
-
 impl epi::App for ProvolaGuiApp {
     fn name(&self) -> &str {
         "Provola"
@@ -156,8 +149,6 @@ impl epi::App for ProvolaGuiApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::CtxRef, frame: &epi::Frame) {
-        use egui::*;
-
         self.handle_messages();
 
         let mut new_config = self.config.clone();
@@ -184,18 +175,7 @@ impl epi::App for ProvolaGuiApp {
         // Side panel for global actions and feedbacks
         SidePanel::left("side_panel").show(ctx, |ui| {
             ui.with_layout(Layout::top_down_justified(Align::Min), |ui| {
-                let result_str = match self.state.last_result {
-                    None => "-",
-                    Some(TestResult::Pass(_)) => "PASS",
-                    Some(TestResult::Fail(_)) => "FAIL",
-                };
-
-                let result_color = from_result_to_color(&self.state.last_result);
-
-                let result_text = RichText::new(result_str).color(result_color);
-
-                let result_label = Label::new(result_text);
-                ui.add(result_label);
+                result_info(ui, &self.state.last_result);
 
                 if ui.button("Run all").clicked() {
                     self.action_run_all();
@@ -238,5 +218,30 @@ impl ProvolaGuiApp {
             s,
             r,
         }
+    }
+}
+
+fn result_info(ui: &mut Ui, result: &Option<TestResult>) -> Response {
+    let text = text_from_result(result);
+    let color = color_from_result(result);
+    let rich_text = RichText::new(text).color(color);
+    let label = Label::new(rich_text);
+
+    ui.add(label)
+}
+
+fn color_from_result(result: &Option<TestResult>) -> Color32 {
+    match result {
+        None => Color32::LIGHT_GRAY,
+        Some(TestResult::Pass(_)) => Color32::GREEN,
+        Some(TestResult::Fail(_)) => Color32::RED,
+    }
+}
+
+fn text_from_result(result: &Option<TestResult>) -> &'static str {
+    match result {
+        None => "-",
+        Some(TestResult::Pass(_)) => "PASS",
+        Some(TestResult::Fail(_)) => "FAIL",
     }
 }
