@@ -126,9 +126,16 @@ fn show_testcase_without_failures(ui: &mut Ui, testcase: &CoreTestCase) {
     let status = testcase.status;
     let name = symbol_and_name(status, &testcase.name);
 
-    CollapsingHeader::new(name)
+    let res = CollapsingHeader::new(name)
         .default_open(false)
         .show(ui, |_ui| {});
+
+    res.header_response.context_menu(|ui| {
+        if ui.button("Enable only this").clicked() {
+            log::info!("Enable only test {}", testcase.fqtc.unwrap());
+            ui.close_menu();
+        }
+    });
 }
 
 fn show_failure(ui: &mut Ui, failure: &CoreFailure) {
