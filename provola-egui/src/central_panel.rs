@@ -90,10 +90,18 @@ fn show_testsuite(ui: &mut Ui, testsuite: &CoreTestSuite) {
 }
 
 fn show_testcase(ui: &mut Ui, testcase: &CoreTestCase) {
+    let has_failures = !testcase.failures.is_empty();
+
+    if has_failures {
+        show_testcase_with_failures(ui, testcase);
+    } else {
+        show_testcase_without_failures(ui, testcase);
+    }
+}
+
+fn show_testcase_with_failures(ui: &mut Ui, testcase: &CoreTestCase) {
     let status = testcase.status;
-
     let name = symbol_and_name(status, &testcase.name);
-
     CollapsingHeader::new(&name)
         .default_open(true)
         .show(ui, |ui| {
@@ -101,6 +109,12 @@ fn show_testcase(ui: &mut Ui, testcase: &CoreTestCase) {
                 show_failure(ui, failure);
             }
         });
+}
+
+fn show_testcase_without_failures(ui: &mut Ui, testcase: &CoreTestCase) {
+    let status = testcase.status;
+    let name = symbol_and_name(status, &testcase.name);
+    ui.add(Label::new(&name));
 }
 
 fn show_failure(ui: &mut Ui, failure: &CoreFailure) {
