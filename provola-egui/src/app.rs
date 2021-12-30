@@ -1,6 +1,7 @@
 use super::{ActionMessage, ActionSender, FeedbackMessage, FeedbackReceiver};
 use crate::central_panel;
 use crossbeam_channel::select;
+use eframe::egui::Color32;
 use eframe::{egui, epi};
 use provola_core::test_runners::TestRunnerOpt;
 use provola_core::{
@@ -124,6 +125,14 @@ impl ProvolaGuiApp {
     }
 }
 
+fn from_result_to_color(result: &Option<TestResult>) -> Color32 {
+    match result {
+        None => Color32::LIGHT_GRAY,
+        Some(TestResult::Pass(_)) => Color32::GREEN,
+        Some(TestResult::Fail(_)) => Color32::RED,
+    }
+}
+
 impl epi::App for ProvolaGuiApp {
     fn name(&self) -> &str {
         "Provola"
@@ -180,17 +189,31 @@ impl epi::App for ProvolaGuiApp {
                 Some(TestResult::Fail(_)) => "FAIL",
             };
 
-            ui.strong(result_str);
+            let result_color = from_result_to_color(&self.state.last_result);
 
-            if ui.button("Run all").clicked() {
-                self.action_run_all();
-            }
+            Grid::new("side_panel_grid")
+                .num_columns(1)
+                .spacing([40., 4.])
+                .striped(true)
+                .min_col_width(ui.available_width())
+                .show(ui, |ui| {
+                    let result_label = Label::new(RichText::new(result_str).color(result_color));
+                    ui.add(result_label);
+                    ui.end_row();
 
-            if ui.button("Scan").clicked() {
-                self.action_req_available_tests();
-            }
+                    if ui.button("Run all").clicked() {
+                        self.action_run_all();
+                    }
+                    ui.end_row();
 
-            ui.checkbox(&mut new_config.watch, "Watch");
+                    if ui.button("Scan").clicked() {
+                        self.action_req_available_tests();
+                    }
+                    ui.end_row();
+
+                    ui.checkbox(&mut new_config.watch, "Watch");
+                    ui.end_row();
+                });
         });
 
         // Central panel for test results

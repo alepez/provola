@@ -64,7 +64,7 @@ fn show_reason_report(ui: &mut Ui, report: &CoreReport) {
     }
 }
 
-fn from_status_to_symbol(status: CoreStatus) -> &'static str {
+fn symbol(status: CoreStatus) -> &'static str {
     match status {
         CoreStatus::Pass => "✔",
         CoreStatus::Fail => "✖",
@@ -81,7 +81,7 @@ fn from_status_to_color(status: CoreStatus) -> Color32 {
 }
 
 fn symbol_and_name(ok: CoreStatus, name: &str) -> RichText {
-    let text = format!("{} {}", from_status_to_symbol(ok), name);
+    let text = format!("{} {}", symbol(ok), name);
     let color = from_status_to_color(ok);
     RichText::new(text).color(color)
 }
