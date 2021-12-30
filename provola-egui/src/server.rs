@@ -11,6 +11,14 @@ pub(crate) struct Server {
 }
 
 impl Server {
+    pub(crate) fn new(action_r: ActionReceiver, feedback_s: FeedbackSender) -> Self {
+        Server {
+            opt: None,
+            action_r,
+            feedback_s,
+        }
+    }
+
     fn handle_message(&mut self, msg: ActionMessage) {
         match msg {
             ActionMessage::Setup(setup) => {

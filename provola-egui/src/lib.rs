@@ -60,14 +60,12 @@ pub fn run(opt: GuiConfig) -> Result<(), Error> {
     let (action_s, action_r) = bounded(1000);
     let (feedback_s, feedback_r) = bounded(1000);
 
-    let mut server = Server {
-        opt: None,
-        action_r,
-        feedback_s: FeedbackSender {
-            sender: feedback_s,
-            repaint_signal: None,
-        },
+    let feedback_s = FeedbackSender {
+        sender: feedback_s,
+        repaint_signal: None,
     };
+
+    let mut server = Server::new(action_r, feedback_s);
 
     thread::spawn(move || {
         server.run();
