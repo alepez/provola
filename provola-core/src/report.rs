@@ -78,6 +78,7 @@ pub struct CoreTestSuite {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct CoreTestCase {
+    // TODO fqtc should not be an Option
     pub fqtc: Option<FullyQualifiedTestCaseId>,
     // TODO error
     // TODO assertions
