@@ -1,9 +1,10 @@
 ---
 source: provola-googletest/src/report.rs
+assertion_line: 174
 expression: "&report"
 
 ---
-Report {
+CoreReport {
     disabled: Some(
         0,
     ),
@@ -20,7 +21,7 @@ Report {
         4,
     ),
     testsuites: [
-        TestSuite {
+        CoreTestSuite {
             disabled: Some(
                 0,
             ),
@@ -36,24 +37,24 @@ Report {
             package: None,
             skipped: None,
             testcases: [
-                TestCase {
+                CoreTestCase {
                     classname: None,
                     name: "Foo1",
-                    status: None,
+                    status: Fail,
                     time: Some(
                         0ns,
                     ),
                     failures: [
-                        Failure {
+                        CoreFailure {
                             ttype: "",
                             message: "/home/pez/workspace/personal/provola-googletest/examples/data/src/tests.cpp:4\nValue of: true\n  Actual: true\nExpected: false",
                         },
                     ],
                 },
-                TestCase {
+                CoreTestCase {
                     classname: None,
                     name: "Foo2",
-                    status: None,
+                    status: Pass,
                     time: Some(
                         0ns,
                     ),
@@ -68,7 +69,7 @@ Report {
                 2021-12-05T23:54:55Z,
             ),
         },
-        TestSuite {
+        CoreTestSuite {
             disabled: Some(
                 0,
             ),
@@ -84,19 +85,19 @@ Report {
             package: None,
             skipped: None,
             testcases: [
-                TestCase {
+                CoreTestCase {
                     classname: None,
                     name: "Bar1",
-                    status: None,
+                    status: Pass,
                     time: Some(
                         0ns,
                     ),
                     failures: [],
                 },
-                TestCase {
+                CoreTestCase {
                     classname: None,
                     name: "Bar2",
-                    status: None,
+                    status: Pass,
                     time: Some(
                         0ns,
                     ),

@@ -1,9 +1,10 @@
 ---
 source: provola-catch2/src/report.rs
+assertion_line: 134
 expression: "&report"
 
 ---
-Report {
+CoreReport {
     disabled: None,
     errors: None,
     failures: Some(
@@ -12,7 +13,7 @@ Report {
     name: None,
     tests: None,
     testsuites: [
-        TestSuite {
+        CoreTestSuite {
             disabled: None,
             errors: None,
             failures: Some(
@@ -24,41 +25,35 @@ Report {
             package: None,
             skipped: None,
             testcases: [
-                TestCase {
+                CoreTestCase {
                     classname: Some(
                         "example.global",
                     ),
                     name: "Foo",
-                    status: Some(
-                        "run",
-                    ),
+                    status: Unknown,
                     time: None,
                     failures: [
-                        Failure {
+                        CoreFailure {
                             ttype: "REQUIRE",
                             message: "false",
                         },
                     ],
                 },
-                TestCase {
+                CoreTestCase {
                     classname: Some(
                         "example.Bar",
                     ),
                     name: "Bar1",
-                    status: Some(
-                        "run",
-                    ),
+                    status: Unknown,
                     time: None,
                     failures: [],
                 },
-                TestCase {
+                CoreTestCase {
                     classname: Some(
                         "example.Bar",
                     ),
                     name: "Bar2",
-                    status: Some(
-                        "run",
-                    ),
+                    status: Unknown,
                     time: None,
                     failures: [],
                 },
