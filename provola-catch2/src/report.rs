@@ -1,4 +1,5 @@
 use provola_core::report::CoreStatus;
+use provola_core::test::xunit::FullyQualifiedTestCase;
 use provola_core::CoreFailure;
 use provola_core::CoreReport;
 use provola_core::CoreTestCase;
@@ -33,6 +34,7 @@ impl Report {
 pub struct TestSuite {
     // // TODO system-err
     // // TODO system-out
+    pub name: String,
     #[serde(rename = "testcase", default)]
     pub testcases: Vec<TestCase>,
 }
@@ -51,6 +53,8 @@ pub struct TestCase {
     pub time: Duration,
     #[serde(rename = "failure", default)]
     pub failures: Vec<Failure>,
+    #[serde(skip)]
+    pub fqtc: Option<FullyQualifiedTestCase>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -72,10 +76,26 @@ impl From<Report> for CoreReport {
 }
 
 impl From<TestSuite> for CoreTestSuite {
-    fn from(x: TestSuite) -> Self {
-        let failures = Some(x.failures_count());
+    fn from(test_suite: TestSuite) -> Self {
+        let failures = Some(test_suite.failures_count());
+
+        let add_fqtc = |mut test_case: TestCase| {
+            let fqtc = FullyQualifiedTestCase::from_test_suite_test_case(
+                &test_suite.name,
+                &test_case.name,
+            );
+
+            test_case.fqtc = Some(fqtc);
+            test_case
+        };
+
         CoreTestSuite {
-            testcases: x.testcases.into_iter().map(|x| x.into()).collect(),
+            testcases: test_suite
+                .testcases
+                .into_iter()
+                .map(add_fqtc)
+                .map(CoreTestCase::from)
+                .collect(),
             failures,
             ..Default::default()
         }
@@ -95,6 +115,7 @@ impl From<TestCase> for CoreTestCase {
             status,
             time: parse_duration(&x.time),
             failures: x.failures.into_iter().map(|x| x.into()).collect(),
+            fqtc: x.fqtc.map(|x| x.id),
         }
     }
 }

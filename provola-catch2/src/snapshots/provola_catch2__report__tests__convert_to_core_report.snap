@@ -1,6 +1,6 @@
 ---
 source: provola-catch2/src/report.rs
-assertion_line: 134
+assertion_line: 155
 expression: "&report"
 
 ---
@@ -26,6 +26,11 @@ CoreReport {
             skipped: None,
             testcases: [
                 CoreTestCase {
+                    fqtc: Some(
+                        FullyQualifiedTestCaseId(
+                            4046575690509372253,
+                        ),
+                    ),
                     classname: Some(
                         "example.global",
                     ),
@@ -40,6 +45,11 @@ CoreReport {
                     ],
                 },
                 CoreTestCase {
+                    fqtc: Some(
+                        FullyQualifiedTestCaseId(
+                            4298635935099818779,
+                        ),
+                    ),
                     classname: Some(
                         "example.Bar",
                     ),
@@ -49,6 +59,11 @@ CoreReport {
                     failures: [],
                 },
                 CoreTestCase {
+                    fqtc: Some(
+                        FullyQualifiedTestCaseId(
+                            6961627989901352185,
+                        ),
+                    ),
                     classname: Some(
                         "example.Bar",
                     ),

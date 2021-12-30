@@ -1,11 +1,13 @@
 ---
 source: provola-catch2/src/report.rs
-expression: "&u"
+assertion_line: 148
+expression: "&report"
 
 ---
 Report {
     testsuites: [
         TestSuite {
+            name: "example",
             testcases: [
                 TestCase {
                     classname: "example.global",
@@ -18,6 +20,7 @@ Report {
                             message: "false",
                         },
                     ],
+                    fqtc: None,
                 },
                 TestCase {
                     classname: "example.Bar",
@@ -25,6 +28,7 @@ Report {
                     status: "run",
                     time: "0.000",
                     failures: [],
+                    fqtc: None,
                 },
                 TestCase {
                     classname: "example.Bar",
@@ -32,6 +36,7 @@ Report {
                     status: "run",
                     time: "0.000",
                     failures: [],
+                    fqtc: None,
                 },
             ],
         },

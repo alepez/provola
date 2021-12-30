@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::test::xunit::FullyQualifiedTestCaseId;
+
 pub type Timestamp = chrono::DateTime<chrono::Utc>;
 pub type Duration = std::time::Duration;
 pub type Count = usize;
@@ -76,6 +78,7 @@ pub struct CoreTestSuite {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct CoreTestCase {
+    pub fqtc: Option<FullyQualifiedTestCaseId>,
     // TODO error
     // TODO assertions
     // TODO skipped

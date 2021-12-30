@@ -3,6 +3,8 @@ use std::collections::BTreeMap;
 use std::hash::{Hash, Hasher};
 use std::iter::Enumerate;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{CoreReport, CoreTestCase, CoreTestSuite};
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone)]
@@ -49,7 +51,7 @@ impl FullyQualifiedTestCase {
     }
 }
 
-fn calculate_id(test_suite: &TestSuite, test_case: &TestCase) -> FullyQualifiedTestCaseId {
+pub fn calculate_id(test_suite: &TestSuite, test_case: &TestCase) -> FullyQualifiedTestCaseId {
     let mut hasher = DefaultHasher::new();
     test_suite.hash(&mut hasher);
     test_case.hash(&mut hasher);
@@ -63,7 +65,7 @@ impl std::fmt::Display for FullyQualifiedTestCase {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub struct FullyQualifiedTestCaseId(u64);
 
 impl std::fmt::Display for FullyQualifiedTestCaseId {

@@ -38,6 +38,7 @@ CoreReport {
             skipped: None,
             testcases: [
                 CoreTestCase {
+                    fqtc: None,
                     classname: None,
                     name: "Foo1",
                     status: Fail,
@@ -52,6 +53,7 @@ CoreReport {
                     ],
                 },
                 CoreTestCase {
+                    fqtc: None,
                     classname: None,
                     name: "Foo2",
                     status: Pass,
@@ -86,6 +88,7 @@ CoreReport {
             skipped: None,
             testcases: [
                 CoreTestCase {
+                    fqtc: None,
                     classname: None,
                     name: "Bar1",
                     status: Pass,
@@ -95,6 +98,7 @@ CoreReport {
                     failures: [],
                 },
                 CoreTestCase {
+                    fqtc: None,
                     classname: None,
                     name: "Bar2",
                     status: Pass,
