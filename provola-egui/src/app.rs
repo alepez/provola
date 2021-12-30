@@ -110,12 +110,14 @@ impl ProvolaGuiApp {
         self.send(ActionMessage::ReqAvailableTests);
     }
 
-    fn action_setup(&mut self, frame: &mut epi::Frame<'_>) {
+    fn action_setup(&mut self, frame: &epi::Frame) {
         // This message is needed to setup the working thread, so it knows
         // how app is configured and how to request a UI repaint.
+        let frame_data = frame.lock();
+        let repaint_signal = frame_data.repaint_signal.clone();
         let setup = super::Setup {
             config: self.config.clone(),
-            repaint_signal: frame.repaint_signal(),
+            repaint_signal,
         };
 
         self.send(ActionMessage::Setup(setup));
@@ -131,7 +133,7 @@ impl epi::App for ProvolaGuiApp {
     fn setup(
         &mut self,
         _ctx: &egui::CtxRef,
-        frame: &mut epi::Frame<'_>,
+        frame: &epi::Frame,
         storage: Option<&dyn epi::Storage>,
     ) {
         self.resume_config(storage);
@@ -144,7 +146,7 @@ impl epi::App for ProvolaGuiApp {
     }
 
     /// Called each time the UI needs repainting, which may be many times per second.
-    fn update(&mut self, ctx: &egui::CtxRef, frame: &mut epi::Frame<'_>) {
+    fn update(&mut self, ctx: &egui::CtxRef, frame: &epi::Frame) {
         use egui::*;
 
         self.handle_messages();
@@ -154,17 +156,18 @@ impl epi::App for ProvolaGuiApp {
         // Top panel contains the main menu
         TopBottomPanel::top("top_panel").show(ctx, |ui| {
             menu::bar(ui, |ui| {
-                menu::menu(ui, "File", |ui| {
+                menu::menu_button(ui, "File", |ui| {
                     if ui.button("Quit").clicked() {
                         frame.quit();
                     }
                 });
-                menu::menu(ui, "Help", |ui| {
+                menu::menu_button(ui, "Help", |ui| {
                     warn_if_debug_build(ui);
                     ui.add(
-                        Hyperlink::new("https://github.com/alepez/provola")
-                            .text("About this project")
-                            .small(),
+                        Hyperlink::from_label_and_url(
+                            RichText::new("About this project").small(),
+                            "https://github.com/alepez/provola",
+                        )
                     )
                 });
             });

@@ -26,5 +26,5 @@ version = "0.1.8"
 path = "../provola-reporters"
 
 [dependencies.eframe]
-version = "0.15.0"
+version = "0.16"
 features = ["persistence"]
