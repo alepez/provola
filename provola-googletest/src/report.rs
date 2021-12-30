@@ -1,4 +1,6 @@
 use provola_core::report::CoreStatus;
+use provola_core::test::xunit::FullyQualifiedTestCase;
+use provola_core::test::xunit::FullyQualifiedTestCaseId;
 use provola_core::CoreFailure;
 use provola_core::CoreReport;
 use provola_core::CoreTestCase;
@@ -72,6 +74,8 @@ pub(crate) struct TestInfo {
     failures: Vec<Failure>,
     result: String,
     timestamp: Timestamp,
+    #[serde(skip)]
+    fqtc: Option<FullyQualifiedTestCaseId>,
 }
 
 impl From<UnitTest> for CoreReport {
@@ -91,13 +95,25 @@ impl From<UnitTest> for CoreReport {
 
 impl From<TestCase> for CoreTestSuite {
     fn from(x: TestCase) -> Self {
+        let add_fqtc = |mut test_info: TestInfo| {
+            let fqtc = FullyQualifiedTestCase::from_test_suite_test_case(&x.name, &test_info.name);
+
+            test_info.fqtc = Some(fqtc.id);
+            test_info
+        };
+
         CoreTestSuite {
-            name: x.name,
+            name: x.name.clone(),
             tests: x.tests,
             disabled: Some(x.disabled),
             errors: Some(x.errors),
             failures: Some(x.failures),
-            testcases: x.testsuite.into_iter().map(|x| x.into()).collect(),
+            testcases: x
+                .testsuite
+                .into_iter()
+                .map(add_fqtc)
+                .map(|x| x.into())
+                .collect(),
             time: parse_duration(&x.time),
             timestamp: Some(x.timestamp),
             ..Default::default()
@@ -123,6 +139,7 @@ impl From<TestInfo> for CoreTestCase {
             status,
             time: parse_duration(&x.time),
             failures: x.failures.into_iter().map(|x| x.into()).collect(),
+            fqtc: x.fqtc,
             ..Default::default()
         }
     }

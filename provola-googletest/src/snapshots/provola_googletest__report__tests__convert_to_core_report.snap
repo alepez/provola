@@ -1,6 +1,6 @@
 ---
 source: provola-googletest/src/report.rs
-assertion_line: 174
+assertion_line: 191
 expression: "&report"
 
 ---
@@ -38,7 +38,11 @@ CoreReport {
             skipped: None,
             testcases: [
                 CoreTestCase {
-                    fqtc: None,
+                    fqtc: Some(
+                        FullyQualifiedTestCaseId(
+                            8963711218677400845,
+                        ),
+                    ),
                     classname: None,
                     name: "Foo1",
                     status: Fail,
@@ -53,7 +57,11 @@ CoreReport {
                     ],
                 },
                 CoreTestCase {
-                    fqtc: None,
+                    fqtc: Some(
+                        FullyQualifiedTestCaseId(
+                            8172373706971880047,
+                        ),
+                    ),
                     classname: None,
                     name: "Foo2",
                     status: Pass,
@@ -88,7 +96,11 @@ CoreReport {
             skipped: None,
             testcases: [
                 CoreTestCase {
-                    fqtc: None,
+                    fqtc: Some(
+                        FullyQualifiedTestCaseId(
+                            1049647244553836656,
+                        ),
+                    ),
                     classname: None,
                     name: "Bar1",
                     status: Pass,
@@ -98,7 +110,11 @@ CoreReport {
                     failures: [],
                 },
                 CoreTestCase {
-                    fqtc: None,
+                    fqtc: Some(
+                        FullyQualifiedTestCaseId(
+                            2609436735268993511,
+                        ),
+                    ),
                     classname: None,
                     name: "Bar2",
                     status: Pass,
