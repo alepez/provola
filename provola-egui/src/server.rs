@@ -1,10 +1,10 @@
 pub use crate::app::{ActionConfig, GuiConfig, ProvolaGuiApp};
 use crate::*;
-use crossbeam_channel::{bounded, select, Receiver, Sender};
-use eframe::epi::backend::RepaintSignal;
-use provola_core::{Action, AvailableTests, Error, TestResult, WatchOptions, Watcher};
-use provola_testrunners::make_test_runner;
-use std::{path::PathBuf, sync::Arc, thread, time::Duration};
+use crossbeam_channel::select;
+
+use provola_core::{Action, Error, WatchOptions, Watcher};
+
+use std::{path::PathBuf, thread, time::Duration};
 
 pub(crate) struct Server {
     pub opt: Option<GuiConfig>,
