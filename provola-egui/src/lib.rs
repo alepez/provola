@@ -4,19 +4,14 @@ mod server;
 
 pub use crate::app::ProvolaGuiApp;
 use crate::server::Server;
-use crossbeam_channel::select;
 use crossbeam_channel::{bounded, Receiver, Sender};
-use eframe::egui::Color32;
 use eframe::epi::backend::RepaintSignal;
-use eframe::{egui, epi};
-use egui::*;
 use provola_core::test_runners::TestRunnerOpt;
 use provola_core::*;
 use provola_core::{Action, AvailableTests, Error, TestResult};
 use provola_testrunners::make_test_runner;
 use provola_testrunners::TestRunnerInfo;
 use std::path::PathBuf;
-use std::time::Duration;
 use std::{sync::Arc, thread};
 
 struct Setup {

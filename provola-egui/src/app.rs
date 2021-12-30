@@ -4,10 +4,9 @@ use crossbeam_channel::select;
 use eframe::egui::Color32;
 use eframe::{egui, epi};
 use egui::*;
-use provola_core::test_runners::TestRunnerOpt;
+
 use provola_core::*;
-use provola_testrunners::TestRunnerInfo;
-use std::path::PathBuf;
+
 use std::time::Duration;
 
 #[derive(Default)]
