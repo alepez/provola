@@ -65,7 +65,7 @@ impl std::fmt::Display for FullyQualifiedTestCase {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub struct FullyQualifiedTestCaseId(u64);
 
 impl std::fmt::Display for FullyQualifiedTestCaseId {

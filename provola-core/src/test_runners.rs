@@ -1,4 +1,4 @@
-use crate::test::xunit::AvailableTests;
+use crate::test::xunit::{AvailableTests, FullyQualifiedTestCaseId};
 use crate::{Error, TestResult};
 use serde::{Deserialize, Serialize};
 use strum_macros::Display;
@@ -29,6 +29,7 @@ pub struct TestRunnerOpt {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum Only {
     SingleByIndex(usize),
+    SingleByFqtc(FullyQualifiedTestCaseId),
     All,
 }
 

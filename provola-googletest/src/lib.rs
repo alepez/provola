@@ -125,6 +125,7 @@ fn make_test_filter(opt: &TestRunnerOpt, tests: &AvailableTests) -> Result<TestF
     let fqtn = match opt.only {
         Only::SingleByIndex(index) => tests.get(index),
         Only::All => None,
+        _ => Err(Error::NotImplemented)?,
     };
 
     let s = fqtn.map(|x| format!("{}.{}", x.test_suite.0, x.test_case.0));

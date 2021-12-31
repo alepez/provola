@@ -1,7 +1,7 @@
 use crate::GuiConfig;
 use crate::*;
 use crossbeam_channel::select;
-use provola_core::{Action, Error, WatchOptions, Watcher};
+use provola_core::{test_runners::Only, Action, Error, WatchOptions, Watcher};
 use std::{path::PathBuf, thread, time::Duration};
 
 pub(crate) struct Server {
@@ -46,7 +46,8 @@ impl Server {
                 self.handle_result(self.get_available_tests());
             }
             ActionMessage::SelectSingleTest(fqtc) => {
-                self.handle_result(self.select_single_test(fqtc));
+                let res = self.select_single_test(fqtc);
+                self.handle_result(res);
             }
         }
     }
@@ -121,8 +122,15 @@ impl Server {
         Ok(())
     }
 
-    fn select_single_test(&self, fqtc: FullyQualifiedTestCaseId) -> Result<(), Error> {
+    fn select_single_test(&mut self, fqtc: FullyQualifiedTestCaseId) -> Result<(), Error> {
         log::info!("Select single test: {}", fqtc);
+
+        if let Some(opt) = &mut self.opt {
+            if let Some(ActionConfig::TestRunner(_info, tro)) = &mut opt.action {
+                tro.only = Only::SingleByFqtc(fqtc);
+            }
+        }
+
         Err(Error::NotImplemented)
     }
 }
