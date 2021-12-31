@@ -131,6 +131,6 @@ impl Server {
             }
         }
 
-        Err(Error::NotImplemented)
+        Ok(())
     }
 }

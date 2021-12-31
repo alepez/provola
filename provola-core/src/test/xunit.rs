@@ -111,6 +111,10 @@ impl AvailableTests {
         self.list.get(index)
     }
 
+    pub fn get_by_id(&self, id: FullyQualifiedTestCaseId) -> Option<&FullyQualifiedTestCase> {
+        self.list.iter().find(|x| x.id == id)
+    }
+
     pub fn test_suites(
         &self,
     ) -> std::collections::btree_map::Iter<TestSuite, Vec<FullyQualifiedTestCase>> {
