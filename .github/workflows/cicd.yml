@@ -428,6 +428,16 @@ jobs:
         toolchain: nightly-2021-12-27
         default: true
         profile: minimal
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: cargo-code-coverage-${{ hashFiles('**/Cargo.lock') }}
     - name: Test
       uses: actions-rs/cargo@v1
       with:
