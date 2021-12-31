@@ -67,8 +67,9 @@ impl ProvolaGuiApp {
                     self.action_run_all();
                 }
             }
-            FeedbackMessage::Error(_error) => {
+            FeedbackMessage::Error(error) => {
                 // TODO Show error
+                log::error!("{}", error.to_string());
             }
         }
     }
