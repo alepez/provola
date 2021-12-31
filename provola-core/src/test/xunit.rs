@@ -87,7 +87,7 @@ impl AvailableTests {
         self.list.push(fqtc.clone());
         self.map
             .entry(fqtc.test_suite.clone())
-            .or_insert(Vec::default())
+            .or_insert_with(Vec::default)
             .push(fqtc);
     }
 

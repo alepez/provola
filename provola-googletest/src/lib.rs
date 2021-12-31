@@ -113,13 +113,8 @@ pub struct TestRunner {
     available_tests: AvailableTests,
 }
 
+#[derive(Default)]
 struct TestFilter(Option<String>);
-
-impl Default for TestFilter {
-    fn default() -> Self {
-        TestFilter(None)
-    }
-}
 
 fn make_test_filter(opt: &TestRunnerOpt, tests: &AvailableTests) -> Result<TestFilter, Error> {
     let fqtn = match opt.only {
@@ -153,7 +148,7 @@ impl From<Executable> for TestRunner {
 
 impl provola_core::test_runners::TestRunner for TestRunner {
     fn run(&self, opt: &TestRunnerOpt) -> Result<provola_core::TestResult, provola_core::Error> {
-        let report = self.generate_report(&opt)?;
+        let report = self.generate_report(opt)?;
         let result = report.into();
         Ok(result)
     }

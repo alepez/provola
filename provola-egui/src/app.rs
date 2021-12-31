@@ -69,7 +69,7 @@ impl ProvolaGuiApp {
             }
             FeedbackMessage::Error(error) => {
                 // TODO Show error
-                log::error!("{}", error.to_string());
+                log::error!("{}", error);
             }
         }
     }
