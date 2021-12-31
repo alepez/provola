@@ -1,5 +1,5 @@
 use super::{ActionMessage, ActionSender, FeedbackMessage, FeedbackReceiver, GuiConfig};
-use crate::central_panel;
+use crate::tests_explorer;
 use crossbeam_channel::select;
 use eframe::egui::Color32;
 use eframe::{egui, epi};
@@ -176,13 +176,13 @@ impl epi::App for ProvolaGuiApp {
         // Central panel for test results
         CentralPanel::default().show(ctx, |ui| {
             if let Some(test_result) = &self.state.last_result {
-                central_panel::show(ui, Some(test_result));
+                tests_explorer::show(ui, Some(test_result));
             } else if let Some(available_tests) = &self.state.available_tests {
                 let report = CoreReport::from(available_tests);
                 let test_result = TestResult::from(report);
-                central_panel::show(ui, Some(&test_result));
+                tests_explorer::show(ui, Some(&test_result));
             } else {
-                central_panel::show(ui, None);
+                tests_explorer::show(ui, None);
             }
         });
 

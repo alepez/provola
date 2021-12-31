@@ -1,5 +1,5 @@
 mod app;
-mod central_panel;
+mod tests_explorer;
 mod server;
 
 pub use crate::app::ProvolaGuiApp;

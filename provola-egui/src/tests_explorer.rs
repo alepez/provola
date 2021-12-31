@@ -3,14 +3,6 @@ use provola_core::{
     report::CoreStatus, CoreFailure, CoreReport, CoreTestCase, CoreTestSuite, Reason, TestResult,
 };
 
-pub struct TestsExplorer {}
-
-impl TestsExplorer {
-    pub(crate) fn new() -> Self {
-        todo!()
-    }
-}
-
 pub fn show(ui: &mut Ui, test_result: Option<&TestResult>) {
     if let Some(test_result) = test_result {
         show_result(ui, test_result);
