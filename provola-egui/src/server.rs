@@ -45,6 +45,9 @@ impl Server {
             ActionMessage::ReqAvailableTests => {
                 self.handle_result(self.get_available_tests());
             }
+            ActionMessage::SelectSingleTest(fqtc) => {
+                self.handle_result(self.select_single_test(fqtc));
+            }
         }
     }
 
@@ -116,5 +119,10 @@ impl Server {
         self.feedback_s.send(FeedbackMessage::AvailableTests(list));
 
         Ok(())
+    }
+
+    fn select_single_test(&self, fqtc: FullyQualifiedTestCaseId) -> Result<(), Error> {
+        log::info!("Select single test: {}", fqtc);
+        Err(Error::NotImplemented)
     }
 }

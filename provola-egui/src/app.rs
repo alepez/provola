@@ -175,14 +175,16 @@ impl epi::App for ProvolaGuiApp {
 
         // Central panel for test results
         CentralPanel::default().show(ctx, |ui| {
+            let action_s = self.s.clone();
+
             if let Some(test_result) = &self.state.last_result {
-                tests_explorer::show(ui, Some(test_result));
+                tests_explorer::show(ui, action_s, Some(test_result));
             } else if let Some(available_tests) = &self.state.available_tests {
                 let report = CoreReport::from(available_tests);
                 let test_result = TestResult::from(report);
-                tests_explorer::show(ui, Some(&test_result));
+                tests_explorer::show(ui, action_s, Some(&test_result));
             } else {
-                tests_explorer::show(ui, None);
+                tests_explorer::show(ui, action_s, None);
             }
         });
 

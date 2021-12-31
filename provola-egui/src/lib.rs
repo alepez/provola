@@ -1,11 +1,12 @@
 mod app;
-mod tests_explorer;
 mod server;
+mod tests_explorer;
 
 pub use crate::app::ProvolaGuiApp;
 use crate::server::Server;
 use crossbeam_channel::{bounded, Receiver, Sender};
 use eframe::epi::backend::RepaintSignal;
+use provola_core::test::xunit::FullyQualifiedTestCaseId;
 use provola_core::test_runners::TestRunnerOpt;
 use provola_core::*;
 use provola_core::{Action, AvailableTests, Error, TestResult};
@@ -24,6 +25,7 @@ enum ActionMessage {
     RunAll,
     UpdateConfig(GuiConfig),
     ReqAvailableTests,
+    SelectSingleTest(FullyQualifiedTestCaseId),
 }
 
 enum FeedbackMessage {
