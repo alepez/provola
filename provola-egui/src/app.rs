@@ -79,7 +79,9 @@ impl ProvolaGuiApp {
             recv(self.r) -> msg => {
                 match msg {
                     Ok(msg) => self.handle_message(msg),
-                    Err(_) => return,
+                    Err(err) => {
+                        log::error!("{}", err)
+                    },
                 }
             },
             default(Duration::from_millis(1)) => {}
