@@ -2,13 +2,13 @@ use std::fmt::Display;
 
 use crate::CoreReport;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TestResult {
     Pass(Reason),
     Fail(Reason),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Reason {
     Unknown,
     Generic(String),

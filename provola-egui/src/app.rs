@@ -189,15 +189,12 @@ impl epi::App for ProvolaGuiApp {
         CentralPanel::default().show(ctx, |ui| {
             let action_s = self.s.clone();
 
-            if let Some(test_result) = &self.state.last_result {
-                tests_explorer::show(ui, action_s, Some(test_result));
-            } else if let Some(available_tests) = &self.state.available_tests {
-                let report = CoreReport::from(available_tests);
-                let test_result = TestResult::from(report);
-                tests_explorer::show(ui, action_s, Some(&test_result));
-            } else {
-                tests_explorer::show(ui, action_s, None);
-            }
+            let test_result = merge_available_tests_and_result(
+                &self.state.last_result,
+                &self.state.available_tests,
+            );
+
+            tests_explorer::show(ui, action_s, test_result.as_ref());
         });
 
         if new_config != self.config {
@@ -241,5 +238,19 @@ fn text_from_result(result: &Option<TestResult>) -> &'static str {
         None => "-",
         Some(TestResult::Pass(_)) => "PASS",
         Some(TestResult::Fail(_)) => "FAIL",
+    }
+}
+
+fn merge_available_tests_and_result(
+    test_result: &Option<TestResult>,
+    available_tests: &Option<AvailableTests>,
+) -> Option<TestResult> {
+    if let Some(test_result) = test_result {
+        Some(test_result.clone())
+    } else if let Some(available_tests) = &available_tests {
+        let report = CoreReport::from(available_tests);
+        Some(TestResult::from(report))
+    } else {
+        None
     }
 }

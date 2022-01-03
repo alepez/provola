@@ -38,7 +38,7 @@ impl From<Option<bool>> for CoreStatus {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct CoreReport {
     pub disabled: Option<Count>,
     pub errors: Option<Count>,
@@ -54,7 +54,7 @@ pub struct CoreReport {
     pub timestamp: Option<Timestamp>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct CoreTestSuite {
     // TODO properties
     // TODO system-err
@@ -76,7 +76,7 @@ pub struct CoreTestSuite {
     pub timestamp: Option<Timestamp>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct CoreTestCase {
     // TODO fqtc should not be an Option
     pub fqtc: Option<FullyQualifiedTestCaseId>,
@@ -94,7 +94,7 @@ pub struct CoreTestCase {
     pub failures: Vec<CoreFailure>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct CoreFailure {
     pub ttype: FailureType,
     pub message: Message,
