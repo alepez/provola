@@ -233,22 +233,6 @@ jobs:
         command: test
         args: --all --locked --target=${{ matrix.job.target }} ${{ steps.test-options.outputs.CARGO_TEST_OPTIONS}}
 
-# TODO Run provola with source/input/output parameters
-#   - name: Run provola with input/output test
-#     uses: actions-rs/cargo@v1
-#     with:
-#       use-cross: ${{ matrix.job.use-cross }}
-#       command: run
-#       args: --locked --target=${{ matrix.job.target }} -- --input FIXME --output FIXME --source FIXME --no-watch
-
-# TODO Run provola with test runner
-#   - name: Run provola with test runner
-#     uses: actions-rs/cargo@v1
-#     with:
-#       use-cross: ${{ matrix.job.use-cross }}
-#       command: run
-#       args: --locked --target=${{ matrix.job.target }} -- -t FIXME -T FIXME
-
     - name: "Feature check: no default features"
       uses: actions-rs/cargo@v1
       with:
@@ -277,9 +261,6 @@ jobs:
         mkdir -p "${ARCHIVE_DIR}/autocomplete"
         # Binary
         cp "${{ steps.strip.outputs.BIN_PATH }}" "$ARCHIVE_DIR"
-        # TODO Generate man page with clap (see https://github.com/clap-rs/clap/issues/552)
-        #       # Man page
-        #       cp 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/manual/provola.1 "$ARCHIVE_DIR"
         # README and LICENSE
         cp "README.md" "LICENSE-MIT" "LICENSE-APACHE" "$ARCHIVE_DIR"
         # Generate autocompletion with `provola --shell-compl ${shell}`
@@ -323,10 +304,6 @@ jobs:
         echo ::set-output name=DPKG_NAME::${DPKG_NAME}
         # Binary
         install -Dm755 "${{ steps.strip.outputs.BIN_PATH }}" "${DPKG_DIR}/usr/bin/${{ steps.strip.outputs.BIN_NAME }}"
-        # TODO Man page
-        #       # Man page
-        #       install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ env.PROJECT_NAME }}'-*/out/assets/manual/provola.1 "${DPKG_DIR}/usr/share/man/man1/${{ env.PROJECT_NAME }}.1"
-        #       gzip -n --best "${DPKG_DIR}/usr/share/man/man1/${{ env.PROJECT_NAME }}.1"
         # Autocompletion files
         install -Dm644 "${{ steps.package.outputs.ARCHIVE_DIR }}/autocomplete/${{ env.PROJECT_NAME }}.bash" "${DPKG_DIR}/usr/share/bash-completion/completions/${{ env.PROJECT_NAME }}"
         install -Dm644 "${{ steps.package.outputs.ARCHIVE_DIR }}/autocomplete/${{ env.PROJECT_NAME }}.fish" "${DPKG_DIR}/usr/share/fish/vendor_completions.d/${{ env.PROJECT_NAME }}.fish"
