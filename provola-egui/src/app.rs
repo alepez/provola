@@ -283,5 +283,7 @@ fn generate_complete_reason(partial: &Reason, available: &AvailableTests) -> Rea
 }
 
 fn generate_complete_report(partial: &CoreReport, available: &AvailableTests) -> CoreReport {
-    todo!()
+    let mut full = partial.clone();
+
+    full
 }
