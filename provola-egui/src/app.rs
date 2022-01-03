@@ -246,8 +246,22 @@ fn merge_available_tests_and_result(
     available_tests: &Option<AvailableTests>,
 ) -> Option<TestResult> {
     if let Some(test_result) = test_result {
-        Some(test_result.clone())
+        if let Some(available_tests) = &available_tests {
+            // We have a result, but it may have incomplete info (because some
+            // tests are ignored, skipped or we have requested to run just a
+            // selection). In this case we want to still show available tests
+            // as not run, so we merge result and available_tests.
+            // FIXME use available_tests
+            Some(test_result.clone())
+        } else {
+            // This is a weird situation, because we have results, but it isn't known
+            // which are the available tests. This may happen if a test runner
+            // does not support available tests listing, but can still generate
+            // a report.
+            Some(test_result.clone())
+        }
     } else if let Some(available_tests) = &available_tests {
+        // We don't have any result, just convert available tests to result
         let report = CoreReport::from(available_tests);
         Some(TestResult::from(report))
     } else {
