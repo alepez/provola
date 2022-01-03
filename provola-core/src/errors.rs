@@ -36,4 +36,6 @@ pub enum Error {
     ReportParseError(Box<dyn std::error::Error>),
     #[error("gui is not available")]
     GuiNotAvailable,
+    #[error("{0}")]
+    GenericError(String),
 }
