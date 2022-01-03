@@ -51,11 +51,11 @@ impl Server {
             ActionMessage::ReqAvailableTests => {
                 log::debug!("ReqAvailableTests");
                 self.get_available_tests()
-            },
+            }
             ActionMessage::SelectSingleTest(fqtc) => {
                 log::debug!("SelectSingleTest");
                 self.select_single_test(fqtc)
-            },
+            }
         }
     }
 
@@ -77,7 +77,12 @@ impl Server {
                             let res = self.handle_message(msg);
                             self.handle_result(res);
                         }
-                        Err(_) => return,
+                        Err(err) => {
+                            let msg = err.to_string();
+                            let err = Error::GenericError(msg);
+                            let res : Result<(), _> = Err(err);
+                            self.handle_result(res);
+                        }
                     }
                 },
             }
