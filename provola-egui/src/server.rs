@@ -36,6 +36,10 @@ impl Server {
                 self.handle_result(self.get_available_tests());
             }
             ActionMessage::RunAll => {
+                let res = self.select_all_tests();
+                self.handle_result(self.run_once());
+            }
+            ActionMessage::RunSelected => {
                 self.handle_result(self.run_once());
             }
             ActionMessage::UpdateConfig(new_config) => {
@@ -118,6 +122,18 @@ impl Server {
         }?;
 
         self.feedback_s.send(FeedbackMessage::AvailableTests(list));
+
+        Ok(())
+    }
+
+    fn select_all_tests(&mut self) -> Result<(), Error> {
+        log::info!("Select all tests");
+
+        if let Some(opt) = &mut self.opt {
+            if let Some(ActionConfig::TestRunner(_info, tro)) = &mut opt.action {
+                tro.only = Only::All;
+            }
+        }
 
         Ok(())
     }

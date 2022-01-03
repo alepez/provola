@@ -93,6 +93,11 @@ impl ProvolaGuiApp {
         self.send(ActionMessage::RunAll);
     }
 
+    fn action_run_selected(&mut self) {
+        self.state.last_result = None;
+        self.send(ActionMessage::RunSelected);
+    }
+
     fn action_req_available_tests(&mut self) {
         self.state.last_result = None;
         self.state.available_tests = None;
@@ -166,6 +171,10 @@ impl epi::App for ProvolaGuiApp {
 
                 if ui.button("Run all").clicked() {
                     self.action_run_all();
+                }
+
+                if ui.button("Run selected").clicked() {
+                    self.action_run_selected();
                 }
 
                 if ui.button("Scan").clicked() {

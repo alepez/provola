@@ -23,6 +23,7 @@ struct Setup {
 enum ActionMessage {
     Setup(Setup),
     RunAll,
+    RunSelected,
     UpdateConfig(GuiConfig),
     ReqAvailableTests,
     SelectSingleTest(FullyQualifiedTestCaseId),
