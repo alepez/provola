@@ -268,10 +268,20 @@ fn merge_available_tests_and_result(
     }
 }
 
-fn generate_complete_result(
-    test_result: &TestResult,
-    available_tests: &AvailableTests,
-) -> TestResult {
-            // FIXME use available_tests
-    test_result.clone()
+fn generate_complete_result(partial: &TestResult, available: &AvailableTests) -> TestResult {
+    match partial {
+        TestResult::Pass(reason) => TestResult::Pass(generate_complete_reason(reason, available)),
+        TestResult::Fail(reason) => TestResult::Fail(generate_complete_reason(reason, available)),
+    }
+}
+
+fn generate_complete_reason(partial: &Reason, available: &AvailableTests) -> Reason {
+    match partial {
+        Reason::Report(report) => Reason::Report(generate_complete_report(report, available)),
+        x => x.clone(),
+    }
+}
+
+fn generate_complete_report(partial: &CoreReport, available: &AvailableTests) -> CoreReport {
+    todo!()
 }
