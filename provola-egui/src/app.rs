@@ -251,8 +251,7 @@ fn merge_available_tests_and_result(
             // tests are ignored, skipped or we have requested to run just a
             // selection). In this case we want to still show available tests
             // as not run, so we merge result and available_tests.
-            // FIXME use available_tests
-            Some(test_result.clone())
+            Some(generate_complete_result(test_result, available_tests))
         } else {
             // This is a weird situation, because we have results, but it isn't known
             // which are the available tests. This may happen if a test runner
@@ -267,4 +266,12 @@ fn merge_available_tests_and_result(
     } else {
         None
     }
+}
+
+fn generate_complete_result(
+    test_result: &TestResult,
+    available_tests: &AvailableTests,
+) -> TestResult {
+            // FIXME use available_tests
+    test_result.clone()
 }
