@@ -19,7 +19,7 @@ impl Server {
         }
     }
 
-    fn handle_message(&mut self, msg: ActionMessage) {
+    fn handle_message(&mut self, msg: ActionMessage) -> Result<(), Error> {
         match msg {
             ActionMessage::Setup(setup) => {
                 // This must be done before starting watch thread
@@ -32,27 +32,30 @@ impl Server {
                 }
 
                 self.opt = Some(setup.config);
-
-                self.handle_result(self.get_available_tests());
+                self.get_available_tests()
             }
             ActionMessage::RunAll => {
-                let res = self.select_all_tests();
-                self.handle_result(self.run_once());
+                log::debug!("RunAll");
+                self.select_all_tests()?;
+                self.run_once()
             }
             ActionMessage::RunSelected => {
-                self.handle_result(self.run_once());
+                log::debug!("RunSelected");
+                self.run_once()
             }
             ActionMessage::UpdateConfig(new_config) => {
                 log::debug!("Configuration changed");
                 self.opt = Some(new_config);
+                Ok(())
             }
             ActionMessage::ReqAvailableTests => {
-                self.handle_result(self.get_available_tests());
-            }
+                log::debug!("ReqAvailableTests");
+                self.get_available_tests()
+            },
             ActionMessage::SelectSingleTest(fqtc) => {
-                let res = self.select_single_test(fqtc);
-                self.handle_result(res);
-            }
+                log::debug!("SelectSingleTest");
+                self.select_single_test(fqtc)
+            },
         }
     }
 
@@ -70,7 +73,10 @@ impl Server {
             select! {
                 recv(self.action_r) -> msg => {
                     match msg {
-                        Ok(msg) => self.handle_message(msg),
+                        Ok(msg) => {
+                            let res = self.handle_message(msg);
+                            self.handle_result(res);
+                        }
                         Err(_) => return,
                     }
                 },
