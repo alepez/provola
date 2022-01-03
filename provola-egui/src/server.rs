@@ -1,6 +1,6 @@
 use crate::GuiConfig;
 use crate::*;
-use crossbeam_channel::select;
+use crossbeam_channel::{select, RecvError};
 use provola_core::{test_runners::Only, Action, Error, WatchOptions, Watcher};
 use std::{path::PathBuf, thread, time::Duration};
 
@@ -68,23 +68,25 @@ impl Server {
             .send(FeedbackMessage::Error(err.to_string()));
     }
 
+    fn handle_message_or_error(&mut self, msg: Result<ActionMessage, RecvError>) {
+        match msg {
+            Ok(msg) => {
+                let res = self.handle_message(msg);
+                self.handle_result(res);
+            }
+            Err(err) => {
+                let msg = err.to_string();
+                let err = Error::GenericError(msg);
+                let res: Result<(), _> = Err(err);
+                self.handle_result(res);
+            }
+        }
+    }
+
     pub(crate) fn run(&mut self) {
         loop {
             select! {
-                recv(self.action_r) -> msg => {
-                    match msg {
-                        Ok(msg) => {
-                            let res = self.handle_message(msg);
-                            self.handle_result(res);
-                        }
-                        Err(err) => {
-                            let msg = err.to_string();
-                            let err = Error::GenericError(msg);
-                            let res : Result<(), _> = Err(err);
-                            self.handle_result(res);
-                        }
-                    }
-                },
+                recv(self.action_r) -> msg => self.handle_message_or_error(msg)
             }
         }
     }
