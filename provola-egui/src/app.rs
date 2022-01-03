@@ -5,6 +5,8 @@ use eframe::egui::Color32;
 use eframe::{egui, epi};
 use egui::*;
 
+use provola_core::report::CoreStatus;
+use provola_core::test::xunit::{FullyQualifiedTestCase, TestSuite};
 use provola_core::*;
 
 use std::time::Duration;
@@ -285,5 +287,63 @@ fn generate_complete_reason(partial: &Reason, available: &AvailableTests) -> Rea
 fn generate_complete_report(partial: &CoreReport, available: &AvailableTests) -> CoreReport {
     let mut full = partial.clone();
 
+    for test_case in available.iter() {
+        if let Some(report_test_suite) = find_test_suite(&mut full, &test_case.test_suite) {
+            // Test suite already exist, but we have to check if we need
+            // to add this test case.
+            let report_test_case = find_test_case(&report_test_suite, &test_case);
+
+            if report_test_case.is_none() {
+                // Test suite does not exist in report, we need to add it
+                let new_test_case = CoreTestCase {
+                    // TODO fqtc should not be None
+                    fqtc: None,
+                    name: test_case.test_case.0.clone(),
+                    status: CoreStatus::Unknown,
+                    ..Default::default()
+                };
+
+                report_test_suite.testcases.push(new_test_case);
+            }
+        } else {
+            // Test suite does not exist in report, we need to add it
+            let new_test_case = CoreTestCase {
+                // TODO fqtc should not be None
+                fqtc: None,
+                name: test_case.test_case.0.clone(),
+                status: CoreStatus::Unknown,
+                ..Default::default()
+            };
+
+            let new_test_suite = CoreTestSuite {
+                name: test_case.test_suite.0.clone(),
+                testcases: vec![new_test_case],
+                ..Default::default()
+            };
+
+            full.testsuites.push(new_test_suite);
+        }
+    }
+
     full
+}
+
+fn find_test_suite<'a>(
+    report: &'a mut CoreReport,
+    test_suite: &TestSuite,
+) -> Option<&'a mut CoreTestSuite> {
+    report
+        .testsuites
+        .iter_mut()
+        .find(|x| x.name == test_suite.0)
+}
+
+fn find_test_case<'a>(
+    report_suite: &'a CoreTestSuite,
+    fqtc: &FullyQualifiedTestCase,
+) -> Option<&'a CoreTestCase> {
+    report_suite
+        .testcases
+        .iter()
+        .find(|report_case| report_case.fqtc == Some(fqtc.id))
 }

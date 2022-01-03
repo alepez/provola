@@ -42,7 +42,7 @@ impl FullyQualifiedTestCase {
     }
 
     pub fn new(test_suite: TestSuite, test_case: TestCase) -> Self {
-        let id = calculate_id(&test_suite, &test_case);
+        let id = calculate_fqtc_id(&test_suite, &test_case);
         Self {
             test_suite,
             test_case,
@@ -51,7 +51,7 @@ impl FullyQualifiedTestCase {
     }
 }
 
-pub fn calculate_id(test_suite: &TestSuite, test_case: &TestCase) -> FullyQualifiedTestCaseId {
+pub fn calculate_fqtc_id(test_suite: &TestSuite, test_case: &TestCase) -> FullyQualifiedTestCaseId {
     let mut hasher = DefaultHasher::new();
     test_suite.hash(&mut hasher);
     test_case.hash(&mut hasher);
