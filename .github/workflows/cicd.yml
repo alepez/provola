@@ -23,12 +23,9 @@ jobs:
     name: Ensure 'cargo fmt' has been run
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        default: true
-        profile: minimal
-        components: rustfmt
+    - name: Checkout source code
+      uses: actions/checkout@v2
+
     - name: Cache
       uses: actions/cache@v2
       with:
@@ -39,27 +36,23 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: cargo-fmt-${{ hashFiles('**/Cargo.lock') }}
-    - uses: actions/checkout@v2
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        default: true
+        profile: minimal
+        components: rustfmt
+
     - run: cargo fmt --all -- --check
 
   min_version:
     name: Minimum supported rust version
     runs-on: ubuntu-20.04
     steps:
-    - name: Install prerequisites
-      shell: bash
-      run: |
-       sudo apt-get install -y build-essential libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
     - name: Checkout source code
       uses: actions/checkout@v2
 
-    - name: Install rust toolchain (v${{ env.MIN_SUPPORTED_RUST_VERSION }})
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: ${{ env.MIN_SUPPORTED_RUST_VERSION }}
-        default: true
-        profile: minimal # minimal component installation (ie, no documentation)
-        components: clippy
     - name: Cache
       uses: actions/cache@v2
       with:
@@ -70,11 +63,26 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: cargo-min-version-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Install prerequisites
+      shell: bash
+      run: |
+       sudo apt-get install -y build-essential libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+
+    - name: Install rust toolchain (v${{ env.MIN_SUPPORTED_RUST_VERSION }})
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ env.MIN_SUPPORTED_RUST_VERSION }}
+        default: true
+        profile: minimal # minimal component installation (ie, no documentation)
+        components: clippy
+
     - name: Run clippy (on minimum supported rust version to prevent warnings we can't fix)
       uses: actions-rs/cargo@v1
       with:
         command: clippy
         args: --all --locked --all-targets --all-features -- --allow clippy::unknown_clippy_lints
+
     - name: Run tests
       uses: actions-rs/cargo@v1
       with:
@@ -144,6 +152,7 @@ jobs:
           aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
           x86_64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install build-essential libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
         esac
+
     - name: Extract crate information
       shell: bash
       run: |
@@ -151,6 +160,7 @@ jobs:
         echo "PROJECT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> $GITHUB_ENV
         echo "PROJECT_MAINTAINER=$(sed -n 's/^authors = \["\(.*\)"\]/\1/p' Cargo.toml)" >> $GITHUB_ENV
         echo "PROJECT_HOMEPAGE=$(sed -n 's/^homepage = "\(.*\)"/\1/p' Cargo.toml)" >> $GITHUB_ENV
+
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
@@ -168,6 +178,7 @@ jobs:
         rustup default
         cargo -V
         rustc -V
+
     - name: Build
       uses: actions-rs/cargo@v1
       with:
@@ -205,6 +216,7 @@ jobs:
         # Let subsequent steps know where to find the (stripped) bin
         echo ::set-output name=BIN_PATH::${BIN_PATH}
         echo ::set-output name=BIN_NAME::${BIN_NAME}
+
     - name: Set testing options
       id: test-options
       shell: bash
@@ -213,6 +225,7 @@ jobs:
         unset CARGO_TEST_OPTIONS
         unset CARGO_TEST_OPTIONS ; case ${{ matrix.job.target }} in arm-* | aarch64-*) CARGO_TEST_OPTIONS="--lib --bin ${PROJECT_NAME}" ;; esac;
         echo ::set-output name=CARGO_TEST_OPTIONS::${CARGO_TEST_OPTIONS}
+
     - name: Run tests
       uses: actions-rs/cargo@v1
       with:
@@ -284,6 +297,7 @@ jobs:
         # Let subsequent steps know where to find the compressed package
         echo ::set-output name=PKG_PATH::"${PKG_STAGING}/${PKG_NAME}"
         echo ::set-output name=ARCHIVE_DIR::"${ARCHIVE_DIR}"
+
     - name: Create Debian package
       id: debian-package
       shell: bash
@@ -377,6 +391,7 @@ jobs:
         echo ::set-output name=DPKG_PATH::${DPKG_PATH}
         # build dpkg
         fakeroot dpkg-deb --build "${DPKG_DIR}" "${DPKG_PATH}"
+
     - name: "Artifact upload: tarball"
       uses: actions/upload-artifact@master
       with:
@@ -396,6 +411,7 @@ jobs:
       run: |
         unset IS_RELEASE ; if [[ $GITHUB_REF =~ ^refs/tags/v[0-9].* ]]; then IS_RELEASE='true' ; fi
         echo ::set-output name=IS_RELEASE::${IS_RELEASE}
+
     - name: Publish archives and packages
       uses: softprops/action-gh-release@v1
       if: steps.is-release.outputs.IS_RELEASE
@@ -410,24 +426,14 @@ jobs:
     name: Code Coverage
     runs-on: ubuntu-20.04
     steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+
     - name: Install prerequisites
       shell: bash
       run: |
        sudo apt-get install -y build-essential libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
-    - uses: actions/checkout@v2
-    - name: Initialize workflow variables
-      id: vars
-      shell: bash
-      run: |
-        # target-specific options
-        # * CODECOV_FLAGS
-        CODECOV_FLAGS=$( echo "${{ matrix.job.os }}" | sed 's/[^[:alnum:]]/_/g' )
-        echo ::set-output name=CODECOV_FLAGS::${CODECOV_FLAGS}
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly-2021-12-27
-        default: true
-        profile: minimal
+
     - name: Cache
       uses: actions/cache@v2
       with:
@@ -438,6 +444,22 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: cargo-code-coverage-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Initialize workflow variables
+      id: vars
+      shell: bash
+      run: |
+        # target-specific options
+        # * CODECOV_FLAGS
+        CODECOV_FLAGS=$( echo "${{ matrix.job.os }}" | sed 's/[^[:alnum:]]/_/g' )
+        echo ::set-output name=CODECOV_FLAGS::${CODECOV_FLAGS}
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly-2021-12-27
+        default: true
+        profile: minimal
+
     - name: Test
       uses: actions-rs/cargo@v1
       with:
@@ -446,9 +468,11 @@ jobs:
       env:
         CARGO_INCREMENTAL: '0'
         RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off'
+
     - name: Generate coverage data
       id: coverage
       uses: actions-rs/grcov@v0.1
+
     - name: Upload coverage results (to Codecov.io)
       uses: codecov/codecov-action@v1
       with:
