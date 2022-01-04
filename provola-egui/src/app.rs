@@ -294,7 +294,7 @@ fn generate_complete_report(partial: &CoreReport, available: &AvailableTests) ->
             let report_test_case = find_test_case(&report_test_suite, &fqtc);
 
             if report_test_case.is_none() {
-                // Test suite does not exist in report, we need to add it
+                // Test case does not exist in report, we need to add it
                 let new_test_case = make_test_case_from_available(fqtc);
                 report_test_suite.testcases.push(new_test_case);
             }
@@ -312,8 +312,7 @@ fn generate_complete_report(partial: &CoreReport, available: &AvailableTests) ->
 
 fn make_test_case_from_available(fqtc: &FullyQualifiedTestCase) -> CoreTestCase {
     CoreTestCase {
-        // TODO fqtc should not be None
-        fqtc: None,
+        fqtc: Some(fqtc.id),
         name: fqtc.test_case.0.clone(),
         status: CoreStatus::Unknown,
         ..Default::default()
