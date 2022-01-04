@@ -287,45 +287,47 @@ fn generate_complete_reason(partial: &Reason, available: &AvailableTests) -> Rea
 fn generate_complete_report(partial: &CoreReport, available: &AvailableTests) -> CoreReport {
     let mut full = partial.clone();
 
-    for test_case in available.iter() {
-        if let Some(report_test_suite) = find_test_suite(&mut full, &test_case.test_suite) {
+    for fqtc in available.iter() {
+        if let Some(report_test_suite) = find_test_suite(&mut full, &fqtc.test_suite) {
             // Test suite already exist, but we have to check if we need
             // to add this test case.
-            let report_test_case = find_test_case(&report_test_suite, &test_case);
+            let report_test_case = find_test_case(&report_test_suite, &fqtc);
 
             if report_test_case.is_none() {
                 // Test suite does not exist in report, we need to add it
-                let new_test_case = CoreTestCase {
-                    // TODO fqtc should not be None
-                    fqtc: None,
-                    name: test_case.test_case.0.clone(),
-                    status: CoreStatus::Unknown,
-                    ..Default::default()
-                };
-
+                let new_test_case = make_test_case_from_available(fqtc);
                 report_test_suite.testcases.push(new_test_case);
             }
         } else {
             // Test suite does not exist in report, we need to add it
-            let new_test_case = CoreTestCase {
-                // TODO fqtc should not be None
-                fqtc: None,
-                name: test_case.test_case.0.clone(),
-                status: CoreStatus::Unknown,
-                ..Default::default()
-            };
 
-            let new_test_suite = CoreTestSuite {
-                name: test_case.test_suite.0.clone(),
-                testcases: vec![new_test_case],
-                ..Default::default()
-            };
+            let new_test_suite = make_test_suite_from_available(fqtc);
 
             full.testsuites.push(new_test_suite);
         }
     }
 
     full
+}
+
+fn make_test_case_from_available(fqtc: &FullyQualifiedTestCase) -> CoreTestCase {
+    CoreTestCase {
+        // TODO fqtc should not be None
+        fqtc: None,
+        name: fqtc.test_case.0.clone(),
+        status: CoreStatus::Unknown,
+        ..Default::default()
+    }
+}
+
+fn make_test_suite_from_available(fqtc: &FullyQualifiedTestCase) -> CoreTestSuite {
+    let new_test_case = make_test_case_from_available(fqtc);
+
+    CoreTestSuite {
+        name: fqtc.test_suite.0.clone(),
+        testcases: vec![new_test_case],
+        ..Default::default()
+    }
 }
 
 fn find_test_suite<'a>(
