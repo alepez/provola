@@ -4,17 +4,18 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "${THIS_DIR}/_common"
 
-open_editor() {
+cargo_path() {
   local dir=$1
   (
     cd $dir
-    ${EDITOR} Cargo.toml
+    echo $(pwd)/Cargo.toml
   )
 }
 
 main() {
   local version=$1
-  for_all_crates open_editor
+  local cargo_paths=$( for_all_crates cargo_path )
+  ${EDITOR} $cargo_paths
 }
 
 main $1
