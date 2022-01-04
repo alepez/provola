@@ -51,7 +51,11 @@ struct FeedbackSender {
 
 impl FeedbackSender {
     fn send(&self, msg: FeedbackMessage) {
-        self.sender.send(msg).unwrap();
+        if let Err(err) = self.sender.send(msg) {
+            // Ignore this error, usually happens on exit
+            log::debug!("Error ignored: {}", err);
+        }
+
         if let Some(repaint_signal) = &self.repaint_signal {
             repaint_signal.request_repaint();
         }
