@@ -1512,7 +1512,7 @@ dependencies = [
 
 [[package]]
 name = "provola"
-version = "0.1.8"
+version = "0.2.0"
 dependencies = [
  "clap",
  "clap_generate",
@@ -1527,7 +1527,7 @@ dependencies = [
 
 [[package]]
 name = "provola-catch2"
-version = "0.1.8"
+version = "0.2.0"
 dependencies = [
  "chrono",
  "insta",
@@ -1540,7 +1540,7 @@ dependencies = [
 
 [[package]]
 name = "provola-core"
-version = "0.1.8"
+version = "0.2.0"
 dependencies = [
  "chrono",
  "lazy_static",
@@ -1556,7 +1556,7 @@ dependencies = [
 
 [[package]]
 name = "provola-egui"
-version = "0.1.8"
+version = "0.2.0"
 dependencies = [
  "crossbeam-channel",
  "eframe",
@@ -1570,7 +1570,7 @@ dependencies = [
 
 [[package]]
 name = "provola-googletest"
-version = "0.1.8"
+version = "0.2.0"
 dependencies = [
  "chrono",
  "insta",
@@ -1583,7 +1583,7 @@ dependencies = [
 
 [[package]]
 name = "provola-reporters"
-version = "0.1.8"
+version = "0.2.0"
 dependencies = [
  "lazy_static",
  "provola-core",
@@ -1594,7 +1594,7 @@ dependencies = [
 
 [[package]]
 name = "provola-terminalreporter"
-version = "0.1.8"
+version = "0.2.0"
 dependencies = [
  "colored",
  "insta",
@@ -1603,7 +1603,7 @@ dependencies = [
 
 [[package]]
 name = "provola-testrunners"
-version = "0.1.8"
+version = "0.2.0"
 dependencies = [
  "provola-catch2",
  "provola-core",

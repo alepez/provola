@@ -1,6 +1,6 @@
 [package]
 name = "provola"
-version = "0.1.8"
+version = "0.2.0"
 authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
 edition = "2021"
 description = "A tool for quick development/test cycle in any language"
@@ -17,19 +17,19 @@ log = "0.4"
 serde = { version = "1", features = ["derive"] }
 
 [dependencies.provola-core]
-version = "0.1.8"
+version = "0.2.0"
 path = "provola-core"
 
 [dependencies.provola-testrunners]
-version = "0.1.8"
+version = "0.2.0"
 path = "provola-testrunners"
 
 [dependencies.provola-reporters]
-version = "0.1.8"
+version = "0.2.0"
 path = "provola-reporters"
 
 [dependencies.provola-egui]
-version = "0.1.8"
+version = "0.2.0"
 path = "provola-egui"
 optional = true
 
