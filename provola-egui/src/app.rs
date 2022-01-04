@@ -307,6 +307,8 @@ fn generate_complete_report(partial: &CoreReport, available: &AvailableTests) ->
         }
     }
 
+    full.sort();
+
     full
 }
 

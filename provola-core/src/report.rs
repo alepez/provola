@@ -54,6 +54,15 @@ pub struct CoreReport {
     pub timestamp: Option<Timestamp>,
 }
 
+impl CoreReport {
+    pub fn sort(&mut self) {
+        self.testsuites.sort_by(|x, y| x.name.cmp(&y.name));
+        for test_suite in &mut self.testsuites {
+            test_suite.testcases.sort_by(|x, y| x.name.cmp(&y.name));
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct CoreTestSuite {
     // TODO properties
