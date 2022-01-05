@@ -91,6 +91,13 @@ If you want to use the GUI, you need to enable the egui feature:
 cargo install --features=egui --path .
 ```
 
+### Arch Linux
+
+You can install [the `provola` package](https://aur.archlinux.org/packages/provola/) from aur:
+
+```shell
+yay -S provola
+```
 
 ## Shell auto completion
 
