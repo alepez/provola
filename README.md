@@ -85,10 +85,10 @@ directory:
 cargo install --path .
 ```
 
-If you want to use the GUI, you need to enable the egui feature:
+`egui` feature, which provides a GUI, is enabled by default. You can disable it:
 
 ```shell
-cargo install --features=egui --path .
+cargo install --no-default-features --path .
 ```
 
 ### Arch Linux
