@@ -7,6 +7,7 @@ for i in \
   ./provola-terminalreporter/Cargo.toml \
   ./provola-reporters/Cargo.toml \
   ./provola-testrunners/Cargo.toml \
+  ./provola-egui/Cargo.toml \
   ./Cargo.toml; do (
   d=$( dirname $i );
   cd $d ;
