@@ -461,6 +461,9 @@ jobs:
   publish_crates:
     name: Publish crates
     runs-on: ubuntu-20.04
+    needs:
+      - ensure_cargo_fmt
+      - min_version
 
     steps:
     - name: Checkout source code
