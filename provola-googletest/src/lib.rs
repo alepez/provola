@@ -3,9 +3,9 @@ use provola_core::{AvailableTests, CoreReport, Error, Executable};
 use std::fs::File;
 use std::io::BufReader;
 use std::time::Duration;
-use subprocess::Popen;
 use subprocess::PopenConfig;
 use subprocess::Redirection;
+use subprocess::{ExitStatus, Popen};
 
 mod report;
 
@@ -22,6 +22,8 @@ fn add_run_argv(mut argv: Vec<String>, report_path: &str) -> Vec<String> {
 }
 
 fn run_exec_with_argv(argv: Vec<String>) -> Result<String, Error> {
+    log::debug!("{:?}", argv);
+
     let mut p = Popen::create(
         &argv,
         PopenConfig {
@@ -37,7 +39,13 @@ fn run_exec_with_argv(argv: Vec<String>) -> Result<String, Error> {
     // TODO Timeout from configuration
     let timeout = Duration::from_secs(3600);
 
-    if let Some(_exit_status) = p.wait_timeout(timeout)? {
+    if let Some(exit_status) = p.wait_timeout(timeout)? {
+        if let ExitStatus::Exited(code) = exit_status {
+            log::debug!("Exit status: {}", code);
+        } else {
+            return Err(Error::GenericError("Invalid exit status".to_string()));
+        }
+
         log::trace!("done");
     } else {
         log::warn!("Terminate subprocess");
@@ -101,7 +109,11 @@ fn generate_report(executable: &Executable, test_filter: &TestFilter) -> Result<
 
     run_exec_with_argv(argv)?;
 
-    let file = File::open(report_path).unwrap();
+    let file = File::open(report_path).map_err(|e| {
+        let msg = format!("Cannot open {}: {}", report_path, e);
+        Error::GenericError(msg)
+    })?;
+
     let reader = BufReader::new(file);
     let gtest_rep: report::UnitTest = serde_json::from_reader(reader).unwrap();
     let core_rep = CoreReport::from(gtest_rep);
