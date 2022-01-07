@@ -474,6 +474,13 @@ jobs:
           toolchain: stable
           override: true
 
+    - name: Check for release
+      id: is-release
+      shell: bash
+      run: |
+        unset IS_RELEASE ; if [[ $GITHUB_REF =~ ^refs/tags/v[0-9].* ]]; then IS_RELEASE='true' ; fi
+        echo ::set-output name=IS_RELEASE::${IS_RELEASE}
+
     - name: Publish crates
       uses: katyo/publish-crates@v1
       if: steps.is-release.outputs.IS_RELEASE
