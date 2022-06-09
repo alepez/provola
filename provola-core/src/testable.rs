@@ -1,5 +1,6 @@
 use super::report::Report;
+use super::error::Error;
 
-trait Testable {
-    fn run() -> Report;
+pub trait Testable {
+    fn run(&self) -> Result<Report, Error>;
 }

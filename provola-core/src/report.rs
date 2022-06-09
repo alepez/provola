@@ -1,7 +1,8 @@
 use super::code::CodeReference;
+use chrono::Duration;
 
 pub struct FailureDetails {
-    message: String,
+    message: Option<String>,
     code_reference: Option<CodeReference>,
 }
 
@@ -12,4 +13,6 @@ pub enum TestResult {
 
 pub struct Report {
     result: TestResult,
+    duration: Option<Duration>,
+    children: Vec<Report>,
 }

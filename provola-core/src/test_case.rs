@@ -1,1 +1,3 @@
-pub trait Test {}
+pub struct TestCase {
+    name: String,
+}
