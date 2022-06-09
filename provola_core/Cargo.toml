@@ -1,5 +1,5 @@
 [package]
-name = "provola-core"
+name = "provola_core"
 version = "1.0.0"
 authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
 edition = "2021"

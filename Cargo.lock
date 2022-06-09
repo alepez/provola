@@ -263,7 +263,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "provola-core"
+name = "provola_core"
 version = "1.0.0"
 dependencies = [
  "chrono",
