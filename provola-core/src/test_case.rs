@@ -1,3 +1,4 @@
+use crate::named::Named;
 use crate::report::Report;
 use crate::testable::Testable;
 
@@ -14,6 +15,12 @@ impl Testable for TestCase {
 
     fn is_ignored(&self) -> bool {
         self.ignored
+    }
+}
+
+impl Named for TestCase {
+    fn name(&self) -> &str {
+        &self.name
     }
 }
 
