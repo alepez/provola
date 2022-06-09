@@ -15,7 +15,7 @@ struct FailTestRunnerMock;
 impl Testable for FailTestRunnerMock {
     fn run(&self) -> Report {
         let details = FailureDetails { message: Some("oops!".into()), code_reference: None };
-        Report::fail(details)
+        Report::fail_with_details(details)
     }
 }
 
