@@ -2,11 +2,12 @@ use crate::report::Report;
 use crate::testable::Testable;
 use super::test_case::TestCase;
 
-struct TestSuite {
-    name: Option<String>,
-    suites: Vec<TestSuite>,
-    cases: Vec<TestCase>,
-    ignored: bool,
+#[derive(Default)]
+pub struct TestSuite {
+    pub name: Option<String>,
+    pub suites: Vec<TestSuite>,
+    pub cases: Vec<TestCase>,
+    pub ignored: bool,
 }
 
 impl Testable for TestSuite {
@@ -22,6 +23,17 @@ impl Testable for TestSuite {
     }
 
     fn is_ignored(&self) -> bool {
-        todo!()
+        self.ignored
+    }
+}
+
+impl TestSuite {
+    pub fn new(name: String) -> Self {
+        Self {
+            name: Some(name),
+            suites: Default::default(),
+            cases: Default::default(),
+            ignored: false,
+        }
     }
 }
