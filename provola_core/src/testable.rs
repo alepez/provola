@@ -2,7 +2,7 @@ use super::report::Report;
 
 pub trait Testable {
     fn run(&self) -> Report {
-        Report::skipped()
+        Report::not_available()
     }
 
     fn is_ignored(&self) -> bool {

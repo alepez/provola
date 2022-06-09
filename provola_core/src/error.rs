@@ -1,1 +1,3 @@
-pub struct Error;
+pub enum Error {
+    NotAvailable,
+}

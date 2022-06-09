@@ -1,4 +1,5 @@
 use super::code::CodeReference;
+use super::error::Error;
 use chrono::Duration;
 
 pub struct FailureDetails {
@@ -10,6 +11,7 @@ pub enum TestResult {
     Pass,
     Fail(FailureDetails),
     Skipped,
+    Error(Error),
 }
 
 impl TestResult {
@@ -61,6 +63,14 @@ impl Report {
     pub fn fail(details: FailureDetails) -> Report {
         Report {
             result: TestResult::Fail(details),
+            duration: None,
+            children: Default::default(),
+        }
+    }
+
+    pub fn not_available() -> Report {
+        Report {
+            result: TestResult::Error(Error::NotAvailable),
             duration: None,
             children: Default::default(),
         }
