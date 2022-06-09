@@ -1,6 +1,0 @@
----
-source: src/simple.rs
-expression: s
-
----
-"FAIL\n\nExpected\n\nbar\n\nActual\n\nfoo\n"

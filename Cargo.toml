@@ -1,11 +1,4 @@
 [workspace]
 members = [
-  "provola",
   "provola-core",
-  "provola-reporters",
-  "provola-googletest",
-  "provola-catch2",
-  "provola-testrunners",
-  "provola-terminalreporter",
-  "provola-egui",
 ]

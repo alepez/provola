@@ -1,6 +1,0 @@
----
-source: src/colorful.rs
-expression: s
-
----
-"\n\u{1b}[1;32mPASS\u{1b}[0m\n"

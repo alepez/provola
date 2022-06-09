@@ -1,1 +1,0 @@
-main = interact reverse
