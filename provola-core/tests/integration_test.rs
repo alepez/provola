@@ -2,11 +2,11 @@ use provola_core::{Report, TestCase, TestSuite};
 use provola_core::Testable;
 use provola_core::Named;
 
-struct TestRunnerMock;
+struct PassTestRunnerMock;
 
-impl Testable for TestRunnerMock {
-    fn run(&self) -> provola_core::Report {
-        Report::success()
+impl Testable for PassTestRunnerMock {
+    fn run(&self) -> Report {
+        Report::pass()
     }
 
     fn is_ignored(&self) -> bool {
@@ -16,7 +16,7 @@ impl Testable for TestRunnerMock {
 
 #[test]
 fn test_custom_test_case() {
-    let runner = Box::new(TestRunnerMock {});
+    let runner = Box::new(PassTestRunnerMock {});
     let test_case = TestCase::new("foo".into(), runner);
     let report = test_case.run();
     assert!(report.result.is_success());

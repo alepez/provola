@@ -7,15 +7,15 @@ pub struct FailureDetails {
 }
 
 pub enum TestResult {
-    Success,
-    Failure(FailureDetails),
+    Pass,
+    Fail(FailureDetails),
     Skipped,
 }
 
 impl TestResult {
     pub fn is_success(&self) -> bool {
         match self {
-            TestResult::Success => true,
+            TestResult::Pass => true,
             _ => false,
         }
     }
@@ -44,9 +44,9 @@ impl Report {
         }
     }
 
-    pub fn success() -> Report {
+    pub fn pass() -> Report {
         Report {
-            result: TestResult::Success,
+            result: TestResult::Pass,
             duration: None,
             children: Default::default(),
         }
