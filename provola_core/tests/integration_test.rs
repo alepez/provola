@@ -24,7 +24,7 @@ fn test_custom_test_case() {
     let runner = Box::new(PassTestRunnerMock {});
     let test_case = TestCase::new("foo".into(), runner);
     let report = test_case.run();
-    assert!(report.result.is_success());
+    assert!(report.result.is_passed());
     assert_eq!("foo", test_case.name());
 }
 
@@ -33,7 +33,7 @@ fn test_custom_test_case_failure() {
     let runner = Box::new(FailTestRunnerMock {});
     let test_case = TestCase::new("foo".into(), runner);
     let report = test_case.run();
-    assert!(report.result.is_fail());
+    assert!(report.result.is_failed());
 }
 
 #[test]

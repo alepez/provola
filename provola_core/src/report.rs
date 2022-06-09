@@ -10,25 +10,19 @@ pub struct FailureDetails {
 }
 
 pub enum TestResult {
-    Pass,
-    Fail(FailureDetails),
+    Passed,
+    Failed(FailureDetails),
     Skipped,
-    Error(Error),
+    Aborted(Error),
     Mixed,
 }
 
 impl TestResult {
-    pub fn is_success(&self) -> bool {
-        match self {
-            TestResult::Pass => true,
-            _ => false,
-        }
+    pub fn is_passed(&self) -> bool {
+        matches!(self, TestResult::Passed)
     }
-    pub fn is_fail(&self) -> bool {
-        match self {
-            TestResult::Fail(_) => true,
-            _ => false,
-        }
+    pub fn is_failed(&self) -> bool {
+        matches!(self, TestResult::Failed(_))
     }
 }
 
@@ -39,13 +33,13 @@ pub struct Report {
 }
 
 fn fold_results(reports: &Vec<Report>) -> TestResult {
-    let all_passed = reports.iter().all(|x| x.result.is_success() && fold_results(&x.children).is_success());
+    let all_passed = reports.iter().all(|x| x.result.is_passed() && fold_results(&x.children).is_passed());
 
-    if all_passed { return TestResult::Pass; }
+    if all_passed { return TestResult::Passed; }
 
-    let all_failed = reports.iter().all(|x| x.result.is_fail() && fold_results(&x.children).is_fail());
+    let all_failed = reports.iter().all(|x| x.result.is_failed() && fold_results(&x.children).is_failed());
 
-    if all_failed { return TestResult::Fail(Default::default()); }
+    if all_failed { return TestResult::Failed(Default::default()); }
 
     TestResult::Mixed
 }
@@ -80,7 +74,7 @@ impl Report {
 
     pub fn pass() -> Report {
         Report {
-            result: TestResult::Pass,
+            result: TestResult::Passed,
             duration: None,
             children: Default::default(),
         }
@@ -88,7 +82,7 @@ impl Report {
 
     pub fn fail_with_details(details: FailureDetails) -> Report {
         Report {
-            result: TestResult::Fail(details),
+            result: TestResult::Failed(details),
             duration: None,
             children: Default::default(),
         }
@@ -96,7 +90,7 @@ impl Report {
 
     pub fn fail() -> Report {
         Report {
-            result: TestResult::Fail(Default::default()),
+            result: TestResult::Failed(Default::default()),
             duration: None,
             children: Default::default(),
         }
@@ -104,7 +98,7 @@ impl Report {
 
     pub fn not_available() -> Report {
         Report {
-            result: TestResult::Error(Error::NotAvailable),
+            result: TestResult::Aborted(Error::NotAvailable),
             duration: None,
             children: Default::default(),
         }
@@ -136,6 +130,6 @@ mod tests {
         ];
 
         let report = Report::with_children(children);
-        assert!(matches!(report.result, TestResult::Pass));
+        assert!(matches!(report.result, TestResult::Passed));
     }
 }
