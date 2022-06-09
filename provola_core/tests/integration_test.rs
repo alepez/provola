@@ -8,10 +8,6 @@ impl Testable for PassTestRunnerMock {
     fn run(&self) -> Report {
         Report::pass()
     }
-
-    fn is_ignored(&self) -> bool {
-        false
-    }
 }
 
 struct FailTestRunnerMock;
@@ -20,10 +16,6 @@ impl Testable for FailTestRunnerMock {
     fn run(&self) -> Report {
         let details = FailureDetails { message: Some("oops!".into()), code_reference: None };
         Report::fail(details)
-    }
-
-    fn is_ignored(&self) -> bool {
-        false
     }
 }
 
