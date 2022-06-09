@@ -9,6 +9,7 @@ pub struct FailureDetails {
 pub enum TestResult {
     Success,
     Failure(FailureDetails),
+    Skipped,
 }
 
 pub struct Report {
