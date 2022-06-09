@@ -19,6 +19,12 @@ impl TestResult {
             _ => false,
         }
     }
+    pub fn is_fail(&self) -> bool {
+        match self {
+            TestResult::Fail(_) => true,
+            _ => false,
+        }
+    }
 }
 
 pub struct Report {

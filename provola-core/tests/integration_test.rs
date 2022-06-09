@@ -41,7 +41,7 @@ fn test_custom_test_case_failure() {
     let runner = Box::new(FailTestRunnerMock {});
     let test_case = TestCase::new("foo".into(), runner);
     let report = test_case.run();
-    assert!(!report.result.is_success());
+    assert!(report.result.is_fail());
 }
 
 #[test]
