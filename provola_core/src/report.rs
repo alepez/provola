@@ -1,3 +1,4 @@
+use std::ops::Add;
 use super::code::CodeReference;
 use super::error::Error;
 use chrono::Duration;
@@ -49,6 +50,17 @@ fn fold_results(reports: &Vec<Report>) -> TestResult {
     TestResult::Mixed
 }
 
+fn sum_durations(reports: &Vec<Report>) -> Option<Duration> {
+    let mut duration = Duration::seconds(0);
+
+    for report in reports {
+        duration.add(report.duration?);
+        duration.add(sum_durations(&report.children)?);
+    }
+
+    Some(duration)
+}
+
 impl Report {
     pub fn skipped() -> Report {
         Report {
@@ -61,7 +73,7 @@ impl Report {
     pub fn with_children(children: Vec<Report>) -> Report {
         Report {
             result: fold_results(&children),
-            duration: None,// FIXME from children
+            duration: sum_durations(&children),
             children,
         }
     }
