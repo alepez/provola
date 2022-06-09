@@ -16,3 +16,13 @@ impl Testable for TestCase {
         self.ignored
     }
 }
+
+impl TestCase {
+    pub fn new(name: String, runner: Box<dyn Testable>) -> Self {
+        Self {
+            name,
+            runner,
+            ignored: false,
+        }
+    }
+}

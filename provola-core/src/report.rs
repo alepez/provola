@@ -12,10 +12,19 @@ pub enum TestResult {
     Skipped,
 }
 
+impl TestResult {
+    pub fn is_success(&self) -> bool {
+        match self {
+            TestResult::Success => true,
+            _ => false,
+        }
+    }
+}
+
 pub struct Report {
-    result: TestResult,
-    duration: Option<Duration>,
-    children: Vec<Report>,
+    pub result: TestResult,
+    pub duration: Option<Duration>,
+    pub children: Vec<Report>,
 }
 
 impl Report {
@@ -32,6 +41,14 @@ impl Report {
             result: TestResult::Skipped, // FIXME from children
             duration: None,// FIXME from children
             children,
+        }
+    }
+
+    pub fn success() -> Report {
+        Report {
+            result: TestResult::Success,
+            duration: None,
+            children: Default::default(),
         }
     }
 }

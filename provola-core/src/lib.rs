@@ -5,3 +5,7 @@ mod code;
 mod error;
 mod collection;
 mod test_suite;
+
+pub use test_case::TestCase;
+pub use testable::Testable;
+pub use report::Report;
