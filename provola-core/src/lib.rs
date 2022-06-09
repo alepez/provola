@@ -10,5 +10,6 @@ mod named;
 pub use test_case::TestCase;
 pub use testable::Testable;
 pub use report::Report;
+pub use report::FailureDetails;
 pub use named::Named;
 pub use test_suite::TestSuite;

@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
 pub struct CodeReference {
-    path: PathBuf,
-    line: usize,
+    pub path: PathBuf,
+    pub line: usize,
 }

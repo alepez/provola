@@ -2,8 +2,8 @@ use super::code::CodeReference;
 use chrono::Duration;
 
 pub struct FailureDetails {
-    message: Option<String>,
-    code_reference: Option<CodeReference>,
+    pub message: Option<String>,
+    pub code_reference: Option<CodeReference>,
 }
 
 pub enum TestResult {
@@ -47,6 +47,14 @@ impl Report {
     pub fn pass() -> Report {
         Report {
             result: TestResult::Pass,
+            duration: None,
+            children: Default::default(),
+        }
+    }
+
+    pub fn fail(details: FailureDetails) -> Report {
+        Report {
+            result: TestResult::Fail(details),
             duration: None,
             children: Default::default(),
         }
