@@ -114,4 +114,16 @@ mod tests {
         let report = Report::with_children(children);
         assert!(matches!(report.result, TestResult::Mixed));
     }
+
+    #[test]
+    fn test_report_with_only_passed() {
+        let children = vec![
+            Report::pass(),
+            Report::pass(),
+            Report::pass(),
+        ];
+
+        let report = Report::with_children(children);
+        assert!(matches!(report.result, TestResult::Pass));
+    }
 }
