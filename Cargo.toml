@@ -1,45 +1,6 @@
-[package]
-name = "provola"
-version = "0.2.0"
-authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
-edition = "2021"
-description = "A tool for quick development/test cycle in any language"
-homepage = "https://github.com/alepez/provola"
-repository = "https://github.com/alepez/provola"
-readme = "README.md"
-license = "MIT/Apache-2.0"
-
-[dependencies]
-clap = { version = "3.0.0-rc.8", features = [ "derive" ] }
-clap_generate = "3.0.0-rc.8"
-env_logger = "0.9"
-log = "0.4"
-serde = { version = "1", features = ["derive"] }
-
-[dependencies.provola-core]
-version = "0.2.0"
-path = "provola-core"
-
-[dependencies.provola-testrunners]
-version = "0.2.0"
-path = "provola-testrunners"
-
-[dependencies.provola-reporters]
-version = "0.2.0"
-path = "provola-reporters"
-
-[dependencies.provola-egui]
-version = "0.2.0"
-path = "provola-egui"
-optional = true
-
-[features]
-default = ["egui"]
-egui = ["provola-egui"]
-
 [workspace]
-
 members = [
+  "provola",
   "provola-core",
   "provola-reporters",
   "provola-googletest",
