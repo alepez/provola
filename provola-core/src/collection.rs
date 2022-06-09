@@ -1,5 +1,3 @@
-use std::ops::Index;
-use crate::error::Error;
 use crate::report::Report;
 use super::testable::Testable;
 
