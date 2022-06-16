@@ -48,8 +48,7 @@ fn sum_durations(reports: &Vec<Report>) -> Option<Duration> {
     let mut duration = Duration::seconds(0);
 
     for report in reports {
-        duration.add(report.duration?);
-        duration.add(sum_durations(&report.children)?);
+        duration = duration.add(report.duration?);
     }
 
     Some(duration)
@@ -69,6 +68,14 @@ impl Report {
             result: fold_results(&children),
             duration: sum_durations(&children),
             children,
+        }
+    }
+
+    pub fn pass_with_duration(duration: Duration) -> Report {
+        Report {
+            result: TestResult::Passed,
+            duration: Some(duration),
+            children: Default::default(),
         }
     }
 
@@ -131,5 +138,41 @@ mod tests {
 
         let report = Report::with_children(children);
         assert!(matches!(report.result, TestResult::Passed));
+    }
+
+    #[test]
+    fn test_sum_durations_of_nothings_gives_zero() {
+        assert_eq!(Some(Duration::seconds(0)), sum_durations(&vec![]));
+    }
+
+    #[test]
+    fn test_sum_durations_of_reports_with_duration() {
+        let reports = vec![
+            Report::pass_with_duration(Duration::seconds(1)),
+            Report::pass_with_duration(Duration::seconds(2)),
+            Report::pass_with_duration(Duration::milliseconds(3)),
+        ];
+        assert_eq!(Some(Duration::milliseconds(3003)), sum_durations(&reports));
+    }
+
+    #[test]
+    fn test_sum_durations_of_reports_without_duration() {
+        let reports = vec![
+            Report::pass_with_duration(Duration::seconds(1)),
+            Report::pass(),
+        ];
+        assert_eq!(None, sum_durations(&reports));
+    }
+
+    #[test]
+    fn test_sum_durations_of_reports_with_children() {
+        let reports = vec![
+            Report::pass_with_duration(Duration::seconds(1)),
+            Report::with_children(vec![
+                Report::pass_with_duration(Duration::seconds(2)),
+                Report::pass_with_duration(Duration::seconds(3)),
+            ]),
+        ];
+        assert_eq!(Some(Duration::seconds(6)), sum_durations(&reports));
     }
 }
