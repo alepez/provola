@@ -19,3 +19,4 @@ strum = "0.23"
 strum_macros = "0.23"
 subprocess = "0.2"
 thiserror = "1.0"
+tokio = { version = "1", features = ["full"] }
