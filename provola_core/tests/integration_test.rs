@@ -1,6 +1,7 @@
 use provola_core::{Report, TestCase, TestSuite, FailureDetails};
 use provola_core::Testable;
 use provola_core::Named;
+use provola_core::AsyncTestable;
 
 struct PassTestRunnerMock;
 
@@ -40,4 +41,13 @@ fn test_custom_test_case_failure() {
 fn test_test_suite() {
     let test_suite = TestSuite::new("suite");
     assert_eq!("suite", test_suite.name.unwrap());
+}
+
+#[tokio::test]
+async fn test_async() {
+    let runner = Box::new(PassTestRunnerMock {});
+    let testable = AsyncTestable::new(runner);
+    let f = testable.launch();
+    let r = f.await;
+    assert!(r.result.is_passed());
 }

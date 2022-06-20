@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use crate::report_future::ReportFuture;
-use super::report::Report;
+use crate::report::Report;
 
 pub trait Testable: Send {
     fn run(&self) -> Report {
@@ -16,11 +16,11 @@ pub trait Testable: Send {
 pub struct AsyncTestable(Arc<Mutex<Box<dyn Testable>>>);
 
 impl AsyncTestable {
-    fn new(testable: Box<dyn Testable>) -> Self {
+    pub fn new(testable: Box<dyn Testable>) -> Self {
         Self(Arc::new(Mutex::new(testable)))
     }
 
-    fn launch(&self) -> ReportFuture {
+    pub fn launch(&self) -> ReportFuture {
         ReportFuture::new(self.0.clone())
     }
 }
