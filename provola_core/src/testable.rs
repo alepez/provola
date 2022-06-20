@@ -9,3 +9,21 @@ pub trait Testable {
         false
     }
 }
+
+#[derive(Clone)]
+pub struct DummyTestable {
+    report: Report,
+}
+
+impl DummyTestable {
+    #[allow(dead_code)]
+    pub fn new(report: Report) -> Self {
+        Self { report }
+    }
+}
+
+impl Testable for DummyTestable {
+    fn run(&self) -> Report {
+        self.report.clone()
+    }
+}

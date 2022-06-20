@@ -22,7 +22,7 @@ impl Testable for FailTestRunnerMock {
 #[test]
 fn test_custom_test_case() {
     let runner = Box::new(PassTestRunnerMock {});
-    let test_case = TestCase::new("foo".into(), runner);
+    let test_case = TestCase::new("foo", runner);
     let report = test_case.run();
     assert!(report.result.is_passed());
     assert_eq!("foo", test_case.name());
@@ -31,13 +31,13 @@ fn test_custom_test_case() {
 #[test]
 fn test_custom_test_case_failure() {
     let runner = Box::new(FailTestRunnerMock {});
-    let test_case = TestCase::new("foo".into(), runner);
+    let test_case = TestCase::new("foo", runner);
     let report = test_case.run();
     assert!(report.result.is_failed());
 }
 
 #[test]
 fn test_test_suite() {
-    let test_suite = TestSuite::new("suite".into());
+    let test_suite = TestSuite::new("suite");
     assert_eq!("suite", test_suite.name.unwrap());
 }

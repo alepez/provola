@@ -25,9 +25,9 @@ impl Named for TestCase {
 }
 
 impl TestCase {
-    pub fn new(name: String, runner: Box<dyn Testable>) -> Self {
+    pub fn new(name: impl Into<String>, runner: Box<dyn Testable>) -> Self {
         Self {
-            name,
+            name: name.into(),
             runner,
             ignored: false,
         }

@@ -3,13 +3,13 @@ use super::code::CodeReference;
 use super::error::Error;
 use chrono::Duration;
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct FailureDetails {
     pub message: Option<String>,
     pub code_reference: Option<CodeReference>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TestResult {
     Passed,
     Failed(FailureDetails),
@@ -28,7 +28,7 @@ impl TestResult {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Report {
     pub result: TestResult,
     pub duration: Option<Duration>,
