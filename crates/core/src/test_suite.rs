@@ -53,7 +53,7 @@ mod tests {
             ignored: true,
         };
         let r = s.start();
-        assert!(matches!(r.result, TestResult::Skipped));
+        assert!(matches!(r.result, TestResult::Skip));
     }
 
     #[test]
@@ -74,6 +74,6 @@ mod tests {
             ..Default::default()
         };
         let r = s.start();
-        assert!(matches!(r.result, TestResult::Passed));
+        assert!(matches!(r.result, TestResult::Pass));
     }
 }

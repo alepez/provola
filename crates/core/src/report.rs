@@ -4,27 +4,27 @@ use chrono::Duration;
 use std::ops::Add;
 
 #[derive(Default, Debug, Clone)]
-pub struct FailureDetails {
+pub struct FailDetails {
     pub message: Option<String>,
     pub code_reference: Option<CodeReference>,
 }
 
 #[derive(Debug, Clone)]
 pub enum TestResult {
-    Passed,
-    Failed(FailureDetails),
-    Skipped,
-    Aborted(Error),
+    Pass,
+    Fail(FailDetails),
+    Skip,
+    Abort(Error),
     Mixed,
     Empty,
 }
 
 impl TestResult {
     pub fn is_passed(&self) -> bool {
-        matches!(self, TestResult::Passed)
+        matches!(self, TestResult::Pass)
     }
     pub fn is_failed(&self) -> bool {
-        matches!(self, TestResult::Failed(_))
+        matches!(self, TestResult::Fail(_))
     }
 }
 
@@ -41,7 +41,7 @@ fn fold_results(reports: &[Report]) -> TestResult {
         .all(|x| x.result.is_passed() && fold_results(&x.children).is_passed());
 
     if all_passed {
-        return TestResult::Passed;
+        return TestResult::Pass;
     }
 
     let all_failed = reports
@@ -49,7 +49,7 @@ fn fold_results(reports: &[Report]) -> TestResult {
         .all(|x| x.result.is_failed() && fold_results(&x.children).is_failed());
 
     if all_failed {
-        return TestResult::Failed(Default::default());
+        return TestResult::Fail(Default::default());
     }
 
     TestResult::Mixed
@@ -68,7 +68,7 @@ fn sum_durations(reports: &Vec<Report>) -> Option<Duration> {
 impl Report {
     pub fn skipped() -> Report {
         Report {
-            result: TestResult::Skipped,
+            result: TestResult::Skip,
             duration: None,
             children: Default::default(),
         }
@@ -84,7 +84,7 @@ impl Report {
 
     pub fn pass_with_duration(duration: Duration) -> Report {
         Report {
-            result: TestResult::Passed,
+            result: TestResult::Pass,
             duration: Some(duration),
             children: Default::default(),
         }
@@ -92,15 +92,15 @@ impl Report {
 
     pub fn pass() -> Report {
         Report {
-            result: TestResult::Passed,
+            result: TestResult::Pass,
             duration: None,
             children: Default::default(),
         }
     }
 
-    pub fn fail_with_details(details: FailureDetails) -> Report {
+    pub fn fail_with_details(details: FailDetails) -> Report {
         Report {
-            result: TestResult::Failed(details),
+            result: TestResult::Fail(details),
             duration: None,
             children: Default::default(),
         }
@@ -108,7 +108,7 @@ impl Report {
 
     pub fn fail() -> Report {
         Report {
-            result: TestResult::Failed(Default::default()),
+            result: TestResult::Fail(Default::default()),
             duration: None,
             children: Default::default(),
         }
@@ -116,7 +116,7 @@ impl Report {
 
     pub fn not_available() -> Report {
         Report {
-            result: TestResult::Aborted(Error::NotAvailable),
+            result: TestResult::Abort(Error::NotAvailable),
             duration: None,
             children: Default::default(),
         }
@@ -140,7 +140,7 @@ mod tests {
         let children = vec![Report::pass(), Report::pass(), Report::pass()];
 
         let report = Report::with_children(children);
-        assert!(matches!(report.result, TestResult::Passed));
+        assert!(matches!(report.result, TestResult::Pass));
     }
 
     #[test]

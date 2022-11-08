@@ -42,7 +42,7 @@ mod tests {
             ignored: true,
         };
         let r = c.start();
-        assert!(matches!(r.result, TestResult::Skipped));
+        assert!(matches!(r.result, TestResult::Skip));
     }
 
     #[test]

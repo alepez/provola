@@ -1,6 +1,6 @@
 use provola_core::Named;
 use provola_core::Testable;
-use provola_core::{FailureDetails, Report, TestCase, TestSuite};
+use provola_core::{FailDetails, Report, TestCase, TestSuite};
 
 struct PassTestRunnerMock;
 
@@ -14,7 +14,7 @@ struct FailTestRunnerMock;
 
 impl Testable for FailTestRunnerMock {
     fn start(&self) -> Report {
-        let details = FailureDetails {
+        let details = FailDetails {
             message: Some("oops!".into()),
             code_reference: None,
         };

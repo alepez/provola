@@ -8,7 +8,7 @@ mod test_suite;
 mod testable;
 
 pub use named::Named;
-pub use report::FailureDetails;
+pub use report::FailDetails;
 pub use report::Report;
 pub use test_case::TestCase;
 pub use test_suite::TestSuite;
