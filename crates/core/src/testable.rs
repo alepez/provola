@@ -1,7 +1,7 @@
+use crate::report::Report;
+use crate::report_future::ReportFuture;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use crate::report_future::ReportFuture;
-use crate::report::Report;
 
 pub trait Testable: Send {
     fn run(&self) -> Report {
@@ -10,18 +10,6 @@ pub trait Testable: Send {
 
     fn is_ignored(&self) -> bool {
         false
-    }
-}
-
-pub struct AsyncTestable(Arc<Mutex<Box<dyn Testable>>>);
-
-impl AsyncTestable {
-    pub fn new(testable: Box<dyn Testable>) -> Self {
-        Self(Arc::new(Mutex::new(testable)))
-    }
-
-    pub fn launch(&self) -> ReportFuture {
-        ReportFuture::new(self.0.clone())
     }
 }
 
@@ -46,20 +34,5 @@ impl Testable for DummyTestable {
     fn run(&self) -> Report {
         std::thread::sleep(self.delay);
         self.report.clone()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn async_testable_can_be_launched() {
-        let delay = Duration::from_millis(10);
-        let testable = Box::new(DummyTestable::new_with_delay(Report::pass(), delay));
-        let testable = AsyncTestable::new(testable);
-        let f = testable.launch();
-        let r = f.await;
-        assert!(r.result.is_passed());
     }
 }
