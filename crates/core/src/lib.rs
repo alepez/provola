@@ -6,7 +6,6 @@ mod error;
 mod collection;
 mod test_suite;
 mod named;
-mod report_future;
 
 pub use test_case::TestCase;
 pub use testable::Testable;

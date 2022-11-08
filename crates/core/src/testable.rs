@@ -1,6 +1,4 @@
 use crate::report::Report;
-use crate::report_future::ReportFuture;
-use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 pub trait Testable: Send {

@@ -1,7 +1,7 @@
 use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CodeLine(u32);
 
 impl From<u32> for CodeLine {
@@ -52,4 +52,3 @@ mod tests {
         assert_eq!("[/foo/bar.rs:32]", cr.to_string())
     }
 }
-

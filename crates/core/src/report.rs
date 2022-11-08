@@ -35,7 +35,7 @@ pub struct Report {
     pub children: Vec<Report>,
 }
 
-fn fold_results(reports: &Vec<Report>) -> TestResult {
+fn fold_results(reports: &[Report]) -> TestResult {
     let all_passed = reports.iter().all(|x| x.result.is_passed() && fold_results(&x.children).is_passed());
 
     if all_passed { return TestResult::Passed; }
