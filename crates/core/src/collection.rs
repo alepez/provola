@@ -1,5 +1,5 @@
-use crate::report::{Report, TestResult};
 use super::testable::Testable;
+use crate::report::{Report, TestResult};
 
 pub struct Collection {
     items: Vec<Box<dyn Testable>>,
@@ -32,19 +32,25 @@ impl Testable for Collection {
 
 #[cfg(test)]
 mod tests {
-    use crate::report::TestResult;
     use super::*;
+    use crate::report::TestResult;
 
     #[test]
     fn ignored_collection_shall_give_skipped_as_result() {
-        let c = Collection { items: Default::default(), ignored: true };
+        let c = Collection {
+            items: Default::default(),
+            ignored: true,
+        };
         let r = c.run();
         assert!(matches!(r.result, TestResult::Skipped));
     }
 
     #[test]
     fn collection_without_children() {
-        let c = Collection { items: Default::default(), ignored: false };
+        let c = Collection {
+            items: Default::default(),
+            ignored: false,
+        };
         let r = c.run();
         assert!(matches!(dbg!(&r.result), TestResult::Empty));
     }

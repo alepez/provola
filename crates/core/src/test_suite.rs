@@ -1,6 +1,6 @@
+use super::test_case::TestCase;
 use crate::report::Report;
 use crate::testable::Testable;
-use super::test_case::TestCase;
 
 #[derive(Default)]
 pub struct TestSuite {
@@ -40,13 +40,18 @@ impl TestSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::report::TestResult;
     use crate::testable::DummyTestable;
-    use super::*;
 
     #[test]
     fn ignored_suite_is_skipped() {
-        let s = TestSuite { name: None, suites: vec![], cases: vec![], ignored: true };
+        let s = TestSuite {
+            name: None,
+            suites: vec![],
+            cases: vec![],
+            ignored: true,
+        };
         let r = s.run();
         assert!(matches!(r.result, TestResult::Skipped));
     }
@@ -55,12 +60,17 @@ mod tests {
     fn suite_with_inner_suites_is_recursively_run() {
         let s = TestSuite {
             suites: vec![
-                TestSuite { ..Default::default() },
-                TestSuite { ..Default::default() },
+                TestSuite {
+                    ..Default::default()
+                },
+                TestSuite {
+                    ..Default::default()
+                },
             ],
-            cases: vec![
-                TestCase::new("", Box::new(DummyTestable::new(Report::pass()))),
-            ],
+            cases: vec![TestCase::new(
+                "",
+                Box::new(DummyTestable::new(Report::pass())),
+            )],
             ..Default::default()
         };
         let r = s.run();

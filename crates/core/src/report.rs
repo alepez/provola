@@ -1,7 +1,7 @@
-use std::ops::Add;
 use super::code::CodeReference;
 use super::error::Error;
 use chrono::Duration;
+use std::ops::Add;
 
 #[derive(Default, Debug, Clone)]
 pub struct FailureDetails {
@@ -36,13 +36,21 @@ pub struct Report {
 }
 
 fn fold_results(reports: &[Report]) -> TestResult {
-    let all_passed = reports.iter().all(|x| x.result.is_passed() && fold_results(&x.children).is_passed());
+    let all_passed = reports
+        .iter()
+        .all(|x| x.result.is_passed() && fold_results(&x.children).is_passed());
 
-    if all_passed { return TestResult::Passed; }
+    if all_passed {
+        return TestResult::Passed;
+    }
 
-    let all_failed = reports.iter().all(|x| x.result.is_failed() && fold_results(&x.children).is_failed());
+    let all_failed = reports
+        .iter()
+        .all(|x| x.result.is_failed() && fold_results(&x.children).is_failed());
 
-    if all_failed { return TestResult::Failed(Default::default()); }
+    if all_failed {
+        return TestResult::Failed(Default::default());
+    }
 
     TestResult::Mixed
 }
@@ -121,11 +129,7 @@ mod tests {
 
     #[test]
     fn test_report_with_children() {
-        let children = vec![
-            Report::skipped(),
-            Report::pass(),
-            Report::fail(),
-        ];
+        let children = vec![Report::skipped(), Report::pass(), Report::fail()];
 
         let report = Report::with_children(children);
         assert!(matches!(report.result, TestResult::Mixed));
@@ -133,11 +137,7 @@ mod tests {
 
     #[test]
     fn test_report_with_only_passed() {
-        let children = vec![
-            Report::pass(),
-            Report::pass(),
-            Report::pass(),
-        ];
+        let children = vec![Report::pass(), Report::pass(), Report::pass()];
 
         let report = Report::with_children(children);
         assert!(matches!(report.result, TestResult::Passed));

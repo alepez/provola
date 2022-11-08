@@ -1,15 +1,15 @@
-mod test_case;
-mod testable;
-mod report;
 mod code;
-mod error;
 mod collection;
-mod test_suite;
+mod error;
 mod named;
+mod report;
+mod test_case;
+mod test_suite;
+mod testable;
 
-pub use test_case::TestCase;
-pub use testable::Testable;
-pub use report::Report;
-pub use report::FailureDetails;
 pub use named::Named;
+pub use report::FailureDetails;
+pub use report::Report;
+pub use test_case::TestCase;
 pub use test_suite::TestSuite;
+pub use testable::Testable;
