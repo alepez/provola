@@ -1,14 +1,14 @@
 [package]
-name = "provola_core"
-version = "1.0.0"
 authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
-edition = "2021"
 description = "provola, fundamental data"
+edition = "2021"
 homepage = "https://github.com/alepez/provola"
-repository = "https://github.com/alepez/provola"
-readme = "README.md"
 license = "MIT/Apache-2.0"
+name = "provola_core"
+readme = "README.md"
+repository = "https://github.com/alepez/provola"
 rust-version = "1.65"
+version = "1.0.0"
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }

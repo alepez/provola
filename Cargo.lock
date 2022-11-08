@@ -355,7 +355,7 @@ name = "provola"
 version = "1.0.0"
 
 [[package]]
-name = "provola_core"
+name = "provola-core"
 version = "1.0.0"
 dependencies = [
  "chrono",
