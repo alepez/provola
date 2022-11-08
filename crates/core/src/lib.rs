@@ -1,5 +1,4 @@
 mod code;
-mod collection;
 mod error;
 mod named;
 mod report;
@@ -9,7 +8,7 @@ mod testable;
 
 pub use named::Named;
 pub use report::FailDetails;
-pub use report::Report;
+pub use report::TreeReport;
 pub use test_case::TestCase;
 pub use test_suite::TestSuite;
 pub use testable::Testable;

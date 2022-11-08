@@ -3,6 +3,15 @@ use super::error::Error;
 use chrono::Duration;
 use std::ops::Add;
 
+pub trait Report {
+    fn result(&self) -> &TestResult;
+    fn duration(&self) -> Option<Duration>;
+}
+
+pub trait PendingReport {
+    fn poll(&self) -> Option<TreeReport>;
+}
+
 #[derive(Default, Debug, Clone)]
 pub struct FailDetails {
     pub message: Option<String>,
@@ -17,172 +26,213 @@ pub struct AbortDetails {
 #[derive(Debug, Clone)]
 pub enum TestResult {
     Pass,
-    Fail(FailDetails),
+    Fail(Option<FailDetails>),
     Skip,
-    Abort(AbortDetails),
+    Abort(Option<AbortDetails>),
     Mixed,
     Empty,
+}
+
+#[derive(Debug, Clone)]
+pub struct SingleReport {
+    pub result: TestResult,
+    pub duration: Option<Duration>,
+}
+
+#[derive(Debug, Clone)]
+pub struct MultiReport {
+    pub children: Vec<SingleReport>,
+}
+
+#[derive(Debug, Clone)]
+pub enum TreeReport {
+    Single(SingleReport),
+    Multi(MultiReport),
 }
 
 impl TestResult {
     pub fn is_passed(&self) -> bool {
         matches!(self, TestResult::Pass)
     }
+
     pub fn is_failed(&self) -> bool {
         matches!(self, TestResult::Fail(_))
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Report {
-    pub result: TestResult,
-    pub duration: Option<Duration>,
-    pub children: Vec<Report>,
-}
-
-fn fold_results(reports: &[Report]) -> TestResult {
-    let all_passed = reports
-        .iter()
-        .all(|x| x.result.is_passed() && fold_results(&x.children).is_passed());
-
-    if all_passed {
-        return TestResult::Pass;
+impl Report for SingleReport {
+    fn result(&self) -> &TestResult {
+        &self.result
     }
 
-    let all_failed = reports
-        .iter()
-        .all(|x| x.result.is_failed() && fold_results(&x.children).is_failed());
-
-    if all_failed {
-        return TestResult::Fail(Default::default());
+    fn duration(&self) -> Option<Duration> {
+        self.duration
     }
-
-    TestResult::Mixed
 }
 
-fn sum_durations(reports: &Vec<Report>) -> Option<Duration> {
-    let mut duration = Duration::seconds(0);
-
-    for report in reports {
-        duration = duration.add(report.duration?);
-    }
-
-    Some(duration)
-}
-
-impl Report {
-    pub fn skipped() -> Report {
-        Report {
+impl SingleReport {
+    pub fn skipped() -> Self {
+        Self {
             result: TestResult::Skip,
             duration: None,
-            children: Default::default(),
         }
     }
 
-    pub fn with_children(children: Vec<Report>) -> Report {
-        Report {
-            result: fold_results(&children),
-            duration: sum_durations(&children),
-            children,
-        }
-    }
-
-    pub fn pass_with_duration(duration: Duration) -> Report {
-        Report {
+    pub fn pass_with_duration(duration: Duration) -> Self {
+        Self {
             result: TestResult::Pass,
             duration: Some(duration),
-            children: Default::default(),
         }
     }
 
-    pub fn pass() -> Report {
-        Report {
+    pub fn pass() -> Self {
+        Self {
             result: TestResult::Pass,
             duration: None,
-            children: Default::default(),
         }
     }
 
-    pub fn fail_with_details(details: FailDetails) -> Report {
-        Report {
-            result: TestResult::Fail(details),
+    pub fn fail_with_details(details: FailDetails) -> Self {
+        Self {
+            result: TestResult::Fail(Some(details)),
             duration: None,
-            children: Default::default(),
         }
     }
 
-    pub fn fail() -> Report {
-        Report {
-            result: TestResult::Fail(Default::default()),
+    pub fn fail() -> Self {
+        Self {
+            result: TestResult::Fail(None),
             duration: None,
-            children: Default::default(),
         }
     }
 
-    pub fn not_available() -> Report {
-        Report {
-            result: TestResult::Abort(AbortDetails {
-                error: Some(Error::NotAvailable),
-            }),
+    pub fn not_available() -> Self {
+        let error = Error::NotAvailable;
+        let details = AbortDetails { error: Some(error) };
+        Self {
+            result: TestResult::Abort(Some(details)),
             duration: None,
-            children: Default::default(),
+        }
+    }
+}
+
+impl Report for MultiReport {
+    fn result(&self) -> &TestResult {
+        let _result = self.fold_results();
+        todo!()
+    }
+
+    fn duration(&self) -> Option<Duration> {
+        self.sum_durations()
+    }
+}
+
+impl MultiReport {
+    pub fn new(children: Vec<SingleReport>) -> Self {
+        Self { children }
+    }
+
+    fn fold_results(&self) -> TestResult {
+        let all_passed = self.children.iter().all(|x| x.result.is_passed());
+        let all_failed = self.children.iter().all(|x| x.result.is_failed());
+
+        match (all_passed, all_failed) {
+            (true, false) => TestResult::Pass,
+            (false, true) => TestResult::Fail(None),
+            _ => TestResult::Mixed,
+        }
+    }
+
+    fn sum_durations(&self) -> Option<Duration> {
+        let mut duration = Duration::seconds(0);
+
+        for report in &self.children {
+            duration = duration.add(report.duration?);
+        }
+
+        Some(duration)
+    }
+}
+
+impl Report for TreeReport {
+    fn result(&self) -> &TestResult {
+        match self {
+            TreeReport::Single(x) => x.result(),
+            TreeReport::Multi(x) => x.result(),
+        }
+    }
+
+    fn duration(&self) -> Option<Duration> {
+        match self {
+            TreeReport::Single(x) => x.duration(),
+            TreeReport::Multi(x) => x.duration(),
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
 
-    #[test]
-    fn test_report_with_children() {
-        let children = vec![Report::skipped(), Report::pass(), Report::fail()];
+    // #[test]
+    // fn test_report_with_children() {
+    //     let children = vec![
+    //         SingleReport::skipped(),
+    //         SingleReport::pass(),
+    //         SingleReport::fail(),
+    //     ];
 
-        let report = Report::with_children(children);
-        assert!(matches!(report.result, TestResult::Mixed));
-    }
+    //     let report = MultiReport::new(children);
+    //     assert!(matches!(report.result, TestResult::Mixed));
+    // }
 
-    #[test]
-    fn test_report_with_only_passed() {
-        let children = vec![Report::pass(), Report::pass(), Report::pass()];
+    // #[test]
+    // fn test_report_with_only_passed() {
+    //     let children = vec![
+    //         SingleReport::pass(),
+    //         SingleReport::pass(),
+    //         SingleReport::pass(),
+    //     ];
 
-        let report = Report::with_children(children);
-        assert!(matches!(report.result, TestResult::Pass));
-    }
+    //     let report = MultiReport::new(children);
+    //     assert!(matches!(report.result, TestResult::Pass));
+    // }
 
-    #[test]
-    fn test_sum_durations_of_nothings_gives_zero() {
-        assert_eq!(Some(Duration::seconds(0)), sum_durations(&vec![]));
-    }
+    // #[test]
+    // fn test_sum_durations_of_nothings_gives_zero() {
+    //     assert_eq!(Some(Duration::seconds(0)), sum_durations(&vec![]));
+    // }
 
-    #[test]
-    fn test_sum_durations_of_reports_with_duration() {
-        let reports = vec![
-            Report::pass_with_duration(Duration::seconds(1)),
-            Report::pass_with_duration(Duration::seconds(2)),
-            Report::pass_with_duration(Duration::milliseconds(3)),
-        ];
-        assert_eq!(Some(Duration::milliseconds(3003)), sum_durations(&reports));
-    }
+    // #[test]
+    // fn test_sum_durations_of_reports_with_duration() {
+    //     let reports = vec![
+    //         SingleReport::pass_with_duration(Duration::seconds(1)),
+    //         SingleReport::pass_with_duration(Duration::seconds(2)),
+    //         SingleReport::pass_with_duration(Duration::milliseconds(3)),
+    //     ];
+    //     let multi = MultiReport::new(reports);
+    //     assert_eq!(Some(Duration::milliseconds(3003)), sum_durations(&reports));
+    // }
 
-    #[test]
-    fn test_sum_durations_of_reports_without_duration() {
-        let reports = vec![
-            Report::pass_with_duration(Duration::seconds(1)),
-            Report::pass(),
-        ];
-        assert_eq!(None, sum_durations(&reports));
-    }
+    // #[test]
+    // fn test_sum_durations_of_reports_without_duration() {
+    //     let reports = vec![
+    //         SingleReport::pass_with_duration(Duration::seconds(1)),
+    //         SingleReport::pass(),
+    //     ];
+    //     let multi = MultiReport::new(reports);
+    //     assert_eq!(None, multi.(&reports));
+    // }
 
-    #[test]
-    fn test_sum_durations_of_reports_with_children() {
-        let reports = vec![
-            Report::pass_with_duration(Duration::seconds(1)),
-            Report::with_children(vec![
-                Report::pass_with_duration(Duration::seconds(2)),
-                Report::pass_with_duration(Duration::seconds(3)),
-            ]),
-        ];
-        assert_eq!(Some(Duration::seconds(6)), sum_durations(&reports));
-    }
+    // #[test]
+    // fn test_sum_durations_of_reports_with_children() {
+    //     let reports = vec![
+    //         Report::pass_with_duration(Duration::seconds(1)),
+    //         Report::new(vec![
+    //             Report::pass_with_duration(Duration::seconds(2)),
+    //             Report::pass_with_duration(Duration::seconds(3)),
+    //         ]),
+    //     ];
+    //     assert_eq!(Some(Duration::seconds(6)), sum_durations(&reports));
+    // }
 }

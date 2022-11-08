@@ -1,5 +1,5 @@
 use crate::named::Named;
-use crate::report::Report;
+use crate::report::PendingReport;
 use crate::testable::Testable;
 
 pub struct TestCase {
@@ -9,7 +9,7 @@ pub struct TestCase {
 }
 
 impl Testable for TestCase {
-    fn start(&self) -> Report {
+    fn start(&self) -> Box<dyn PendingReport> {
         self.runner.start()
     }
 

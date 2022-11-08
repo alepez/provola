@@ -1,5 +1,5 @@
 use super::test_case::TestCase;
-use crate::report::Report;
+use crate::report::PendingReport;
 use crate::testable::Testable;
 
 #[derive(Default)]
@@ -11,15 +11,12 @@ pub struct TestSuite {
 }
 
 impl Testable for TestSuite {
-    fn start(&self) -> Report {
+    fn start(&self) -> Box<dyn PendingReport> {
         if self.ignored {
-            return Report::skipped();
+            todo!()
         }
 
-        let mut children = Vec::new();
-        children.extend(self.cases.iter().map(|t| t.start()));
-        children.extend(self.suites.iter().map(|t| t.start()));
-        Report::with_children(children)
+        todo!()
     }
 
     fn is_ignored(&self) -> bool {
@@ -38,42 +35,41 @@ impl TestSuite {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::report::TestResult;
-    use crate::testable::DummyTestable;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     use crate::report::TestResult;
 
-    #[test]
-    fn ignored_suite_is_skipped() {
-        let s = TestSuite {
-            name: None,
-            suites: vec![],
-            cases: vec![],
-            ignored: true,
-        };
-        let r = s.start();
-        assert!(matches!(r.result, TestResult::Skip));
-    }
+//     #[test]
+//     fn ignored_suite_is_skipped() {
+//         let s = TestSuite {
+//             name: None,
+//             suites: vec![],
+//             cases: vec![],
+//             ignored: true,
+//         };
+//         let r = s.start();
+//         assert!(matches!(r.result, TestResult::Skip));
+//     }
 
-    #[test]
-    fn suite_with_inner_suites_is_recursively_run() {
-        let s = TestSuite {
-            suites: vec![
-                TestSuite {
-                    ..Default::default()
-                },
-                TestSuite {
-                    ..Default::default()
-                },
-            ],
-            cases: vec![TestCase::new(
-                "",
-                Box::new(DummyTestable::new(Report::pass())),
-            )],
-            ..Default::default()
-        };
-        let r = s.start();
-        assert!(matches!(r.result, TestResult::Pass));
-    }
-}
+//     #[test]
+//     fn suite_with_inner_suites_is_recursively_run() {
+//         let s = TestSuite {
+//             suites: vec![
+//                 TestSuite {
+//                     ..Default::default()
+//                 },
+//                 TestSuite {
+//                     ..Default::default()
+//                 },
+//             ],
+//             cases: vec![TestCase::new(
+//                 "",
+//                 Box::new(DummyTestable::new(Report::pass())),
+//             )],
+//             ..Default::default()
+//         };
+//         let r = s.start();
+//         assert!(matches!(r.result, TestResult::Pass));
+//     }
+// }

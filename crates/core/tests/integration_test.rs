@@ -1,46 +1,46 @@
-use provola_core::Named;
-use provola_core::Testable;
-use provola_core::{FailDetails, Report, TestCase, TestSuite};
+// use provola_core::Named;
+// use provola_core::Testable;
+// use provola_core::{FailDetails, Report, TestCase, TestSuite};
 
-struct PassTestRunnerMock;
+// struct PassTestRunnerMock;
 
-impl Testable for PassTestRunnerMock {
-    fn start(&self) -> Report {
-        Report::pass()
-    }
-}
+// impl Testable for PassTestRunnerMock {
+//     fn start(&self) -> Report {
+//         Report::pass()
+//     }
+// }
 
-struct FailTestRunnerMock;
+// struct FailTestRunnerMock;
 
-impl Testable for FailTestRunnerMock {
-    fn start(&self) -> Report {
-        let details = FailDetails {
-            message: Some("oops!".into()),
-            code_reference: None,
-        };
-        Report::fail_with_details(details)
-    }
-}
+// impl Testable for FailTestRunnerMock {
+//     fn start(&self) -> Report {
+//         let details = FailDetails {
+//             message: Some("oops!".into()),
+//             code_reference: None,
+//         };
+//         Report::fail_with_details(details)
+//     }
+// }
 
-#[test]
-fn test_custom_test_case() {
-    let runner = Box::new(PassTestRunnerMock {});
-    let test_case = TestCase::new("foo", runner);
-    let report = test_case.start();
-    assert!(report.result.is_passed());
-    assert_eq!("foo", test_case.name());
-}
+// #[test]
+// fn test_custom_test_case() {
+//     let runner = Box::new(PassTestRunnerMock {});
+//     let test_case = TestCase::new("foo", runner);
+//     let report = test_case.start();
+//     assert!(report.result.is_passed());
+//     assert_eq!("foo", test_case.name());
+// }
 
-#[test]
-fn test_custom_test_case_failure() {
-    let runner = Box::new(FailTestRunnerMock {});
-    let test_case = TestCase::new("foo", runner);
-    let report = test_case.start();
-    assert!(report.result.is_failed());
-}
+// #[test]
+// fn test_custom_test_case_failure() {
+//     let runner = Box::new(FailTestRunnerMock {});
+//     let test_case = TestCase::new("foo", runner);
+//     let report = test_case.start();
+//     assert!(report.result.is_failed());
+// }
 
-#[test]
-fn test_test_suite() {
-    let test_suite = TestSuite::new("suite");
-    assert_eq!("suite", test_suite.name.unwrap());
-}
+// #[test]
+// fn test_test_suite() {
+//     let test_suite = TestSuite::new("suite");
+//     assert_eq!("suite", test_suite.name.unwrap());
+// }
