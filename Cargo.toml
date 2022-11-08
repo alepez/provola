@@ -11,6 +11,7 @@ categories = ["development-tools"]
 license = "MIT/Apache-2.0"
 edition = "2021"
 readme = "README.md"
+rust-version = "1.65"
 
 [[bin]]
 path = "crates/app/main.rs"
