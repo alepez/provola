@@ -1,4 +1,30 @@
+[package]
+name = "provola"
+version = "1.0.0"  #:version
+authors = ["Alessandro Pezzato <alessandro@pezzato.net>"]
+description = "A tool for quick development/test cycle in any language"
+documentation = "https://github.com/alepez/provola"
+homepage = "https://github.com/alepez/provola"
+repository = "https://github.com/alepez/provola"
+keywords = ["test"]
+categories = ["development-tools"]
+license = "MIT/Apache-2.0"
+edition = "2021"
+readme = "README.md"
+
+[[bin]]
+path = "crates/app/main.rs"
+name = "provola"
+
 [workspace]
 members = [
-  "provola_core",
+  "crates/core",
 ]
+
+[dependencies]
+
+[build-dependencies]
+
+[dev-dependencies]
+
+[features]
