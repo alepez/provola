@@ -9,12 +9,17 @@ pub struct FailDetails {
     pub code_reference: Option<CodeReference>,
 }
 
+#[derive(Default, Debug, Clone)]
+pub struct AbortDetails {
+    pub error: Option<Error>,
+}
+
 #[derive(Debug, Clone)]
 pub enum TestResult {
     Pass,
     Fail(FailDetails),
     Skip,
-    Abort(Error),
+    Abort(AbortDetails),
     Mixed,
     Empty,
 }
@@ -116,7 +121,9 @@ impl Report {
 
     pub fn not_available() -> Report {
         Report {
-            result: TestResult::Abort(Error::NotAvailable),
+            result: TestResult::Abort(AbortDetails {
+                error: Some(Error::NotAvailable),
+            }),
             duration: None,
             children: Default::default(),
         }
