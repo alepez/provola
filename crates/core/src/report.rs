@@ -9,7 +9,7 @@ pub trait Report {
 }
 
 pub trait PendingReport {
-    fn poll(&self) -> Option<TreeReport>;
+    fn poll(&self) -> Option<NodeReport>;
 }
 
 #[derive(Default, Debug, Clone)]
@@ -41,11 +41,11 @@ pub struct SingleReport {
 
 #[derive(Debug, Clone)]
 pub struct MultiReport {
-    pub children: Vec<SingleReport>,
+    pub children: Vec<NodeReport>,
 }
 
 #[derive(Debug, Clone)]
-pub enum TreeReport {
+pub enum NodeReport {
     Single(SingleReport),
     Multi(MultiReport),
 }
@@ -118,39 +118,58 @@ impl SingleReport {
 
 impl Report for MultiReport {
     fn result(&self) -> TestResult {
-        fold_results(&self.children)
+        fold_results(self.children.iter())
     }
 
     fn duration(&self) -> Option<Duration> {
-        sum_durations(&self.children)
+        sum_durations(self.children.iter())
     }
 }
 
 impl MultiReport {
-    pub fn new(children: Vec<SingleReport>) -> Self {
+    pub fn new(children: Vec<impl Into<NodeReport>>) -> Self {
+        let children = children.into_iter().map(|x| x.into()).collect();
         Self { children }
     }
 }
 
-impl Report for TreeReport {
+impl Report for &NodeReport {
     fn result(&self) -> TestResult {
         match self {
-            TreeReport::Single(x) => x.result(),
-            TreeReport::Multi(x) => x.result(),
+            NodeReport::Single(x) => x.result(),
+            NodeReport::Multi(x) => x.result(),
         }
     }
 
     fn duration(&self) -> Option<Duration> {
         match self {
-            TreeReport::Single(x) => x.duration(),
-            TreeReport::Multi(x) => x.duration(),
+            NodeReport::Single(x) => x.duration(),
+            NodeReport::Multi(x) => x.duration(),
         }
     }
 }
 
-fn fold_results(reports: &[SingleReport]) -> TestResult {
-    let all_passed = reports.iter().all(|x| x.result.is_passed());
-    let all_failed = reports.iter().all(|x| x.result.is_failed());
+impl From<SingleReport> for NodeReport {
+    fn from(x: SingleReport) -> Self {
+        NodeReport::Single(x)
+    }
+}
+
+impl From<MultiReport> for NodeReport {
+    fn from(x: MultiReport) -> Self {
+        NodeReport::Multi(x)
+    }
+}
+
+fn fold_results<T>(mut reports: T) -> TestResult
+where
+    T: Iterator + Clone,
+    T::Item: Report,
+{
+    let all_passed = reports.clone().all(|x| x.result().is_passed());
+    let all_failed = reports.all(|x| x.result().is_failed());
+
+    dbg!([all_passed, all_failed]);
 
     match (all_passed, all_failed) {
         (true, false) => TestResult::Pass,
@@ -159,11 +178,15 @@ fn fold_results(reports: &[SingleReport]) -> TestResult {
     }
 }
 
-fn sum_durations(reports: &[SingleReport]) -> Option<Duration> {
+fn sum_durations<T>(reports: T) -> Option<Duration>
+where
+    T: Iterator,
+    T::Item: Report,
+{
     let mut duration = Duration::seconds(0);
 
     for report in reports {
-        duration = duration.add(report.duration?);
+        duration = duration.add(report.duration()?);
     }
 
     Some(duration)
@@ -199,7 +222,11 @@ mod tests {
 
     #[test]
     fn test_sum_durations_of_nothings_gives_zero() {
-        assert_eq!(Some(Duration::seconds(0)), sum_durations(&vec![]));
+        let children: Vec<SingleReport> = vec![];
+        assert_eq!(
+            Some(Duration::seconds(0)),
+            sum_durations(children.into_iter())
+        );
     }
 
     #[test]
@@ -223,15 +250,17 @@ mod tests {
         assert_eq!(None, multi.duration());
     }
 
-    // #[test]
-    // fn test_sum_durations_of_reports_with_children() {
-    //     let reports = vec![
-    //         Report::pass_with_duration(Duration::seconds(1)),
-    //         Report::new(vec![
-    //             Report::pass_with_duration(Duration::seconds(2)),
-    //             Report::pass_with_duration(Duration::seconds(3)),
-    //         ]),
-    //     ];
-    //     assert_eq!(Some(Duration::seconds(6)), sum_durations(&reports));
-    // }
+    #[test]
+    fn test_sum_durations_of_reports_with_children() {
+        let reports: Vec<NodeReport> = vec![
+            SingleReport::pass_with_duration(Duration::seconds(1)).into(),
+            MultiReport::new(vec![
+                SingleReport::pass_with_duration(Duration::seconds(2)),
+                SingleReport::pass_with_duration(Duration::seconds(3)),
+            ])
+            .into(),
+        ];
+        let report = MultiReport::new(reports);
+        assert_eq!(Some(Duration::seconds(6)), report.duration());
+    }
 }
