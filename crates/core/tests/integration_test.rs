@@ -1,46 +1,84 @@
-// use provola_core::Named;
-// use provola_core::Testable;
-// use provola_core::{FailDetails, Report, TestCase, TestSuite};
+use chrono::Duration;
 
-// struct PassTestRunnerMock;
+use provola_core::*;
 
-// impl Testable for PassTestRunnerMock {
-//     fn start(&self) -> Report {
-//         Report::pass()
-//     }
-// }
+struct ImmediatelyReadyPendingReport {
+    report: Option<Box<dyn Report>>,
+}
 
-// struct FailTestRunnerMock;
+impl ImmediatelyReadyPendingReport {
+    fn new(report: SingleReport) -> Self {
+        Self {
+            report: Some(Box::new(report)),
+        }
+    }
+}
 
-// impl Testable for FailTestRunnerMock {
-//     fn start(&self) -> Report {
-//         let details = FailDetails {
-//             message: Some("oops!".into()),
-//             code_reference: None,
-//         };
-//         Report::fail_with_details(details)
-//     }
-// }
+impl PendingReport for ImmediatelyReadyPendingReport {
+    fn poll(&mut self) -> Option<Box<dyn Report>> {
+        self.report.take()
+    }
+}
 
-// #[test]
-// fn test_custom_test_case() {
-//     let runner = Box::new(PassTestRunnerMock {});
-//     let test_case = TestCase::new("foo", runner);
-//     let report = test_case.start();
-//     assert!(report.result.is_passed());
-//     assert_eq!("foo", test_case.name());
-// }
+struct PassTestCaseMock;
 
-// #[test]
-// fn test_custom_test_case_failure() {
-//     let runner = Box::new(FailTestRunnerMock {});
-//     let test_case = TestCase::new("foo", runner);
-//     let report = test_case.start();
-//     assert!(report.result.is_failed());
-// }
+impl Ignorable for PassTestCaseMock {}
 
-// #[test]
-// fn test_test_suite() {
-//     let test_suite = TestSuite::new("suite");
-//     assert_eq!("suite", test_suite.name.unwrap());
-// }
+impl Testable for PassTestCaseMock {
+    fn start(&self) -> Box<dyn PendingReport> {
+        Box::new(ImmediatelyReadyPendingReport::new(SingleReport {
+            result: TestResult::Pass,
+            duration: Some(Duration::seconds(1)),
+        }))
+    }
+}
+
+impl Named for PassTestCaseMock {
+    fn name(&self) -> &str {
+        "foo"
+    }
+}
+
+impl TestCase for PassTestCaseMock {}
+
+struct FailTestCaseMock;
+
+impl Ignorable for FailTestCaseMock {}
+
+impl Testable for FailTestCaseMock {
+    fn start(&self) -> Box<dyn PendingReport> {
+        Box::new(ImmediatelyReadyPendingReport::new(SingleReport {
+            result: TestResult::Fail(None),
+            duration: Some(Duration::seconds(1)),
+        }))
+    }
+}
+
+impl TestCase for FailTestCaseMock {}
+
+impl Named for FailTestCaseMock {
+    fn name(&self) -> &str {
+        "foo"
+    }
+}
+
+#[test]
+fn test_custom_test_case() {
+    let test_case = PassTestCaseMock;
+    let report = test_case.start().poll().unwrap();
+    assert!(report.result().is_passed());
+    assert_eq!("foo", test_case.name());
+}
+
+#[test]
+fn test_custom_test_case_failure() {
+    let test_case = FailTestCaseMock;
+    let report = test_case.start().poll().unwrap();
+    assert!(report.result().is_failed());
+}
+
+#[test]
+fn test_test_suite() {
+    // let test_suite = TestSuite::new("suite");
+    // assert_eq!("suite", test_suite.name.unwrap());
+}

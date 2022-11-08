@@ -5,7 +5,8 @@ mod report;
 mod test_case;
 mod testable;
 
-pub use named::Named;
-pub use report::FailDetails;
-pub use test_case::TestCase;
-pub use testable::Testable;
+pub use named::*;
+pub use report::*;
+pub use report::*;
+pub use test_case::*;
+pub use testable::*;
