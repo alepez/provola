@@ -11,14 +11,14 @@ pub struct TestSuite {
 }
 
 impl Testable for TestSuite {
-    fn run(&self) -> Report {
+    fn start(&self) -> Report {
         if self.ignored {
             return Report::skipped();
         }
 
         let mut children = Vec::new();
-        children.extend(self.cases.iter().map(|t| t.run()));
-        children.extend(self.suites.iter().map(|t| t.run()));
+        children.extend(self.cases.iter().map(|t| t.start()));
+        children.extend(self.suites.iter().map(|t| t.start()));
         Report::with_children(children)
     }
 
@@ -52,7 +52,7 @@ mod tests {
             cases: vec![],
             ignored: true,
         };
-        let r = s.run();
+        let r = s.start();
         assert!(matches!(r.result, TestResult::Skipped));
     }
 
@@ -73,7 +73,7 @@ mod tests {
             )],
             ..Default::default()
         };
-        let r = s.run();
+        let r = s.start();
         assert!(matches!(r.result, TestResult::Passed));
     }
 }

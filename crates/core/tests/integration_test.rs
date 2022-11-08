@@ -5,7 +5,7 @@ use provola_core::{FailureDetails, Report, TestCase, TestSuite};
 struct PassTestRunnerMock;
 
 impl Testable for PassTestRunnerMock {
-    fn run(&self) -> Report {
+    fn start(&self) -> Report {
         Report::pass()
     }
 }
@@ -13,7 +13,7 @@ impl Testable for PassTestRunnerMock {
 struct FailTestRunnerMock;
 
 impl Testable for FailTestRunnerMock {
-    fn run(&self) -> Report {
+    fn start(&self) -> Report {
         let details = FailureDetails {
             message: Some("oops!".into()),
             code_reference: None,
@@ -26,7 +26,7 @@ impl Testable for FailTestRunnerMock {
 fn test_custom_test_case() {
     let runner = Box::new(PassTestRunnerMock {});
     let test_case = TestCase::new("foo", runner);
-    let report = test_case.run();
+    let report = test_case.start();
     assert!(report.result.is_passed());
     assert_eq!("foo", test_case.name());
 }
@@ -35,7 +35,7 @@ fn test_custom_test_case() {
 fn test_custom_test_case_failure() {
     let runner = Box::new(FailTestRunnerMock {});
     let test_case = TestCase::new("foo", runner);
-    let report = test_case.run();
+    let report = test_case.start();
     assert!(report.result.is_failed());
 }
 

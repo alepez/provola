@@ -9,8 +9,8 @@ pub struct TestCase {
 }
 
 impl Testable for TestCase {
-    fn run(&self) -> Report {
-        self.runner.run()
+    fn start(&self) -> Report {
+        self.runner.start()
     }
 
     fn is_ignored(&self) -> bool {

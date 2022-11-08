@@ -2,7 +2,7 @@ use crate::report::Report;
 use std::time::Duration;
 
 pub trait Testable: Send {
-    fn run(&self) -> Report {
+    fn start(&self) -> Report {
         Report::not_available()
     }
 
@@ -29,7 +29,7 @@ impl DummyTestable {
 }
 
 impl Testable for DummyTestable {
-    fn run(&self) -> Report {
+    fn start(&self) -> Report {
         std::thread::sleep(self.delay);
         self.report.clone()
     }

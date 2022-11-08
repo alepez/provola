@@ -7,7 +7,7 @@ pub struct Collection {
 }
 
 impl Testable for Collection {
-    fn run(&self) -> Report {
+    fn start(&self) -> Report {
         if self.ignored {
             return Report::skipped();
         }
@@ -20,7 +20,7 @@ impl Testable for Collection {
             };
         }
 
-        let children = self.items.iter().map(|t| t.run()).collect();
+        let children = self.items.iter().map(|t| t.start()).collect();
 
         Report::with_children(children)
     }
@@ -41,7 +41,7 @@ mod tests {
             items: Default::default(),
             ignored: true,
         };
-        let r = c.run();
+        let r = c.start();
         assert!(matches!(r.result, TestResult::Skipped));
     }
 
@@ -51,7 +51,7 @@ mod tests {
             items: Default::default(),
             ignored: false,
         };
-        let r = c.run();
+        let r = c.start();
         assert!(matches!(dbg!(&r.result), TestResult::Empty));
     }
 }
