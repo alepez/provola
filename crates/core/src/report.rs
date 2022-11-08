@@ -9,7 +9,7 @@ pub trait Report {
 }
 
 pub trait PendingReport {
-    fn poll(&self) -> Option<NodeReport>;
+    fn poll(&self) -> Option<Box<dyn Report>>;
 }
 
 #[derive(Default, Debug, Clone)]
