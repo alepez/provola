@@ -27,16 +27,6 @@ pub enum NodeReport {
     Multi(MultiReport),
 }
 
-impl TestResult {
-    pub fn is_passed(&self) -> bool {
-        matches!(self, TestResult::Pass)
-    }
-
-    pub fn is_failed(&self) -> bool {
-        matches!(self, TestResult::Fail(_))
-    }
-}
-
 impl Report for SingleReport {
     fn result(&self) -> TestResult {
         self.result.clone()

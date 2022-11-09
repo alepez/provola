@@ -21,3 +21,13 @@ pub enum TestResult {
     Mixed,
     Empty,
 }
+
+impl TestResult {
+    pub fn is_passed(&self) -> bool {
+        matches!(self, TestResult::Pass)
+    }
+
+    pub fn is_failed(&self) -> bool {
+        matches!(self, TestResult::Fail(_))
+    }
+}
