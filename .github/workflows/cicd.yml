@@ -241,6 +241,8 @@ jobs:
         args: --all --locked --target=${{ matrix.job.target }} --verbose --no-default-features
 
     - name: Create tarball
+      if: |
+        steps.is-release.outputs.IS_RELEASE
       id: package
       shell: bash
       run: |
@@ -275,7 +277,9 @@ jobs:
     - name: Create Debian package
       id: debian-package
       shell: bash
-      if: startsWith(matrix.job.os, 'ubuntu')
+      if: |
+        startsWith(matrix.job.os, 'ubuntu') &&
+        steps.is-release.outputs.IS_RELEASE
       run: |
         COPYRIGHT_YEARS="2021 - "$(date "+%Y")
         DPKG_STAGING="${{ env.CICD_INTERMEDIATES_DIR }}/debian-package"
@@ -364,6 +368,7 @@ jobs:
 
     - name: "Artifact upload: tarball"
       uses: actions/upload-artifact@master
+      if: steps.is-release.outputs.IS_RELEASE
       with:
         name: ${{ steps.package.outputs.PKG_NAME }}
         path: ${{ steps.package.outputs.PKG_PATH }}
