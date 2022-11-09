@@ -5,6 +5,7 @@ mod pending_report;
 mod report;
 mod report_data;
 mod test_case;
+mod test_suite;
 mod testable;
 
 pub use named::*;
