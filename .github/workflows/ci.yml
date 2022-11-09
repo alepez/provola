@@ -1,6 +1,5 @@
-# Continuous integration/Continuous delivery
 # Inspired by https://github.com/sharkdp/bat
-name: CICD
+name: CI
 
 env:
   MIN_SUPPORTED_RUST_VERSION: "1.65.0"
