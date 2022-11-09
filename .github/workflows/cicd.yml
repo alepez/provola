@@ -240,13 +240,6 @@ jobs:
         command: check
         args: --all --locked --target=${{ matrix.job.target }} --verbose --no-default-features
 
-    - name: "Feature check: egui"
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: ${{ matrix.job.use-cross }}
-        command: check
-        args: --all --locked --target=${{ matrix.job.target }} --verbose --no-default-features --features egui
-
     - name: Create tarball
       id: package
       shell: bash
