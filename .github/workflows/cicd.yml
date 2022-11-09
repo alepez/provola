@@ -449,9 +449,9 @@ jobs:
       uses: actions-rs/grcov@v0.1
 
     - name: Upload coverage results (to Codecov.io)
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       with:
-        file: ${{ steps.coverage.outputs.report }}
+        files: ${{ steps.coverage.outputs.report }}
         flags: ${{ steps.vars.outputs.CODECOV_FLAGS }}
         name: codecov-umbrella
         fail_ci_if_error: false
