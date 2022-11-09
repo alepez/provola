@@ -3,7 +3,7 @@
 name: CICD
 
 env:
-  MIN_SUPPORTED_RUST_VERSION: "1.56.0"
+  MIN_SUPPORTED_RUST_VERSION: "1.65.0"
   CICD_INTERMEDIATES_DIR: "_cicd-intermediates"
   # Force color terminal, needed for testing reporters
   # See https://github.com/mackwic/colored and https://bixense.com/clicolors
@@ -21,7 +21,7 @@ on:
 jobs:
   ensure_cargo_fmt:
     name: Ensure 'cargo fmt' has been run
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
@@ -48,7 +48,7 @@ jobs:
 
   min_version:
     name: Minimum supported rust version
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
@@ -92,7 +92,7 @@ jobs:
 # TODO Documentation
 # documentation:
 #   name: Documentation
-#   runs-on: ubuntu-20.04
+#   runs-on: ubuntu-22.04
 #   steps:
 #   - name: Git checkout
 #     uses: actions/checkout@v2
@@ -117,18 +117,18 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { target: x86_64-unknown-linux-gnu    , os: ubuntu-20.04                  }
+          - { target: x86_64-unknown-linux-gnu    , os: ubuntu-22.04                  }
           # TODO Enable other toolchains
-          # - { target: aarch64-unknown-linux-gnu   , os: ubuntu-20.04, use-cross: true }
-          # - { target: arm-unknown-linux-gnueabihf , os: ubuntu-20.04, use-cross: true }
-          # - { target: arm-unknown-linux-musleabihf, os: ubuntu-20.04, use-cross: true }
+          # - { target: aarch64-unknown-linux-gnu   , os: ubuntu-22.04, use-cross: true }
+          # - { target: arm-unknown-linux-gnueabihf , os: ubuntu-22.04, use-cross: true }
+          # - { target: arm-unknown-linux-musleabihf, os: ubuntu-22.04, use-cross: true }
           # - { target: i686-pc-windows-msvc        , os: windows-2019                  }
-          # - { target: i686-unknown-linux-gnu      , os: ubuntu-20.04, use-cross: true }
-          # - { target: i686-unknown-linux-musl     , os: ubuntu-20.04, use-cross: true }
+          # - { target: i686-unknown-linux-gnu      , os: ubuntu-22.04, use-cross: true }
+          # - { target: i686-unknown-linux-musl     , os: ubuntu-22.04, use-cross: true }
           # - { target: x86_64-apple-darwin         , os: macos-10.15                   }
           # - { target: x86_64-pc-windows-gnu       , os: windows-2019                  }
           # - { target: x86_64-pc-windows-msvc      , os: windows-2019                  }
-          # - { target: x86_64-unknown-linux-musl   , os: ubuntu-20.04, use-cross: true }
+          # - { target: x86_64-unknown-linux-musl   , os: ubuntu-22.04, use-cross: true }
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
@@ -401,7 +401,7 @@ jobs:
 
   coverage:
     name: Code Coverage
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
@@ -460,7 +460,7 @@ jobs:
 
   publish_crates:
     name: Publish crates
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - ensure_cargo_fmt
       - min_version
