@@ -1,36 +1,10 @@
-use super::code::CodeReference;
-use super::error::Error;
+use crate::{report_data::{TestResult, AbortDetails, FailDetails}, error::Error};
 use chrono::Duration;
 use std::ops::Add;
 
 pub trait Report {
     fn result(&self) -> TestResult;
     fn duration(&self) -> Option<Duration>;
-}
-
-pub trait PendingReport {
-    fn poll(&mut self) -> Option<Box<dyn Report>>;
-}
-
-#[derive(Default, Debug, Clone)]
-pub struct FailDetails {
-    pub message: Option<String>,
-    pub code_reference: Option<CodeReference>,
-}
-
-#[derive(Default, Debug, Clone)]
-pub struct AbortDetails {
-    pub error: Option<Error>,
-}
-
-#[derive(Debug, Clone)]
-pub enum TestResult {
-    Pass,
-    Fail(Option<FailDetails>),
-    Skip,
-    Abort(Option<AbortDetails>),
-    Mixed,
-    Empty,
 }
 
 #[derive(Debug, Clone)]
