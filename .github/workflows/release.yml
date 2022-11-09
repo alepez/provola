@@ -1,115 +1,19 @@
-# Continuous integration/Continuous delivery
 # Inspired by https://github.com/sharkdp/bat
-name: CICD
+name: Release
 
 env:
-  MIN_SUPPORTED_RUST_VERSION: "1.56.0"
+  MIN_SUPPORTED_RUST_VERSION: "1.65.0"
   CICD_INTERMEDIATES_DIR: "_cicd-intermediates"
   # Force color terminal, needed for testing reporters
   # See https://github.com/mackwic/colored and https://bixense.com/clicolors
   CLICOLOR_FORCE: 1
 
 on:
-  workflow_dispatch:
-  pull_request:
   push:
-    branches:
-      - main
     tags:
-      - '*'
+      - 'v*'
 
 jobs:
-  ensure_cargo_fmt:
-    name: Ensure 'cargo fmt' has been run
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Checkout source code
-      uses: actions/checkout@v2
-
-    - name: Cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: cargo-fmt-${{ hashFiles('**/Cargo.lock') }}
-
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        default: true
-        profile: minimal
-        components: rustfmt
-
-    - run: cargo fmt --all -- --check
-
-  min_version:
-    name: Minimum supported rust version
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Checkout source code
-      uses: actions/checkout@v2
-
-    - name: Cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: cargo-min-version-${{ hashFiles('**/Cargo.lock') }}
-
-    - name: Install prerequisites
-      shell: bash
-      run: |
-       sudo apt-get install -y build-essential libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
-
-    - name: Install rust toolchain (v${{ env.MIN_SUPPORTED_RUST_VERSION }})
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: ${{ env.MIN_SUPPORTED_RUST_VERSION }}
-        default: true
-        profile: minimal # minimal component installation (ie, no documentation)
-        components: clippy
-
-    - name: Run clippy (on minimum supported rust version to prevent warnings we can't fix)
-      uses: actions-rs/cargo@v1
-      with:
-        command: clippy
-        args: --all --locked --all-targets --all-features -- --allow clippy::unknown_clippy_lints
-
-    - name: Run tests
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --all --locked
-
-# TODO Documentation
-# documentation:
-#   name: Documentation
-#   runs-on: ubuntu-20.04
-#   steps:
-#   - name: Git checkout
-#     uses: actions/checkout@v2
-#   - name: Install Rust toolchain
-#     uses: actions-rs/toolchain@v1
-#     with:
-#       toolchain: stable
-#       default: true
-#       profile: minimal
-#   - name: Check documentation
-#     env:
-#       RUSTDOCFLAGS: -D warnings
-#     uses: actions-rs/cargo@v1
-#     with:
-#       command: doc
-#       args: --all --locked --no-deps --document-private-items --all-features
-
   build:
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
     runs-on: ${{ matrix.job.os }}
@@ -117,18 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { target: x86_64-unknown-linux-gnu    , os: ubuntu-20.04                  }
-          # TODO Enable other toolchains
-          # - { target: aarch64-unknown-linux-gnu   , os: ubuntu-20.04, use-cross: true }
-          # - { target: arm-unknown-linux-gnueabihf , os: ubuntu-20.04, use-cross: true }
-          # - { target: arm-unknown-linux-musleabihf, os: ubuntu-20.04, use-cross: true }
-          # - { target: i686-pc-windows-msvc        , os: windows-2019                  }
-          # - { target: i686-unknown-linux-gnu      , os: ubuntu-20.04, use-cross: true }
-          # - { target: i686-unknown-linux-musl     , os: ubuntu-20.04, use-cross: true }
-          # - { target: x86_64-apple-darwin         , os: macos-10.15                   }
-          # - { target: x86_64-pc-windows-gnu       , os: windows-2019                  }
-          # - { target: x86_64-pc-windows-msvc      , os: windows-2019                  }
-          # - { target: x86_64-unknown-linux-musl   , os: ubuntu-20.04, use-cross: true }
+          - { target: x86_64-unknown-linux-gnu    , os: ubuntu-22.04                  }
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
@@ -148,8 +41,6 @@ jobs:
       shell: bash
       run: |
         case ${{ matrix.job.target }} in
-          arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
-          aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
           x86_64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install build-essential libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
         esac
 
@@ -214,8 +105,8 @@ jobs:
           "${STRIP}" "${BIN_PATH}"
         fi
         # Let subsequent steps know where to find the (stripped) bin
-        echo ::set-output name=BIN_PATH::${BIN_PATH}
-        echo ::set-output name=BIN_NAME::${BIN_NAME}
+        echo "BIN_PATH=${BIN_PATH}" >> $GITHUB_OUTPUT
+        echo "BIN_NAME=${BIN_NAME}" >> $GITHUB_OUTPUT
 
     - name: Set testing options
       id: test-options
@@ -224,7 +115,7 @@ jobs:
         # test only library unit tests and binary for arm-type targets
         unset CARGO_TEST_OPTIONS
         unset CARGO_TEST_OPTIONS ; case ${{ matrix.job.target }} in arm-* | aarch64-*) CARGO_TEST_OPTIONS="--lib --bin ${PROJECT_NAME}" ;; esac;
-        echo ::set-output name=CARGO_TEST_OPTIONS::${CARGO_TEST_OPTIONS}
+        echo "CARGO_TEST_OPTIONS=${CARGO_TEST_OPTIONS}" >> $GITHUB_OUTPUT
 
     - name: Run tests
       uses: actions-rs/cargo@v1
@@ -240,13 +131,6 @@ jobs:
         command: check
         args: --all --locked --target=${{ matrix.job.target }} --verbose --no-default-features
 
-    - name: "Feature check: egui"
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: ${{ matrix.job.use-cross }}
-        command: check
-        args: --all --locked --target=${{ matrix.job.target }} --verbose --no-default-features --features egui
-
     - name: Create tarball
       id: package
       shell: bash
@@ -254,7 +138,7 @@ jobs:
         PKG_suffix=".tar.gz" ; case ${{ matrix.job.target }} in *-pc-windows-*) PKG_suffix=".zip" ;; esac;
         PKG_BASENAME=${PROJECT_NAME}-v${PROJECT_VERSION}-${{ matrix.job.target }}
         PKG_NAME=${PKG_BASENAME}${PKG_suffix}
-        echo ::set-output name=PKG_NAME::${PKG_NAME}
+        echo "PKG_NAME=${PKG_NAME}" >> $GITHUB_OUTPUT
         PKG_STAGING="${{ env.CICD_INTERMEDIATES_DIR }}/package"
         ARCHIVE_DIR="${PKG_STAGING}/${PKG_BASENAME}/"
         mkdir -p "${ARCHIVE_DIR}"
@@ -276,8 +160,8 @@ jobs:
         esac;
         popd >/dev/null
         # Let subsequent steps know where to find the compressed package
-        echo ::set-output name=PKG_PATH::"${PKG_STAGING}/${PKG_NAME}"
-        echo ::set-output name=ARCHIVE_DIR::"${ARCHIVE_DIR}"
+        echo "PKG_PATH=${PKG_STAGING}/${PKG_NAME}" >> $GITHUB_OUTPUT
+        echo "ARCHIVE_DIR=${ARCHIVE_DIR}" >> $GITHUB_OUTPUT
 
     - name: Create Debian package
       id: debian-package
@@ -301,7 +185,7 @@ jobs:
           *) DPKG_ARCH=notset ;;
         esac;
         DPKG_NAME="${DPKG_BASENAME}_${DPKG_VERSION}_${DPKG_ARCH}.deb"
-        echo ::set-output name=DPKG_NAME::${DPKG_NAME}
+        echo "DPKG_NAME=${DPKG_NAME}" >> $GITHUB_OUTPUT
         # Binary
         install -Dm755 "${{ steps.strip.outputs.BIN_PATH }}" "${DPKG_DIR}/usr/bin/${{ steps.strip.outputs.BIN_NAME }}"
         # Autocompletion files
@@ -365,7 +249,7 @@ jobs:
           A cat(1) clone with syntax highlighting and Git integration.
         EOF
         DPKG_PATH="${DPKG_STAGING}/${DPKG_NAME}"
-        echo ::set-output name=DPKG_PATH::${DPKG_PATH}
+        echo "DPKG_PATH=${DPKG_PATH}" >> $GITHUB_OUTPUT
         # build dpkg
         fakeroot dpkg-deb --build "${DPKG_DIR}" "${DPKG_PATH}"
 
@@ -382,16 +266,8 @@ jobs:
         name: ${{ steps.debian-package.outputs.DPKG_NAME }}
         path: ${{ steps.debian-package.outputs.DPKG_PATH }}
 
-    - name: Check for release
-      id: is-release
-      shell: bash
-      run: |
-        unset IS_RELEASE ; if [[ $GITHUB_REF =~ ^refs/tags/v[0-9].* ]]; then IS_RELEASE='true' ; fi
-        echo ::set-output name=IS_RELEASE::${IS_RELEASE}
-
     - name: Publish archives and packages
       uses: softprops/action-gh-release@v1
-      if: steps.is-release.outputs.IS_RELEASE
       with:
         files: |
           ${{ steps.package.outputs.PKG_PATH }}
@@ -401,7 +277,7 @@ jobs:
 
   coverage:
     name: Code Coverage
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
@@ -429,11 +305,11 @@ jobs:
         # target-specific options
         # * CODECOV_FLAGS
         CODECOV_FLAGS=$( echo "${{ matrix.job.os }}" | sed 's/[^[:alnum:]]/_/g' )
-        echo ::set-output name=CODECOV_FLAGS::${CODECOV_FLAGS}
+        echo "CODECOV_FLAGS=${CODECOV_FLAGS}" >> $GITHUB_OUTPUT
 
     - uses: actions-rs/toolchain@v1
       with:
-        toolchain: nightly-2021-12-27
+        toolchain: nightly-2022-11-08
         default: true
         profile: minimal
 
@@ -451,16 +327,16 @@ jobs:
       uses: actions-rs/grcov@v0.1
 
     - name: Upload coverage results (to Codecov.io)
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       with:
-        file: ${{ steps.coverage.outputs.report }}
+        files: ${{ steps.coverage.outputs.report }}
         flags: ${{ steps.vars.outputs.CODECOV_FLAGS }}
         name: codecov-umbrella
         fail_ci_if_error: false
 
   publish_crates:
     name: Publish crates
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - ensure_cargo_fmt
       - min_version
@@ -474,15 +350,7 @@ jobs:
           toolchain: stable
           override: true
 
-    - name: Check for release
-      id: is-release
-      shell: bash
-      run: |
-        unset IS_RELEASE ; if [[ $GITHUB_REF =~ ^refs/tags/v[0-9].* ]]; then IS_RELEASE='true' ; fi
-        echo ::set-output name=IS_RELEASE::${IS_RELEASE}
-
     - name: Publish crates
       uses: katyo/publish-crates@v1
-      if: steps.is-release.outputs.IS_RELEASE
       with:
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}

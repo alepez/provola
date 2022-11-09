@@ -1,0 +1,297 @@
+# Inspired by https://github.com/sharkdp/bat
+name: CI
+
+env:
+  MIN_SUPPORTED_RUST_VERSION: "1.65.0"
+  CICD_INTERMEDIATES_DIR: "_cicd-intermediates"
+  # Force color terminal, needed for testing reporters
+  # See https://github.com/mackwic/colored and https://bixense.com/clicolors
+  CLICOLOR_FORCE: 1
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  ensure_cargo_fmt:
+    name: Ensure 'cargo fmt' has been run
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: cargo-fmt-${{ hashFiles('**/Cargo.lock') }}
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        default: true
+        profile: minimal
+        components: rustfmt
+
+    - run: cargo fmt --all -- --check
+
+  min_version:
+    name: Minimum supported rust version
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: cargo-min-version-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Install prerequisites
+      shell: bash
+      run: |
+       sudo apt-get install -y build-essential libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+
+    - name: Install rust toolchain (v${{ env.MIN_SUPPORTED_RUST_VERSION }})
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ env.MIN_SUPPORTED_RUST_VERSION }}
+        default: true
+        profile: minimal # minimal component installation (ie, no documentation)
+        components: clippy
+
+    - name: Run clippy (on minimum supported rust version to prevent warnings we can't fix)
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: --all --locked --all-targets --all-features -- --allow clippy::unknown_clippy_lints
+
+    - name: Run tests
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --all --locked
+
+# TODO Documentation
+# documentation:
+#   name: Documentation
+#   runs-on: ubuntu-22.04
+#   steps:
+#   - name: Git checkout
+#     uses: actions/checkout@v2
+#   - name: Install Rust toolchain
+#     uses: actions-rs/toolchain@v1
+#     with:
+#       toolchain: stable
+#       default: true
+#       profile: minimal
+#   - name: Check documentation
+#     env:
+#       RUSTDOCFLAGS: -D warnings
+#     uses: actions-rs/cargo@v1
+#     with:
+#       command: doc
+#       args: --all --locked --no-deps --document-private-items --all-features
+
+  build:
+    name: ${{ matrix.job.target }} (${{ matrix.job.os }})
+    runs-on: ${{ matrix.job.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - { target: x86_64-unknown-linux-gnu    , os: ubuntu-22.04                  }
+          # TODO Enable other toolchains
+          # - { target: aarch64-unknown-linux-gnu   , os: ubuntu-22.04, use-cross: true }
+          # - { target: arm-unknown-linux-gnueabihf , os: ubuntu-22.04, use-cross: true }
+          # - { target: arm-unknown-linux-musleabihf, os: ubuntu-22.04, use-cross: true }
+          # - { target: i686-pc-windows-msvc        , os: windows-2019                  }
+          # - { target: i686-unknown-linux-gnu      , os: ubuntu-22.04, use-cross: true }
+          # - { target: i686-unknown-linux-musl     , os: ubuntu-22.04, use-cross: true }
+          # - { target: x86_64-apple-darwin         , os: macos-10.15                   }
+          # - { target: x86_64-pc-windows-gnu       , os: windows-2019                  }
+          # - { target: x86_64-pc-windows-msvc      , os: windows-2019                  }
+          # - { target: x86_64-unknown-linux-musl   , os: ubuntu-22.04, use-cross: true }
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ matrix.target }}-${{ matrix.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Install prerequisites
+      shell: bash
+      run: |
+        case ${{ matrix.job.target }} in
+          arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
+          aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
+          x86_64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install build-essential libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+        esac
+
+    - name: Extract crate information
+      shell: bash
+      run: |
+        echo "PROJECT_NAME=$(sed -n 's/^name = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> $GITHUB_ENV
+        echo "PROJECT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> $GITHUB_ENV
+        echo "PROJECT_MAINTAINER=$(sed -n 's/^authors = \["\(.*\)"\]/\1/p' Cargo.toml)" >> $GITHUB_ENV
+        echo "PROJECT_HOMEPAGE=$(sed -n 's/^homepage = "\(.*\)"/\1/p' Cargo.toml)" >> $GITHUB_ENV
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: ${{ matrix.job.target }}
+        override: true
+        profile: minimal # minimal component installation (ie, no documentation)
+
+    - name: Show version information (Rust, cargo, GCC)
+      shell: bash
+      run: |
+        gcc --version || true
+        rustup -V
+        rustup toolchain list
+        rustup default
+        cargo -V
+        rustc -V
+
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        use-cross: ${{ matrix.job.use-cross }}
+        command: build
+        args: --all --locked --release --target=${{ matrix.job.target }}
+
+    - name: Strip debug information from executable
+      id: strip
+      shell: bash
+      run: |
+        # Figure out suffix of binary
+        EXE_suffix=""
+        case ${{ matrix.job.target }} in
+          *-pc-windows-*) EXE_suffix=".exe" ;;
+        esac;
+        # Figure out what strip tool to use if any
+        STRIP="strip"
+        case ${{ matrix.job.target }} in
+          arm-unknown-linux-*) STRIP="arm-linux-gnueabihf-strip" ;;
+          aarch64-unknown-linux-gnu) STRIP="aarch64-linux-gnu-strip" ;;
+          *-pc-windows-msvc) STRIP="" ;;
+        esac;
+        # Setup paths
+        BIN_DIR="${{ env.CICD_INTERMEDIATES_DIR }}/stripped-release-bin/"
+        mkdir -p "${BIN_DIR}"
+        BIN_NAME="${{ env.PROJECT_NAME }}${EXE_suffix}"
+        BIN_PATH="${BIN_DIR}/${BIN_NAME}"
+        # Copy the release build binary to the result location
+        cp "target/${{ matrix.job.target }}/release/${BIN_NAME}" "${BIN_DIR}"
+        # Also strip if possible
+        if [ -n "${STRIP}" ]; then
+          "${STRIP}" "${BIN_PATH}"
+        fi
+        # Let subsequent steps know where to find the (stripped) bin
+        echo "BIN_PATH=${BIN_PATH}" >> $GITHUB_OUTPUT
+        echo "BIN_NAME=${BIN_NAME}" >> $GITHUB_OUTPUT
+
+    - name: Set testing options
+      id: test-options
+      shell: bash
+      run: |
+        # test only library unit tests and binary for arm-type targets
+        unset CARGO_TEST_OPTIONS
+        unset CARGO_TEST_OPTIONS ; case ${{ matrix.job.target }} in arm-* | aarch64-*) CARGO_TEST_OPTIONS="--lib --bin ${PROJECT_NAME}" ;; esac;
+        echo "CARGO_TEST_OPTIONS=${CARGO_TEST_OPTIONS}" >> $GITHUB_OUTPUT
+
+    - name: Run tests
+      uses: actions-rs/cargo@v1
+      with:
+        use-cross: ${{ matrix.job.use-cross }}
+        command: test
+        args: --all --locked --target=${{ matrix.job.target }} ${{ steps.test-options.outputs.CARGO_TEST_OPTIONS}}
+
+    - name: "Feature check: no default features"
+      uses: actions-rs/cargo@v1
+      with:
+        use-cross: ${{ matrix.job.use-cross }}
+        command: check
+        args: --all --locked --target=${{ matrix.job.target }} --verbose --no-default-features
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+
+    - name: Install prerequisites
+      shell: bash
+      run: |
+       sudo apt-get install -y build-essential libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: cargo-code-coverage-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Initialize workflow variables
+      id: vars
+      shell: bash
+      run: |
+        # target-specific options
+        # * CODECOV_FLAGS
+        CODECOV_FLAGS=$( echo "${{ matrix.job.os }}" | sed 's/[^[:alnum:]]/_/g' )
+        echo "CODECOV_FLAGS=${CODECOV_FLAGS}" >> $GITHUB_OUTPUT
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly-2022-11-08
+        default: true
+        profile: minimal
+
+    - name: Test
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --all --no-fail-fast
+      env:
+        CARGO_INCREMENTAL: '0'
+        RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off'
+
+    - name: Generate coverage data
+      id: coverage
+      uses: actions-rs/grcov@v0.1
+
+    - name: Upload coverage results (to Codecov.io)
+      uses: codecov/codecov-action@v3
+      with:
+        files: ${{ steps.coverage.outputs.report }}
+        flags: ${{ steps.vars.outputs.CODECOV_FLAGS }}
+        name: codecov-umbrella
+        fail_ci_if_error: false
