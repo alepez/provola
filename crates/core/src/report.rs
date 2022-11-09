@@ -146,8 +146,6 @@ where
     let all_passed = reports.clone().all(|x| x.result().is_passed());
     let all_failed = reports.all(|x| x.result().is_failed());
 
-    dbg!([all_passed, all_failed]);
-
     match (all_passed, all_failed) {
         (true, false) => TestResult::Pass,
         (false, true) => TestResult::Fail(None),
