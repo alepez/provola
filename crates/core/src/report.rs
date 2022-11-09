@@ -1,4 +1,7 @@
-use crate::{report_data::{TestResult, AbortDetails, FailDetails}, error::Error};
+use crate::{
+    error::Error,
+    report_data::{AbortDetails, FailDetails, TestResult},
+};
 use chrono::Duration;
 use std::ops::Add;
 
@@ -101,7 +104,7 @@ impl Report for MultiReport {
 }
 
 impl MultiReport {
-    pub fn new(children: Vec<impl Into<NodeReport>>) -> Self {
+    pub fn new(children: impl IntoIterator<Item = impl Into<NodeReport>>) -> Self {
         let children = children.into_iter().map(|x| x.into()).collect();
         Self { children }
     }
