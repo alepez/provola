@@ -5,7 +5,7 @@ use crate::{
 use chrono::Duration;
 use std::ops::Add;
 
-pub trait Report {
+pub trait Report: core::fmt::Debug {
     fn result(&self) -> TestResult;
     fn duration(&self) -> Option<Duration>;
 }

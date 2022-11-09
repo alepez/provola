@@ -10,7 +10,7 @@ impl From<u32> for CodeLine {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CodeReference {
     path: PathBuf,
     line: CodeLine,

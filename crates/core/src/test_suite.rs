@@ -1,18 +1,19 @@
-use crate::{Ignorable, Named, TestCase, Testable};
+use crate::{Ignorable, Named, Runner, TestCase, Testable};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SingleTestCase {
     name: String,
+    runner: Box<dyn Runner>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MultiTestCase {
     name: String,
     #[allow(dead_code)]
     children: Vec<NodeTestCase>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum NodeTestCase {
     Single(SingleTestCase),
     Multi(MultiTestCase),
@@ -28,16 +29,16 @@ impl Named for SingleTestCase {
 
 impl Testable for SingleTestCase {
     fn start(&self) -> Box<dyn crate::PendingReport> {
-        todo!()
+        self.runner.start()
     }
 }
 
 impl TestCase for SingleTestCase {}
 
 impl SingleTestCase {
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<String>, runner: Box<dyn Runner>) -> Self {
         let name: String = name.into();
-        Self { name }
+        Self { name, runner }
     }
 }
 
@@ -101,23 +102,47 @@ impl From<MultiTestCase> for NodeTestCase {
 
 #[cfg(test)]
 mod tests {
+    use crate::TestResult;
+    use chrono::Duration;
+
     use super::*;
+
+    #[derive(Debug)]
+    struct MockRunner;
+
+    impl Runner for MockRunner {
+        fn start(&self) -> Box<dyn crate::PendingReport> {
+            Box::new(
+                crate::pending_report::ImmediatelyReadyPendingReport::from_result(
+                    TestResult::Pass,
+                    Duration::seconds(1),
+                ),
+            )
+        }
+    }
 
     #[test]
     fn test_single_test_case() {
-        let test_case = SingleTestCase::new("one");
+        let test_case = SingleTestCase::new("one", Box::new(MockRunner));
         assert_eq!("one", test_case.name());
+        let mut report = test_case.start();
+        let report = report.poll();
+        let report = report.unwrap();
+        assert_eq!(TestResult::Pass, report.result());
     }
 
     #[test]
     fn test_test_case_with_children() {
         let children = vec![
-            SingleTestCase::new("one"),
-            SingleTestCase::new("two"),
-            SingleTestCase::new("three"),
+            SingleTestCase::new("one", Box::new(MockRunner)),
+            SingleTestCase::new("two", Box::new(MockRunner)),
+            SingleTestCase::new("three", Box::new(MockRunner)),
         ];
 
         let test_case = MultiTestCase::new("group", children);
         assert_eq!("group", test_case.name());
+        // TODO
+        // let mut report = test_case.start();
+        // let _report = report.poll();
     }
 }

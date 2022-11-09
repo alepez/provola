@@ -2,24 +2,6 @@ use chrono::Duration;
 
 use provola_core::*;
 
-struct ImmediatelyReadyPendingReport {
-    report: Option<Box<dyn Report>>,
-}
-
-impl ImmediatelyReadyPendingReport {
-    fn new(report: SingleReport) -> Self {
-        Self {
-            report: Some(Box::new(report)),
-        }
-    }
-}
-
-impl PendingReport for ImmediatelyReadyPendingReport {
-    fn poll(&mut self) -> Option<Box<dyn Report>> {
-        self.report.take()
-    }
-}
-
 struct PassTestCaseMock;
 
 impl Ignorable for PassTestCaseMock {}
